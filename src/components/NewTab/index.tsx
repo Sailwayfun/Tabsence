@@ -1,17 +1,21 @@
 import { useState, useEffect } from "react";
+import { FieldValue } from "firebase/firestore";
+interface Tab extends chrome.tabs.Tab {
+  lastAccessed: FieldValue;
+}
 const NewTab = () => {
-  const [tabs, setTabs] = useState<chrome.tabs.Tab[]>([]);
+  const [tabs, setTabs] = useState<Tab[]>([]);
   console.log(tabs);
   useEffect(() => {
     chrome.runtime.sendMessage({ action: "getTabs" }, function (response) {
-      if (response && response.tabs) setTabs(response.tabs);
+      if (response) setTabs(response);
     });
   }, []);
   return (
     <div className="mx-auto w-full px-80 py-8">
       <h1 className="mb-4 text-3xl">Your Tabs</h1>
       <ul className="flex flex-col gap-3">
-        {tabs &&
+        {tabs.length > 0 &&
           tabs.map((tab, index) => {
             return (
               <li

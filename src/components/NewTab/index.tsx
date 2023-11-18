@@ -31,7 +31,7 @@ const NewTab = () => {
                 key={index}
                 className="flex items-center gap-3 rounded-lg border px-4 py-2 text-lg"
               >
-                <img src={tab.favIconUrl} className="h-4 w-4" />
+                <img src={tab.favIconUrl} className="h-4 w-4 bg-gray-500" />
                 <a
                   onClick={(e) => openLink(e, tab)}
                   className="cursor-pointer hover:text-gray-500 hover:underline"

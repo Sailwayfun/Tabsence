@@ -40,12 +40,18 @@ chrome.tabs.onUpdated.addListener((_, changeInfo, tab) => {
   }
 });
 
+function getFaviconUrl(url: string) {
+  return `chrome-extension://${
+    chrome.runtime.id
+  }/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`;
+}
+
 function saveTabInfo(tab: chrome.tabs.Tab) {
   if (tab.url && tab.title) {
     const tabData = {
       title: tab.title,
       url: tab.url,
-      favIconUrl: tab.favIconUrl || "",
+      favIconUrl: getFaviconUrl(tab.url) || tab.favIconUrl || "",
       lastAccessed: serverTimestamp(),
     };
 

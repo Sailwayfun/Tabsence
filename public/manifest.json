@@ -10,7 +10,7 @@
       "64": "icons/icon-16.png"
     }
   },
-  "permissions": ["tabs", "activeTab"],
+  "permissions": ["tabs", "activeTab", "favicon"],
   "background": {
     "service_worker": "background.js",
     "type": "module"

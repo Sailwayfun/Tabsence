@@ -20,6 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "prettier.config.cjs"],
+  "include": ["src", "prettier.config.cjs", "firebase-config.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

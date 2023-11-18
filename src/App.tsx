@@ -1,4 +1,7 @@
+import { db } from "../firebase-config.ts";
+
 const App = () => {
+  console.log(db);
   function newTab() {
     chrome.tabs.create({ url: "newTab.html" });
   }

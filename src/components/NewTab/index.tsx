@@ -11,6 +11,15 @@ const NewTab = () => {
       if (response) setTabs(response);
     });
   }, []);
+  function openLink(
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+    tab: Tab,
+  ) {
+    e.preventDefault();
+    if (!tab.url) return;
+    const newTabUrl = tab.url;
+    chrome.tabs.create({ url: newTabUrl });
+  }
   return (
     <div className="mx-auto w-full px-80 py-8">
       <h1 className="mb-4 text-3xl">Your Tabs</h1>
@@ -24,8 +33,8 @@ const NewTab = () => {
               >
                 <img src={tab.favIconUrl} className="h-4 w-4" />
                 <a
-                  href={tab.url}
-                  className="hover:text-gray-500 hover:underline"
+                  onClick={(e) => openLink(e, tab)}
+                  className="cursor-pointer hover:text-gray-500 hover:underline"
                 >
                   {tab.title}
                 </a>

@@ -8,14 +8,23 @@ const NewTab = () => {
     });
   }, []);
   return (
-    <div>
-      <p>This is a new tab</p>
-      <ul>
+    <div className="mx-auto w-full px-80 py-8">
+      <h1 className="mb-4 text-3xl">Your Tabs</h1>
+      <ul className="flex flex-col gap-3">
         {tabs &&
           tabs.map((tab, index) => {
             return (
-              <li key={index}>
-                <a href={tab.url}>{tab.title}</a>
+              <li
+                key={index}
+                className="flex items-center gap-3 rounded-lg border px-4 py-2 text-lg"
+              >
+                <img src={tab.favIconUrl} className="h-4 w-4" />
+                <a
+                  href={tab.url}
+                  className="hover:text-gray-500 hover:underline"
+                >
+                  {tab.title}
+                </a>
               </li>
             );
           })}

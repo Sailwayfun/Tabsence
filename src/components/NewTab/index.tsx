@@ -7,11 +7,23 @@ interface Tab extends chrome.tabs.Tab {
 }
 const NewTab = () => {
   const [tabs, setTabs] = useState<Tab[]>([]);
-  console.log(tabs);
+  const [spaceNames, setSpaceNames] = useState<string[]>([]);
+  const [activePopupId, setActivePopupId] = useState<string | undefined>();
+  console.log("activePopupId", activePopupId);
   useEffect(() => {
     chrome.runtime.sendMessage({ action: "getTabs" }, function (response) {
       if (response) setTabs(response);
     });
+    setSpaceNames([
+      "Unsaved",
+      "AppWorks School",
+      "Family",
+      "Game",
+      "Trip",
+      "Career",
+      "Cooking",
+      "Sports",
+    ]);
   }, []);
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
@@ -22,9 +34,14 @@ const NewTab = () => {
     const newTabUrl = tab.url;
     chrome.tabs.create({ url: newTabUrl });
   }
+  function openSpacesPopup(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    const id = e.currentTarget.dataset.id;
+    console.log("id", id);
+    if (id) setActivePopupId(id);
+  }
   return (
     <div className="flex w-full py-8">
-      <Spaces />
+      <Spaces spaceNames={spaceNames} />
       <div className="flex flex-col">
         <h1 className="mb-4 text-3xl">Your Tabs</h1>
         <ul className="flex flex-col gap-3">
@@ -42,7 +59,25 @@ const NewTab = () => {
                   >
                     {tab.title}
                   </a>
-                  <MoveToSpace />
+                  <MoveToSpace
+                    spaces={spaceNames}
+                    id={tab.id?.toString()}
+                    onOpenSpacesPopup={openSpacesPopup}
+                  />
+                  {tab.id === activePopupId && (
+                    <div className="ml-5 h-14 w-52 rounded-md border px-3">
+                      <label htmlFor={tab.id || "spaces"} className="text-xl">
+                        Move to space:
+                      </label>
+                      <select id={tab.id || "spaces"}>
+                        {spaceNames.map((spaceName) => (
+                          <option value={spaceName} key={spaceName}>
+                            {spaceName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </li>
               );
             })}

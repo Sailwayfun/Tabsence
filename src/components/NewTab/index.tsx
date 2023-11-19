@@ -45,6 +45,7 @@ const NewTab = () => {
   }
   function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
     setSelectedSpace(e.target.value);
+    if (e.target.value === "Unsaved") return;
     const request = {
       action: "moveTab",
       updatedTab: tabs.find((tab) => tab.id === activePopupId),
@@ -52,7 +53,8 @@ const NewTab = () => {
     };
     console.log("request", request);
     chrome.runtime.sendMessage(request, function (response) {
-      if (response) setTabs([...tabs, response]);
+      const oldTabs = tabs.filter((tab) => tab.id !== activePopupId);
+      if (response) setTabs(oldTabs);
     });
     setSelectedSpace(undefined);
   }
@@ -91,11 +93,13 @@ const NewTab = () => {
                         onChange={selectSpace}
                         value={selectedSpace}
                       >
-                        {spaceNames.map((spaceName) => (
-                          <option value={spaceName} key={spaceName}>
-                            {spaceName}
-                          </option>
-                        ))}
+                        {spaceNames.map((spaceName) => {
+                          return (
+                            <option value={spaceName} key={spaceName}>
+                              {spaceName}
+                            </option>
+                          );
+                        })}
                       </select>
                     </div>
                   )}

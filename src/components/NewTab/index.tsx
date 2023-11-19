@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { FieldValue } from "firebase/firestore";
 import Spaces from "./Spaces";
 import MoveToSpace from "./MoveToSpace";
+
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
   spaceId: string;
@@ -44,16 +45,16 @@ const NewTab = () => {
   }
   function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
     setSelectedSpace(e.target.value);
-    chrome.runtime.sendMessage(
-      {
-        action: "moveTab",
-        upDatedtab: tabs.find((tab) => tab.id === activePopupId),
-        spaceName: e.target.value,
-      },
-      function (response) {
-        if (response) setTabs([...tabs, response]);
-      },
-    );
+    const request = {
+      action: "moveTab",
+      updatedTab: tabs.find((tab) => tab.id === activePopupId),
+      spaceName: e.target.value,
+    };
+    console.log("request", request);
+    chrome.runtime.sendMessage(request, function (response) {
+      if (response) setTabs([...tabs, response]);
+    });
+    setSelectedSpace(undefined);
   }
   return (
     <div className="flex w-full py-8">

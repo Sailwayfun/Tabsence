@@ -96,7 +96,8 @@ chrome.runtime.onMessage.addListener(
     sendResponse,
   ) => {
     if (request.action === "moveTab") {
-      const tabDocRef = doc(db, "tabs", `tab-${request.updatedTab.id}`);
+      const tabDocRef = doc(db, "tabs", `${request.updatedTab.id}`);
+      console.log("requestedId", `${request.updatedTab.id}`);
       const spaceCollectionRef = collection(db, "spaces");
       const spaceQuery = query(
         spaceCollectionRef,
@@ -108,6 +109,7 @@ chrome.runtime.onMessage.addListener(
         })
         .catch((error) => {
           console.error("Error updating tab: ", error);
+          sendResponse(null);
         });
       return true;
     }

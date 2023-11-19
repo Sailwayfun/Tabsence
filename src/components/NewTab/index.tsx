@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FieldValue } from "firebase/firestore";
 import Spaces from "./Spaces";
+import MoveToSpace from "./MoveToSpace";
 interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
 }
@@ -22,7 +23,7 @@ const NewTab = () => {
     chrome.tabs.create({ url: newTabUrl });
   }
   return (
-    <div className="flex w-full px-4 py-8">
+    <div className="flex w-full py-8">
       <Spaces />
       <div className="flex flex-col">
         <h1 className="mb-4 text-3xl">Your Tabs</h1>
@@ -32,7 +33,7 @@ const NewTab = () => {
               return (
                 <li
                   key={index}
-                  className="flex items-center gap-3 rounded-lg border px-4 py-2 text-lg"
+                  className="flex items-center gap-3 rounded-lg border px-4 py-2 text-lg hover:bg-slate-300"
                 >
                   <img src={tab.favIconUrl} className="h-4 w-4 bg-gray-500" />
                   <a
@@ -41,6 +42,7 @@ const NewTab = () => {
                   >
                     {tab.title}
                   </a>
+                  <MoveToSpace />
                 </li>
               );
             })}

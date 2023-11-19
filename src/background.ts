@@ -5,6 +5,8 @@ import {
   setDoc,
   getDocs,
   serverTimestamp,
+  query,
+  where,
 } from "firebase/firestore";
 
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
@@ -30,12 +32,14 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
   chrome.tabs.get(activeInfo.tabId, (tab) => {
+    saveSpaceInfo();
     saveTabInfo(tab);
   });
 });
 
 chrome.tabs.onUpdated.addListener((_, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
+    saveSpaceInfo();
     saveTabInfo(tab);
   }
 });
@@ -46,6 +50,23 @@ function getFaviconUrl(url: string) {
   }/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`;
 }
 
+const spaceCollectionRef = collection(db, "spaces");
+const spaceId = doc(spaceCollectionRef).id;
+async function saveSpaceInfo() {
+  const spaceName = "unsaved";
+  const spaceQuery = query(spaceCollectionRef, where("title", "==", spaceName));
+  const spaceSnapshot = await getDocs(spaceQuery);
+  const spaceDocRef = !spaceSnapshot.empty
+    ? spaceSnapshot.docs[0].ref
+    : doc(spaceCollectionRef);
+  const spaceData = {
+    title: spaceName,
+    id: spaceId,
+  };
+  await setDoc(spaceDocRef, spaceData, { merge: true });
+  return;
+}
+
 function saveTabInfo(tab: chrome.tabs.Tab) {
   if (tab.url && tab.title) {
     const tabData = {
@@ -53,8 +74,9 @@ function saveTabInfo(tab: chrome.tabs.Tab) {
       url: tab.url,
       favIconUrl: getFaviconUrl(tab.url) || tab.favIconUrl || "",
       lastAccessed: serverTimestamp(),
+      spaceId,
+      isArchived: false,
     };
-
     const tabDocRef = doc(db, "tabs", `tab-${tab.id}`);
     setDoc(tabDocRef, tabData, { merge: true })
       .then(() => {

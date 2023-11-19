@@ -4,6 +4,8 @@ import Spaces from "./Spaces";
 import MoveToSpace from "./MoveToSpace";
 interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
+  spaceId: string;
+  isArchived: boolean;
 }
 const NewTab = () => {
   const [tabs, setTabs] = useState<Tab[]>([]);

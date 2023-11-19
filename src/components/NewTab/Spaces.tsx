@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 interface SpacesProps {
   spaceNames: string[];
 }
@@ -8,7 +9,7 @@ const Spaces = ({ spaceNames }: SpacesProps) => {
         {spaceNames.map((spaceName) => {
           return (
             <li className="border px-2 py-4 text-white">
-              <a>{spaceName}</a>
+              <Link to={`/${spaceName.toLowerCase()}`}>{spaceName}</Link>
             </li>
           );
         })}

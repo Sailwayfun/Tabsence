@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { FieldValue } from "firebase/firestore";
 import Spaces from "./Spaces";
 import MoveToSpace from "./MoveToSpace";
-interface Tab extends chrome.tabs.Tab {
+export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
   spaceId: string;
   isArchived: boolean;
@@ -11,6 +11,7 @@ const NewTab = () => {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [spaceNames, setSpaceNames] = useState<string[]>([]);
   const [activePopupId, setActivePopupId] = useState<string | undefined>();
+  const [selectedSpace, setSelectedSpace] = useState<string | undefined>();
   console.log("activePopupId", activePopupId);
   useEffect(() => {
     chrome.runtime.sendMessage({ action: "getTabs" }, function (response) {
@@ -40,6 +41,19 @@ const NewTab = () => {
     const id = e.currentTarget.dataset.id;
     console.log("id", id);
     if (id) setActivePopupId(id);
+  }
+  function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
+    setSelectedSpace(e.target.value);
+    chrome.runtime.sendMessage(
+      {
+        action: "moveTab",
+        upDatedtab: tabs.find((tab) => tab.id === activePopupId),
+        spaceName: e.target.value,
+      },
+      function (response) {
+        if (response) setTabs([...tabs, response]);
+      },
+    );
   }
   return (
     <div className="flex w-full py-8">
@@ -71,7 +85,11 @@ const NewTab = () => {
                       <label htmlFor={tab.id || "spaces"} className="text-xl">
                         Move to space:
                       </label>
-                      <select id={tab.id || "spaces"}>
+                      <select
+                        id={tab.id || "spaces"}
+                        onChange={selectSpace}
+                        value={selectedSpace}
+                      >
                         {spaceNames.map((spaceName) => (
                           <option value={spaceName} key={spaceName}>
                             {spaceName}

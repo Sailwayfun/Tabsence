@@ -1,4 +1,5 @@
 import { db } from "../firebase-config";
+import { Tab } from "./components/NewTab";
 import {
   collection,
   doc,
@@ -7,6 +8,10 @@ import {
   serverTimestamp,
   query,
   where,
+  Query,
+  DocumentData,
+  CollectionReference,
+  DocumentReference,
 } from "firebase/firestore";
 
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
@@ -78,12 +83,59 @@ function saveTabInfo(tab: chrome.tabs.Tab) {
       isArchived: false,
     };
     const tabDocRef = doc(db, "tabs", `tab-${tab.id}`);
-    setDoc(tabDocRef, tabData, { merge: true })
-      .then(() => {
-        console.log("Tab info saved successfully");
-      })
-      .catch((error) => {
-        console.error("Error saving tab info: ", error);
-      });
+    setDoc(tabDocRef, tabData, { merge: true }).catch((error) => {
+      console.error("Error saving tab info: ", error);
+    });
+  }
+}
+
+chrome.runtime.onMessage.addListener(
+  (
+    request: { action: string; updatedTab: Tab; spaceName: string },
+    _,
+    sendResponse,
+  ) => {
+    if (request.action === "moveTab") {
+      const tabDocRef = doc(db, "tabs", `tab-${request.updatedTab.id}`);
+      const spaceCollectionRef = collection(db, "spaces");
+      const spaceQuery = query(
+        spaceCollectionRef,
+        where("title", "==", request.spaceName),
+      );
+      upDateSpaceOfTab(spaceQuery, spaceCollectionRef, request, tabDocRef)
+        .then((updatedTab) => {
+          sendResponse(updatedTab);
+        })
+        .catch((error) => {
+          console.error("Error updating tab: ", error);
+        });
+      return true;
+    }
+  },
+);
+async function upDateSpaceOfTab(
+  spaceQuery: Query<DocumentData, DocumentData>,
+  spaceCollectionRef: CollectionReference<DocumentData, DocumentData>,
+  request: { action: string; updatedTab: Tab; spaceName: string },
+  tabDocRef: DocumentReference<DocumentData, DocumentData>,
+) {
+  try {
+    const spaceSnapshot = await getDocs(spaceQuery);
+    const spaceDocRef = !spaceSnapshot.empty
+      ? spaceSnapshot.docs[0].ref
+      : doc(spaceCollectionRef);
+    const spaceData = {
+      title: request.spaceName,
+      id: spaceDocRef.id,
+    };
+    await setDoc(spaceDocRef, spaceData, { merge: true });
+    const tabData = {
+      spaceId: spaceDocRef.id,
+    };
+    await setDoc(tabDocRef, tabData, { merge: true });
+    const upDatedTab = { ...request.updatedTab, spaceId: tabData.spaceId };
+    return upDatedTab;
+  } catch (error) {
+    console.error("Error getting tabs: ", error);
   }
 }

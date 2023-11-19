@@ -103,7 +103,7 @@ chrome.runtime.onMessage.addListener(
         spaceCollectionRef,
         where("title", "==", request.spaceName),
       );
-      upDateSpaceOfTab(spaceQuery, spaceCollectionRef, request, tabDocRef)
+      updateSpaceOfTab(spaceQuery, spaceCollectionRef, request, tabDocRef)
         .then((updatedTab) => {
           sendResponse(updatedTab);
         })
@@ -115,7 +115,7 @@ chrome.runtime.onMessage.addListener(
     }
   },
 );
-async function upDateSpaceOfTab(
+async function updateSpaceOfTab(
   spaceQuery: Query<DocumentData, DocumentData>,
   spaceCollectionRef: CollectionReference<DocumentData, DocumentData>,
   request: { action: string; updatedTab: Tab; spaceName: string },
@@ -135,8 +135,8 @@ async function upDateSpaceOfTab(
       spaceId: spaceDocRef.id,
     };
     await setDoc(tabDocRef, tabData, { merge: true });
-    const upDatedTab = { ...request.updatedTab, spaceId: tabData.spaceId };
-    return upDatedTab;
+    const updatedTab = { ...request.updatedTab, spaceId: tabData.spaceId };
+    return updatedTab;
   } catch (error) {
     console.error("Error getting tabs: ", error);
   }

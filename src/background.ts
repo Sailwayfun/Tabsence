@@ -4,11 +4,13 @@ import {
   collection,
   doc,
   addDoc,
-  setDoc,
   getDocs,
+  query,
+  where,
   serverTimestamp,
   DocumentData,
   DocumentReference,
+  updateDoc,
 } from "firebase/firestore";
 
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
@@ -87,16 +89,22 @@ chrome.runtime.onMessage.addListener(
     sendResponse,
   ) => {
     if (request.action === "moveTab") {
-      const tabDocRef = doc(db, "tabs", `${request.updatedTab.tabId}`);
-      console.log("requestedId", `${request.updatedTab.tabId}`);
-      updateSpaceOfTab(request, tabDocRef)
-        .then((updatedTab) => {
-          sendResponse(updatedTab);
-        })
-        .catch((error) => {
-          console.error("Error updating tab: ", error);
-          sendResponse(null);
+      const tabsCollectionRef = collection(db, "tabs");
+      const tabId = request.updatedTab.tabId;
+      const q = query(tabsCollectionRef, where("tabId", "==", tabId));
+      getDocs(q).then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          const tabDocRef = doc.ref;
+          updateSpaceOfTab(request, tabDocRef)
+            .then((updatedTab) => {
+              sendResponse(updatedTab);
+            })
+            .catch((error) => {
+              console.error("Error updating tab: ", error);
+              sendResponse(null);
+            });
         });
+      });
       return true;
     }
   },
@@ -113,11 +121,8 @@ async function updateSpaceOfTab(
       spaceId,
     };
     await addDoc(spaceCollectionRef, spaceData);
-    const tabData = {
-      spaceId,
-    };
-    await setDoc(tabDocRef, tabData, { merge: true });
-    const updatedTab = { ...request.updatedTab, spaceId: tabData.spaceId };
+    await updateDoc(tabDocRef, { spaceId });
+    const updatedTab = { ...request.updatedTab, spaceId };
     return updatedTab;
   } catch (error) {
     console.error("Error getting tabs: ", error);

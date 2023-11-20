@@ -48,7 +48,7 @@ const NewTab = () => {
         tabId: parseInt(id),
       };
       chrome.runtime.sendMessage(request, function (response) {
-        const oldTabs = tabs.filter((tab) => tab.id !== parseInt(id));
+        const oldTabs = tabs.filter((tab) => tab.tabId !== parseInt(id));
         if (response.success) setTabs(oldTabs);
         console.log("a tab is closed");
       });
@@ -99,7 +99,7 @@ const NewTab = () => {
                     id={tab.id?.toString()}
                     onOpenSpacesPopup={openSpacesPopup}
                   />
-                  <CloseBtn id={tab.id?.toString()} onCloseTab={closeTab} />
+                  <CloseBtn id={tab.tabId?.toString()} onCloseTab={closeTab} />
                   {tab.id === activePopupId && (
                     <div className="ml-5 h-14 w-52 rounded-md border px-3">
                       <label htmlFor={tab.id || "spaces"} className="text-xl">

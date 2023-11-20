@@ -2,9 +2,9 @@ interface CloseBtnProps {
   onCloseTab: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   id: string | undefined;
 }
-const CloseBtn = ({ id }: CloseBtnProps) => {
+const CloseBtn = ({ id, onCloseTab }: CloseBtnProps) => {
   return (
-    <button data-id={id}>
+    <button data-id={id} onClick={onCloseTab}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"

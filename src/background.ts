@@ -168,3 +168,9 @@ async function removeTabFromFirestore(tabId: number) {
     deleteDoc(doc.ref);
   });
 }
+
+chrome.tabs.onRemoved.addListener((tabId: number) => {
+  removeTabFromFirestore(tabId);
+  chrome.runtime.sendMessage({ action: "tabClosed", tabId });
+  return true;
+});

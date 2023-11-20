@@ -31,6 +31,16 @@ const NewTab = () => {
       "Sports",
     ]);
   }, []);
+  useEffect(() => {
+    chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
+      if (request.action === "tabClosed") {
+        const deletedTabId = request.tabId;
+        setTabs((t) => t.filter((tab) => tab.tabId !== deletedTabId));
+        sendResponse({ success: true });
+      }
+      return true;
+    });
+  }, []);
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
     tab: Tab,

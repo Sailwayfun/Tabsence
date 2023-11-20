@@ -141,3 +141,20 @@ async function updateSpaceOfTab(
     console.error("Error getting tabs: ", error);
   }
 }
+
+chrome.runtime.onMessage.addListener(
+  (
+    request: {
+      action: string;
+      tabId: number;
+    },
+    _,
+    sendResponse,
+  ) => {
+    if (request.action === "closeTab") {
+      chrome.tabs.remove(request.tabId);
+      sendResponse({ success: true });
+      return true;
+    }
+  },
+);

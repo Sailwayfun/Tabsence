@@ -39,6 +39,21 @@ const NewTab = () => {
     const newTabUrl = tab.url;
     chrome.tabs.create({ url: newTabUrl });
   }
+  function closeTab(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    const id = e.currentTarget.dataset.id;
+    if (id) {
+      const request = {
+        action: "closeTab",
+        tabId: parseInt(id),
+      };
+      chrome.runtime.sendMessage(request, function (response) {
+        const oldTabs = tabs.filter((tab) => tab.id !== parseInt(id));
+        if (response.success) setTabs(oldTabs);
+        console.log("a tab is closed");
+        
+      });
+    }
+  }
   function openSpacesPopup(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     const id = e.currentTarget.dataset.id;
     console.log("id", id);
@@ -84,7 +99,7 @@ const NewTab = () => {
                     id={tab.id?.toString()}
                     onOpenSpacesPopup={openSpacesPopup}
                   />
-                  <CloseBtn />
+                  <CloseBtn id={tab.id?.toString()} onCloseTab={closeTab} />
                   {tab.id === activePopupId && (
                     <div className="ml-5 h-14 w-52 rounded-md border px-3">
                       <label htmlFor={tab.id || "spaces"} className="text-xl">

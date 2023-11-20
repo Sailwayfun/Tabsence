@@ -7,6 +7,7 @@ import CloseBtn from "./CloseBtn";
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
   spaceId: string;
+  tabId: number | undefined;
   isArchived: boolean;
 }
 const NewTab = () => {
@@ -50,7 +51,6 @@ const NewTab = () => {
         const oldTabs = tabs.filter((tab) => tab.id !== parseInt(id));
         if (response.success) setTabs(oldTabs);
         console.log("a tab is closed");
-        
       });
     }
   }

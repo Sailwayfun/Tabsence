@@ -3,6 +3,7 @@ import { Tab } from "./components/NewTab";
 import {
   collection,
   doc,
+  addDoc,
   setDoc,
   getDocs,
   serverTimestamp,
@@ -66,15 +67,16 @@ async function saveSpaceInfo() {
     : doc(spaceCollectionRef);
   const spaceData = {
     title: spaceName,
-    id: spaceId,
+    spaceId: spaceId,
   };
   await setDoc(spaceDocRef, spaceData, { merge: true });
   return;
 }
 
-function saveTabInfo(tab: chrome.tabs.Tab) {
+async function saveTabInfo(tab: chrome.tabs.Tab) {
   if (tab.url && tab.title) {
     const tabData = {
+      tabId: tab.id,
       title: tab.title,
       url: tab.url,
       favIconUrl: getFaviconUrl(tab.url) || tab.favIconUrl || "",
@@ -82,10 +84,8 @@ function saveTabInfo(tab: chrome.tabs.Tab) {
       spaceId,
       isArchived: false,
     };
-    const tabDocRef = doc(db, "tabs", `tab-${tab.id}`);
-    setDoc(tabDocRef, tabData, { merge: true }).catch((error) => {
-      console.error("Error saving tab info: ", error);
-    });
+    const tabDocRef = await addDoc(collection(db, "tabs"), tabData);
+    console.log("Document written with ID: ", tabDocRef.id);
   }
 }
 
@@ -96,8 +96,8 @@ chrome.runtime.onMessage.addListener(
     sendResponse,
   ) => {
     if (request.action === "moveTab") {
-      const tabDocRef = doc(db, "tabs", `${request.updatedTab.id}`);
-      console.log("requestedId", `${request.updatedTab.id}`);
+      const tabDocRef = doc(db, "tabs", `${request.updatedTab.tabId}`);
+      console.log("requestedId", `${request.updatedTab.tabId}`);
       const spaceCollectionRef = collection(db, "spaces");
       const spaceQuery = query(
         spaceCollectionRef,

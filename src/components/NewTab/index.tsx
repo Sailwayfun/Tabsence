@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { FieldValue } from "firebase/firestore";
 import Spaces from "./Spaces";
 import MoveToSpace from "./MoveToSpace";
+import CloseBtn from "./CloseBtn";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -83,6 +84,7 @@ const NewTab = () => {
                     id={tab.id?.toString()}
                     onOpenSpacesPopup={openSpacesPopup}
                   />
+                  <CloseBtn />
                   {tab.id === activePopupId && (
                     <div className="ml-5 h-14 w-52 rounded-md border px-3">
                       <label htmlFor={tab.id || "spaces"} className="text-xl">

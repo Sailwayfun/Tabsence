@@ -12,6 +12,7 @@ import {
   DocumentData,
   DocumentReference,
   updateDoc,
+  setDoc,
 } from "firebase/firestore";
 
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
@@ -68,7 +69,7 @@ async function saveSpaceInfo(): Promise<string> {
 }
 
 async function saveTabInfo(tab: chrome.tabs.Tab, spaceId: string) {
-  if (tab.url && tab.title) {
+  if (tab.url && tab.title && tab.id) {
     const tabData = {
       tabId: tab.id,
       title: tab.title,
@@ -78,8 +79,8 @@ async function saveTabInfo(tab: chrome.tabs.Tab, spaceId: string) {
       spaceId,
       isArchived: false,
     };
-    const tabDocRef = await addDoc(collection(db, "tabs"), tabData);
-    console.log("Document written with ID: ", tabDocRef.id);
+    const tabDocRef = doc(db, "tabs", tab.id.toString());
+    await setDoc(tabDocRef, tabData, { merge: true });
   }
 }
 

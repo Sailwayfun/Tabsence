@@ -24,7 +24,7 @@ const NewTab = () => {
     }
     chrome.runtime.sendMessage({ action: "getTabs" }, function (response) {
       if (response) {
-        setTabs((t) => [...t, ...getNewTabs(response, t)]);
+        setTabs((t) => getNewTabs(response, t));
         return;
       }
     });

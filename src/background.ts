@@ -5,6 +5,7 @@ import {
   doc,
   addDoc,
   getDocs,
+  deleteDoc,
   query,
   where,
   serverTimestamp,
@@ -139,9 +140,31 @@ chrome.runtime.onMessage.addListener(
     sendResponse,
   ) => {
     if (request.action === "closeTab") {
-      chrome.tabs.remove(request.tabId);
-      sendResponse({ success: true });
+      closeTabAndRemoveFromFirestore(request.tabId)
+        .then(() => sendResponse({ success: true }))
+        .catch((error) => {
+          console.error("Error closing tab: ", error);
+          sendResponse({ success: false });
+        });
       return true;
     }
   },
 );
+
+async function closeTabAndRemoveFromFirestore(tabId: number) {
+  await closeTab(tabId);
+  await removeTabFromFirestore(tabId);
+}
+
+async function closeTab(tabId: number) {
+  await chrome.tabs.remove(tabId);
+}
+
+async function removeTabFromFirestore(tabId: number) {
+  const tabsCollectionRef = collection(db, "tabs");
+  const q = query(tabsCollectionRef, where("tabId", "==", tabId));
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    deleteDoc(doc.ref);
+  });
+}

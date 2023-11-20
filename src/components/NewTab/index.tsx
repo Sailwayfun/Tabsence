@@ -88,10 +88,11 @@ const NewTab = () => {
         <h1 className="mb-4 text-3xl">Your Tabs</h1>
         <ul className="flex flex-col gap-3">
           {tabs.length > 0 &&
-            tabs.map((tab, index) => {
+            tabs.map((tab) => {
+              const uniqueKey: string = `${tab.url}-${tab.title}`;
               return (
                 <li
-                  key={index}
+                  key={uniqueKey}
                   className="flex items-center gap-3 rounded-lg border px-4 py-2 text-lg hover:bg-slate-300"
                 >
                   <img src={tab.favIconUrl} className="h-4 w-4 bg-gray-500" />

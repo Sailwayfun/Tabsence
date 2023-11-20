@@ -15,7 +15,6 @@ const NewTab = () => {
   const [spaceNames, setSpaceNames] = useState<string[]>([]);
   const [activePopupId, setActivePopupId] = useState<string | undefined>();
   const [selectedSpace, setSelectedSpace] = useState<string | undefined>();
-  console.log("activePopupId", activePopupId);
   useEffect(() => {
     chrome.runtime.sendMessage({ action: "getTabs" }, function (response) {
       if (response) setTabs(response);
@@ -60,13 +59,12 @@ const NewTab = () => {
       chrome.runtime.sendMessage(request, function (response) {
         const oldTabs = tabs.filter((tab) => tab.tabId !== parseInt(id));
         if (response.success) setTabs(oldTabs);
-        console.log("a tab is closed");
+        return true;
       });
     }
   }
   function openSpacesPopup(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     const id = e.currentTarget.dataset.id;
-    console.log("id", id);
     if (id) setActivePopupId(id);
   }
   function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -77,7 +75,6 @@ const NewTab = () => {
       updatedTab: tabs.find((tab) => tab.id === activePopupId),
       spaceName: e.target.value,
     };
-    console.log("request", request);
     chrome.runtime.sendMessage(request, function (response) {
       const oldTabs = tabs.filter((tab) => tab.id !== activePopupId);
       if (response) setTabs(oldTabs);

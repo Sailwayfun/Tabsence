@@ -19,7 +19,6 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
     const tabsCollection = collection(db, "tabs");
     const tabsSnapshot = await getDocs(tabsCollection);
     if (tabsSnapshot.empty) {
-      console.log("No tabs found");
       return [];
     }
     const tabs = tabsSnapshot.docs.map((doc) => {

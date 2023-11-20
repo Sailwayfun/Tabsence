@@ -7,11 +7,7 @@ import {
   setDoc,
   getDocs,
   serverTimestamp,
-  query,
-  where,
-  Query,
   DocumentData,
-  CollectionReference,
   DocumentReference,
 } from "firebase/firestore";
 
@@ -37,16 +33,16 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
 });
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
-  chrome.tabs.get(activeInfo.tabId, (tab) => {
-    saveSpaceInfo();
-    saveTabInfo(tab);
+  chrome.tabs.get(activeInfo.tabId, async (tab) => {
+    const spaceId = await saveSpaceInfo();
+    saveTabInfo(tab, spaceId);
   });
 });
 
-chrome.tabs.onUpdated.addListener((_, changeInfo, tab) => {
+chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
-    saveSpaceInfo();
-    saveTabInfo(tab);
+    const spaceId: string = await saveSpaceInfo();
+    saveTabInfo(tab, spaceId);
   }
 });
 
@@ -56,24 +52,19 @@ function getFaviconUrl(url: string) {
   }/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`;
 }
 
-const spaceCollectionRef = collection(db, "spaces");
-const spaceId = doc(spaceCollectionRef).id;
-async function saveSpaceInfo() {
+async function saveSpaceInfo(): Promise<string> {
   const spaceName = "unsaved";
-  const spaceQuery = query(spaceCollectionRef, where("title", "==", spaceName));
-  const spaceSnapshot = await getDocs(spaceQuery);
-  const spaceDocRef = !spaceSnapshot.empty
-    ? spaceSnapshot.docs[0].ref
-    : doc(spaceCollectionRef);
+  const spaceCollectionRef = collection(db, "spaces");
+  const spaceId = doc(spaceCollectionRef).id;
   const spaceData = {
     title: spaceName,
     spaceId: spaceId,
   };
-  await setDoc(spaceDocRef, spaceData, { merge: true });
-  return;
+  await addDoc(spaceCollectionRef, spaceData);
+  return spaceId;
 }
 
-async function saveTabInfo(tab: chrome.tabs.Tab) {
+async function saveTabInfo(tab: chrome.tabs.Tab, spaceId: string) {
   if (tab.url && tab.title) {
     const tabData = {
       tabId: tab.id,
@@ -98,12 +89,7 @@ chrome.runtime.onMessage.addListener(
     if (request.action === "moveTab") {
       const tabDocRef = doc(db, "tabs", `${request.updatedTab.tabId}`);
       console.log("requestedId", `${request.updatedTab.tabId}`);
-      const spaceCollectionRef = collection(db, "spaces");
-      const spaceQuery = query(
-        spaceCollectionRef,
-        where("title", "==", request.spaceName),
-      );
-      updateSpaceOfTab(spaceQuery, spaceCollectionRef, request, tabDocRef)
+      updateSpaceOfTab(request, tabDocRef)
         .then((updatedTab) => {
           sendResponse(updatedTab);
         })
@@ -116,23 +102,19 @@ chrome.runtime.onMessage.addListener(
   },
 );
 async function updateSpaceOfTab(
-  spaceQuery: Query<DocumentData, DocumentData>,
-  spaceCollectionRef: CollectionReference<DocumentData, DocumentData>,
   request: { action: string; updatedTab: Tab; spaceName: string },
   tabDocRef: DocumentReference<DocumentData, DocumentData>,
 ) {
   try {
-    const spaceSnapshot = await getDocs(spaceQuery);
-    const spaceDocRef = !spaceSnapshot.empty
-      ? spaceSnapshot.docs[0].ref
-      : doc(spaceCollectionRef);
+    const spaceCollectionRef = collection(db, "spaces");
+    const spaceId = doc(spaceCollectionRef).id;
     const spaceData = {
       title: request.spaceName,
-      id: spaceDocRef.id,
+      spaceId,
     };
-    await setDoc(spaceDocRef, spaceData, { merge: true });
+    await addDoc(spaceCollectionRef, spaceData);
     const tabData = {
-      spaceId: spaceDocRef.id,
+      spaceId,
     };
     await setDoc(tabDocRef, tabData, { merge: true });
     const updatedTab = { ...request.updatedTab, spaceId: tabData.spaceId };

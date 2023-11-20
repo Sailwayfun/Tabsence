@@ -42,9 +42,10 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 });
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
-  if (changeInfo.status === "complete") {
+  if (changeInfo.status === "complete" && changeInfo.url) {
     const spaceId: string = await saveSpaceInfo();
     saveTabInfo(tab, spaceId);
+    return true;
   }
 });
 

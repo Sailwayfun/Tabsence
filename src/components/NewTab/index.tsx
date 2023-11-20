@@ -16,8 +16,17 @@ const NewTab = () => {
   const [activePopupId, setActivePopupId] = useState<string | undefined>();
   const [selectedSpace, setSelectedSpace] = useState<string | undefined>();
   useEffect(() => {
+    function getNewTabs(response: Tab[], tabs: Tab[]) {
+      return response.filter(
+        (newTab: Tab) =>
+          !tabs.some((existingTab) => existingTab.tabId === newTab.tabId),
+      );
+    }
     chrome.runtime.sendMessage({ action: "getTabs" }, function (response) {
-      if (response) setTabs(response);
+      if (response) {
+        setTabs((t) => [...t, ...getNewTabs(response, t)]);
+        return;
+      }
     });
     setSpaceNames([
       "Unsaved",

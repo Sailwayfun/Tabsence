@@ -46,6 +46,18 @@ const NewTab = () => {
         setTabs((t) => t.filter((tab) => tab.tabId !== deletedTabId));
         sendResponse({ success: true });
       }
+      if (request.action === "tabUpdated") {
+        const updatedTab = request.updatedTab;
+        setTabs((t) => {
+          const tabExists = t.some((tab) => tab.tabId === updatedTab.tabId);
+          if (!tabExists) return [...t, updatedTab];
+          return t.map((tab) => {
+            if (tab.tabId === updatedTab.tabId) return updatedTab;
+            return tab;
+          });
+        });
+        sendResponse({ success: true });
+      }
       return true;
     });
   }, []);

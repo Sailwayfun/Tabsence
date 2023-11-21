@@ -38,7 +38,11 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
     const spaceId: string = await saveSpaceInfo();
-    saveTabInfo(tab, spaceId);
+    const tabData = await saveTabInfo(tab, spaceId);
+    chrome.runtime.sendMessage({
+      action: "tabUpdated",
+      updatedTab: { ...tab, ...tabData },
+    });
     return true;
   }
 });
@@ -74,6 +78,7 @@ async function saveTabInfo(tab: chrome.tabs.Tab, spaceId: string) {
     };
     const tabDocRef = doc(db, "tabs", tab.id.toString());
     await setDoc(tabDocRef, tabData, { merge: true });
+    return tabData;
   }
 }
 

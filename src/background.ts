@@ -39,10 +39,17 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
     const spaceId: string = await saveSpaceInfo();
     const tabData = await saveTabInfo(tab, spaceId);
-    chrome.runtime.sendMessage({
-      action: "tabUpdated",
-      updatedTab: { ...tab, ...tabData },
-    });
+    chrome.runtime.sendMessage(
+      {
+        action: "tabUpdated",
+        updatedTab: { ...tab, ...tabData },
+      },
+      () => {
+        if (chrome.runtime.lastError) {
+          console.error(chrome.runtime.lastError.message);
+        }
+      },
+    );
     return true;
   }
 });

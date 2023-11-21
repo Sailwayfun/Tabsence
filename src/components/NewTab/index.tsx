@@ -95,7 +95,7 @@ const NewTab = () => {
   }
   function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
     setSelectedSpace(e.target.value);
-    if (e.target.value === "Unsaved") return;
+    // if (e.target.value === "Unsaved") return;
     const request = {
       action: "moveTab",
       updatedTab: tabs.find((tab) => tab.id?.toString() === activePopupId),

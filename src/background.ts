@@ -3,7 +3,6 @@ import { Tab } from "./components/NewTab";
 import {
   collection,
   doc,
-  addDoc,
   getDocs,
   deleteDoc,
   query,
@@ -126,14 +125,15 @@ async function updateSpaceOfTab(
 ) {
   try {
     const spaceCollectionRef = collection(db, "spaces");
-    const spaceId = doc(spaceCollectionRef).id;
     const spaceData = {
       title: request.spaceName,
-      spaceId,
+      spaceId: request.spaceId,
     };
-    await addDoc(spaceCollectionRef, spaceData);
-    await updateDoc(tabDocRef, { spaceId });
-    const updatedTab = { ...request.updatedTab, spaceId };
+    await setDoc(doc(spaceCollectionRef, request.spaceId), spaceData, {
+      merge: true,
+    });
+    await updateDoc(tabDocRef, { spaceId: request.spaceId });
+    const updatedTab = { ...request.updatedTab, spaceId: request.spaceId };
     return updatedTab;
   } catch (error) {
     console.error("Error getting tabs: ", error);

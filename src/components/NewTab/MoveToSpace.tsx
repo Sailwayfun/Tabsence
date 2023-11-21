@@ -1,5 +1,6 @@
+import { Space } from ".";
 interface MoveToSpaceProps {
-  spaces: string[];
+  spaces: Space[];
   id: string | undefined;
   onOpenSpacesPopup: (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,

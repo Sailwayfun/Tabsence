@@ -10,9 +10,13 @@ export interface Tab extends chrome.tabs.Tab {
   tabId: number | undefined;
   isArchived: boolean;
 }
+export interface Space {
+  id: string;
+  title: string;
+}
 const NewTab = () => {
   const [tabs, setTabs] = useState<Tab[]>([]);
-  const [spaceNames, setSpaceNames] = useState<string[]>([]);
+  const [spaces, setSpaces] = useState<Space[]>([]);
   const [activePopupId, setActivePopupId] = useState<string | undefined>();
   const [selectedSpace, setSelectedSpace] = useState<string | undefined>();
   useEffect(() => {
@@ -28,15 +32,10 @@ const NewTab = () => {
         return;
       }
     });
-    setSpaceNames([
-      "Unsaved",
-      "AppWorks School",
-      "Family",
-      "Game",
-      "Trip",
-      "Career",
-      "Cooking",
-      "Sports",
+    setSpaces([
+      { title: "Unsaved", id: "OyUOBRt0XlFnQfG5LSdu" },
+      { title: "AppWorks School", id: "z3xPL4r4l9N3xPGggrzB" },
+      { title: "Family", id: "9fVOHBpO0MKrnI46GnA2" },
     ]);
   }, []);
   useEffect(() => {
@@ -93,18 +92,21 @@ const NewTab = () => {
     if (e.target.value === "Unsaved") return;
     const request = {
       action: "moveTab",
-      updatedTab: tabs.find((tab) => tab.id === activePopupId),
-      spaceName: e.target.value,
+      updatedTab: tabs.find((tab) => tab.id?.toString() === activePopupId),
+      spaceId: e.target.value,
+      spaceName: e.target.selectedOptions[0].text,
     };
     chrome.runtime.sendMessage(request, function (response) {
-      const oldTabs = tabs.filter((tab) => tab.id !== activePopupId);
+      const oldTabs = tabs.filter(
+        (tab) => tab.id?.toString() !== activePopupId,
+      );
       if (response) setTabs(oldTabs);
     });
     setSelectedSpace(undefined);
   }
   return (
     <div className="flex w-full py-8">
-      <Spaces spaceNames={spaceNames} />
+      <Spaces spaces={spaces} />
       <div className="flex flex-col">
         <h1 className="mb-4 text-3xl">Your Tabs</h1>
         <ul className="flex flex-col gap-3">
@@ -127,7 +129,7 @@ const NewTab = () => {
                     {tab.title}
                   </a>
                   <MoveToSpace
-                    spaces={spaceNames}
+                    spaces={spaces}
                     id={tab.id?.toString()}
                     onOpenSpacesPopup={openSpacesPopup}
                   />
@@ -145,10 +147,10 @@ const NewTab = () => {
                         onChange={selectSpace}
                         value={selectedSpace}
                       >
-                        {spaceNames.map((spaceName) => {
+                        {spaces.map(({ id, title }) => {
                           return (
-                            <option value={spaceName} key={spaceName}>
-                              {spaceName}
+                            <option value={id} key={id}>
+                              {title}
                             </option>
                           );
                         })}

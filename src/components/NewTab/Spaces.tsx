@@ -1,15 +1,16 @@
 import { Link } from "react-router-dom";
+import { Space } from ".";
 interface SpacesProps {
-  spaceNames: string[];
+  spaces: Space[];
 }
-const Spaces = ({ spaceNames }: SpacesProps) => {
+const Spaces = ({ spaces }: SpacesProps) => {
   return (
     <div className="flex w-40 bg-red-800">
       <ul className="my-44 flex w-full flex-col">
-        {spaceNames.map((spaceName) => {
+        {spaces.map(({ id, title }) => {
           return (
             <li className="border px-2 py-4 text-white">
-              <Link to={`/${spaceName.toLowerCase()}`}>{spaceName}</Link>
+              <Link to={`/${id}`}>{title.toLowerCase()}</Link>
             </li>
           );
         })}

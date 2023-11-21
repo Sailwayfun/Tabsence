@@ -54,14 +54,14 @@ function getFaviconUrl(url: string) {
 }
 
 async function saveSpaceInfo(): Promise<string> {
-  const spaceName = "unsaved";
+  const spaceName = "Unsaved";
   const spaceCollectionRef = collection(db, "spaces");
-  const spaceId = doc(spaceCollectionRef).id;
+  const spaceId = "OyUOBRt0XlFnQfG5LSdu";
   const spaceData = {
     title: spaceName,
     spaceId: spaceId,
   };
-  await addDoc(spaceCollectionRef, spaceData);
+  await setDoc(doc(spaceCollectionRef, spaceId), spaceData, { merge: true });
   return spaceId;
 }
 
@@ -84,7 +84,12 @@ async function saveTabInfo(tab: chrome.tabs.Tab, spaceId: string) {
 
 chrome.runtime.onMessage.addListener(
   (
-    request: { action: string; updatedTab: Tab; spaceName: string },
+    request: {
+      action: string;
+      updatedTab: Tab;
+      spaceId: string;
+      spaceName: string;
+    },
     _,
     sendResponse,
   ) => {
@@ -110,7 +115,12 @@ chrome.runtime.onMessage.addListener(
   },
 );
 async function updateSpaceOfTab(
-  request: { action: string; updatedTab: Tab; spaceName: string },
+  request: {
+    action: string;
+    updatedTab: Tab;
+    spaceId: string;
+    spaceName: string;
+  },
   tabDocRef: DocumentReference<DocumentData, DocumentData>,
 ) {
   try {

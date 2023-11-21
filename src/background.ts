@@ -16,9 +16,10 @@ import {
 } from "firebase/firestore";
 
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
-  async function getTabs() {
+  async function getTabs(queryString: string) {
     const tabsCollection = collection(db, "tabs");
-    const tabsSnapshot = await getDocs(tabsCollection);
+    const tabQuery = query(tabsCollection, where("spaceId", "==", queryString));
+    const tabsSnapshot = await getDocs(tabQuery);
     if (tabsSnapshot.empty) {
       return [];
     }
@@ -28,7 +29,7 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
     return tabs;
   }
   if (request.action == "getTabs") {
-    getTabs()
+    getTabs(request.query)
       .then((tabs) => sendResponse(tabs))
       .catch((error) => console.error("Error getting tabs: ", error));
     return true;

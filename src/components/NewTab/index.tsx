@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FieldValue } from "firebase/firestore";
+import { useLocation } from "react-router-dom";
 import Spaces from "./Spaces";
 import MoveToSpace from "./MoveToSpace";
 import CloseBtn from "./CloseBtn";
@@ -19,6 +20,7 @@ const NewTab = () => {
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [activePopupId, setActivePopupId] = useState<string | undefined>();
   const [selectedSpace, setSelectedSpace] = useState<string | undefined>();
+  const location = useLocation();
   useEffect(() => {
     function getNewTabs(response: Tab[], tabs: Tab[]) {
       return response.filter(
@@ -26,18 +28,22 @@ const NewTab = () => {
           !tabs.some((existingTab) => existingTab.tabId === newTab.tabId),
       );
     }
-    chrome.runtime.sendMessage({ action: "getTabs" }, function (response) {
-      if (response) {
-        setTabs((t) => getNewTabs(response, t));
-        return;
-      }
-    });
+    const query = location.pathname.split("/")[1];
+    chrome.runtime.sendMessage(
+      { action: "getTabs", query },
+      function (response) {
+        if (response) {
+          setTabs((t) => getNewTabs(response, t));
+          return;
+        }
+      },
+    );
     setSpaces([
       { title: "Unsaved", id: "OyUOBRt0XlFnQfG5LSdu" },
       { title: "AppWorks School", id: "z3xPL4r4l9N3xPGggrzB" },
       { title: "Family", id: "9fVOHBpO0MKrnI46GnA2" },
     ]);
-  }, []);
+  }, [location.pathname]);
   useEffect(() => {
     chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
       if (request.action === "tabClosed") {

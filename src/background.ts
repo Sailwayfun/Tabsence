@@ -35,13 +35,6 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
   }
 });
 
-chrome.tabs.onActivated.addListener((activeInfo) => {
-  chrome.tabs.get(activeInfo.tabId, async (tab) => {
-    const spaceId = await saveSpaceInfo();
-    saveTabInfo(tab, spaceId);
-  });
-});
-
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   if (changeInfo.status === "complete" && changeInfo.url) {
     const spaceId: string = await saveSpaceInfo();

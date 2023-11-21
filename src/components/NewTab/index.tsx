@@ -85,7 +85,7 @@ const NewTab = () => {
     }
   }
   function openSpacesPopup(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    const id = e.currentTarget.dataset.id;
+    const id: string | undefined = e.currentTarget.dataset.id;
     if (id) setActivePopupId(id);
   }
   function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -129,13 +129,16 @@ const NewTab = () => {
                     onOpenSpacesPopup={openSpacesPopup}
                   />
                   <CloseBtn id={tab.tabId?.toString()} onCloseTab={closeTab} />
-                  {tab.id === activePopupId && (
+                  {tab.id?.toString() === activePopupId && (
                     <div className="ml-5 h-14 w-52 rounded-md border px-3">
-                      <label htmlFor={tab.id || "spaces"} className="text-xl">
+                      <label
+                        htmlFor={tab.id?.toString() || "spaces"}
+                        className="text-xl"
+                      >
                         Move to space:
                       </label>
                       <select
-                        id={tab.id || "spaces"}
+                        id={tab.id?.toString() || "spaces"}
                         onChange={selectSpace}
                         value={selectedSpace}
                       >

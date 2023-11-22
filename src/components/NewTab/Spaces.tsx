@@ -5,7 +5,7 @@ interface SpacesProps {
 }
 const Spaces = ({ spaces }: SpacesProps) => {
   return (
-    <div className="flex w-40 bg-red-800">
+    <div className="flex min-h-screen w-40 bg-red-800">
       <ul className="my-44 flex w-full flex-col">
         {spaces.map(({ id, title }) => {
           return (

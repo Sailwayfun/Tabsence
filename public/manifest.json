@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Tabsence",
+  "version": "1.0.0",
+  "description": "Organize your tabs",
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "64": "icons/icon-16.png"
+    }
+  },
+  "permissions": ["tabs", "activeTab", "favicon"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
+}

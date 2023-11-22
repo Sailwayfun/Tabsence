@@ -111,7 +111,7 @@ const NewTab = () => {
     setSelectedSpace(undefined);
   }
   return (
-    <div className="flex w-full py-8">
+    <div className="flex w-full gap-5 py-8">
       <Spaces spaces={spaces} />
       <div className="flex flex-col">
         <h1 className="mb-4 text-3xl">Your Tabs</h1>

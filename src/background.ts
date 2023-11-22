@@ -31,8 +31,8 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
     getTabs(request.query)
       .then((tabs) => sendResponse(tabs))
       .catch((error) => console.error("Error getting tabs: ", error));
-    return true;
   }
+  return true;
 });
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
@@ -50,8 +50,8 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
         }
       },
     );
-    return true;
   }
+  return true;
 });
 
 function getFaviconUrl(url: string) {
@@ -117,8 +117,8 @@ chrome.runtime.onMessage.addListener(
             });
         });
       });
-      return true;
     }
+    return true;
   },
 );
 async function updateSpaceOfTab(
@@ -163,8 +163,8 @@ chrome.runtime.onMessage.addListener(
           console.error("Error closing tab: ", error);
           sendResponse({ success: false });
         });
-      return true;
     }
+    return true;
   },
 );
 

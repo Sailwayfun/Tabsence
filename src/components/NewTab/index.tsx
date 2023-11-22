@@ -15,6 +15,9 @@ export interface Space {
   id: string;
   title: string;
 }
+interface Response {
+  success: boolean;
+}
 const NewTab = () => {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [spaces, setSpaces] = useState<Space[]>([]);
@@ -45,7 +48,15 @@ const NewTab = () => {
     ]);
   }, [location.pathname]);
   useEffect(() => {
-    chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
+    const handleTabsChange = (
+      request: {
+        action: string;
+        tabId: number | undefined;
+        updatedTab: Tab;
+      },
+      _: chrome.runtime.MessageSender | undefined,
+      sendResponse: <T extends Response>(response: T) => void,
+    ) => {
       if (request.action === "tabClosed") {
         const deletedTabId = request.tabId;
         setTabs((t) => t.filter((tab) => tab.tabId !== deletedTabId));
@@ -64,7 +75,11 @@ const NewTab = () => {
         sendResponse({ success: true });
       }
       return true;
-    });
+    };
+    chrome.runtime.onMessage.addListener(handleTabsChange);
+    return () => {
+      chrome.runtime.onMessage.removeListener(handleTabsChange);
+    };
   }, []);
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,

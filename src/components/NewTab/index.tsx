@@ -32,6 +32,7 @@ const NewTab = () => {
       );
     }
     const query = location.pathname.split("/")[1];
+    console.log({ query });
     chrome.runtime.sendMessage(
       { action: "getTabs", query },
       function (response) {
@@ -57,6 +58,7 @@ const NewTab = () => {
       _: chrome.runtime.MessageSender | undefined,
       sendResponse: <T extends Response>(response: T) => void,
     ) => {
+      console.log({ request });
       if (request.action === "tabClosed") {
         const deletedTabId = request.tabId;
         setTabs((t) => t.filter((tab) => tab.tabId !== deletedTabId));

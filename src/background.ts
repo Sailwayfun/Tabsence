@@ -17,6 +17,7 @@ import {
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
   async function getTabs(queryString: string) {
     const tabsCollection = collection(db, "tabs");
+    if (queryString === "") queryString = "OyUOBRt0XlFnQfG5LSdu";
     const tabQuery = query(tabsCollection, where("spaceId", "==", queryString));
     const tabsSnapshot = await getDocs(tabQuery);
     if (tabsSnapshot.empty) {

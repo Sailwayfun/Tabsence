@@ -46,6 +46,9 @@ const Spaces = forwardRef(
             return (
               <li className="border px-2 py-4 text-white" key={id}>
                 <Link to={`/${id}`}>{title.toLowerCase()}</Link>
+                <br />
+                <br />
+                {JSON.stringify(id)}
               </li>
             );
           })}

@@ -33,8 +33,8 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
-    const spaceId: string = await saveSpaceInfo();
-    const tabData = await saveTabInfo(tab, spaceId);
+    // const spaceId: string = await saveSpaceInfo();
+    const tabData = await saveTabInfo(tab);
     chrome.runtime.sendMessage(
       {
         action: "tabUpdated",
@@ -51,17 +51,17 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
 });
 
 //TODO: 手動建立預設的unsaved space || 不建立unsaved space
-async function saveSpaceInfo(): Promise<string> {
-  const spaceName = "Unsaved";
-  const spaceCollectionRef = collection(db, "spaces");
-  const spaceId = "OyUOBRt0XlFnQfG5LSdu";
-  const spaceData = {
-    title: spaceName,
-    spaceId: spaceId,
-  };
-  await setDoc(doc(spaceCollectionRef, spaceId), spaceData, { merge: true });
-  return spaceId;
-}
+// async function saveSpaceInfo(): Promise<string> {
+//   const spaceName = "Unsaved";
+//   const spaceCollectionRef = collection(db, "spaces");
+//   const spaceId = "OyUOBRt0XlFnQfG5LSdu";
+//   const spaceData = {
+//     title: spaceName,
+//     spaceId: spaceId,
+//   };
+//   await setDoc(doc(spaceCollectionRef, spaceId), spaceData, { merge: true });
+//   return spaceId;
+// }
 
 chrome.runtime.onMessage.addListener(
   (

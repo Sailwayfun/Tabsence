@@ -7,7 +7,7 @@ import CloseBtn from "./CloseBtn";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
-  spaceId: string;
+  spaceId?: string;
   tabId: number | undefined;
   isArchived: boolean;
 }
@@ -45,24 +45,16 @@ const NewTab = () => {
         }
       },
     );
-    function getNewSpaces(response: Space[], spaces: Space[]) {
-      return response.filter(
-        (newSpace: Space) =>
-          !spaces.some((existingSpace) => existingSpace.id === newSpace.id),
-      );
-    }
-    chrome.runtime.sendMessage({ action: "getSpaces" }, function (response) {
-      console.log({ response });
-      if (response) {
-        setSpaces((s) => getNewSpaces(response, s));
-        return;
-      }
-    });
-    // setSpaces([
-    //   { title: "Unsaved", id: "OyUOBRt0XlFnQfG5LSdu" },
-    //   { title: "AppWorks School", id: "z3xPL4r4l9N3xPGggrzB" },
-    //   { title: "Family", id: "9fVOHBpO0MKrnI46GnA2" },
-    // ]);
+    chrome.runtime.sendMessage(
+      { action: "getSpaces" },
+      function (response: Space[]) {
+        console.log({ response });
+        if (response) {
+          setSpaces(response);
+          return;
+        }
+      },
+    );
   }, [location.pathname]);
   useEffect(() => {
     const handleMessagePassing = (
@@ -128,7 +120,6 @@ const NewTab = () => {
   }
   function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
     setSelectedSpace(e.target.value);
-    // if (e.target.value === "Unsaved") return;
     const request = {
       action: "moveTab",
       updatedTab: tabs.find((tab) => tab.id?.toString() === activePopupId),
@@ -152,7 +143,6 @@ const NewTab = () => {
   function addNewSpace() {
     const newSpaceTitle: string | undefined =
       newSpaceInputRef.current?.value.trim();
-    // const newSpaceId: string = "";
     if (!newSpaceTitle || newSpaceTitle.trim().length === 0)
       return alert("Please enter a space name");
     if (
@@ -170,7 +160,6 @@ const NewTab = () => {
         }
       },
     );
-    // setSpaces((s) => [...s, { title: newSpaceTitle, id: newSpaceId }]);
     if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
   }
   return (

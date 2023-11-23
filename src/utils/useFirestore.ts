@@ -12,6 +12,9 @@ import {
 } from "firebase/firestore";
 import { Tab } from "../components/NewTab";
 import { db } from "../../firebase-config";
+interface FirebaseDoc extends DocumentData {
+  id: string;
+}
 async function getDocFromFirestore(
   collectionName: string,
   queryString?: string,
@@ -29,12 +32,24 @@ async function getDocFromFirestore(
       return spaces;
     }
     case "tabs": {
-      if (queryString === "") queryString = "OyUOBRt0XlFnQfG5LSdu"; //TODO: query 沒有spaceId的tabs
-      const tabQuery = query(
-        collectionRef,
-        where("spaceId", "==", queryString),
-      );
+      // if (queryString === "") queryString = null; //TODO: query 沒有spaceId的tabs
+      const tabQuery =
+        queryString === ""
+          ? collectionRef
+          : query(collectionRef, where("spaceId", "==", queryString));
       const tabsSnapshot = await getDocs(tabQuery);
+      if (queryString === "") {
+        const tabsWithoutSpace = tabsSnapshot.docs.reduce(
+          (accumulator: FirebaseDoc[], doc) => {
+            if (!doc.data().spaceId) {
+              accumulator.push({ id: doc.id, ...doc.data() });
+            }
+            return accumulator;
+          },
+          [],
+        );
+        return tabsWithoutSpace;
+      }
       if (tabsSnapshot.empty) {
         return [];
       }
@@ -61,7 +76,8 @@ async function getSpaces() {
   return spaces;
 }
 
-async function saveTabInfo(tab: chrome.tabs.Tab, spaceId: string) {
+async function saveTabInfo(tab: chrome.tabs.Tab) {
+  //TODO: 為了處理hash router尚未產生pathname的狀況，初次寫入tab時，先把spaceId設為""，之後再更新
   if (tab.url && tab.title && tab.id) {
     const tabData = {
       tabId: tab.id,
@@ -69,7 +85,6 @@ async function saveTabInfo(tab: chrome.tabs.Tab, spaceId: string) {
       url: tab.url,
       favIconUrl: _getFaviconUrl(tab.url) || tab.favIconUrl || "",
       lastAccessed: serverTimestamp(),
-      spaceId,
       isArchived: false,
     };
     const tabDocRef = doc(db, "tabs", tab.id.toString());

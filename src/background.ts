@@ -28,10 +28,26 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
     });
     return tabs;
   }
+  async function getSpaces() {
+    const spacesCollection = collection(db, "spaces");
+    const spacesSnapshot = await getDocs(spacesCollection);
+    if (spacesSnapshot.empty) {
+      return [];
+    }
+    const spaces = spacesSnapshot.docs.map((doc) => {
+      return { id: doc.id, ...doc.data() };
+    });
+    return spaces;
+  }
   if (request.action == "getTabs") {
     getTabs(request.query)
       .then((tabs) => sendResponse(tabs))
       .catch((error) => console.error("Error getting tabs: ", error));
+  }
+  if (request.action == "getSpaces") {
+    getSpaces()
+      .then((spaces) => sendResponse(spaces))
+      .catch((error) => console.error("Error getting spaces: ", error));
   }
   return true;
 });

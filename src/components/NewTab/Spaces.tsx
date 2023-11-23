@@ -44,7 +44,7 @@ const Spaces = forwardRef(
         <ul className="flex w-full flex-col">
           {spaces.map(({ id, title }) => {
             return (
-              <li className="border px-2 py-4 text-white">
+              <li className="border px-2 py-4 text-white" key={id}>
                 <Link to={`/${id}`}>{title.toLowerCase()}</Link>
               </li>
             );

@@ -45,11 +45,24 @@ const NewTab = () => {
         }
       },
     );
-    setSpaces([
-      { title: "Unsaved", id: "OyUOBRt0XlFnQfG5LSdu" },
-      { title: "AppWorks School", id: "z3xPL4r4l9N3xPGggrzB" },
-      { title: "Family", id: "9fVOHBpO0MKrnI46GnA2" },
-    ]);
+    function getNewSpaces(response: Space[], spaces: Space[]) {
+      return response.filter(
+        (newSpace: Space) =>
+          !spaces.some((existingSpace) => existingSpace.id === newSpace.id),
+      );
+    }
+    chrome.runtime.sendMessage({ action: "getSpaces" }, function (response) {
+      console.log({ response });
+      if (response) {
+        setSpaces((s) => getNewSpaces(response, s));
+        return;
+      }
+    });
+    // setSpaces([
+    //   { title: "Unsaved", id: "OyUOBRt0XlFnQfG5LSdu" },
+    //   { title: "AppWorks School", id: "z3xPL4r4l9N3xPGggrzB" },
+    //   { title: "Family", id: "9fVOHBpO0MKrnI46GnA2" },
+    // ]);
   }, [location.pathname]);
   useEffect(() => {
     const handleMessagePassing = (

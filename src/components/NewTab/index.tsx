@@ -149,6 +149,7 @@ const NewTab = () => {
     )
       return alert("Space name already exists");
     setSpaces((s) => [...s, { title: newSpaceTitle, id: newSpaceId }]);
+    if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
   }
   return (
     <div className="flex w-full gap-5 py-8">

@@ -139,7 +139,7 @@ const NewTab = () => {
   function addNewSpace() {
     const newSpaceTitle: string | undefined =
       newSpaceInputRef.current?.value.trim();
-    const newSpaceId: string = "";
+    // const newSpaceId: string = "";
     if (!newSpaceTitle || newSpaceTitle.trim().length === 0)
       return alert("Please enter a space name");
     if (
@@ -148,7 +148,16 @@ const NewTab = () => {
       )
     )
       return alert("Space name already exists");
-    setSpaces((s) => [...s, { title: newSpaceTitle, id: newSpaceId }]);
+    chrome.runtime.sendMessage(
+      { action: "addSpace", newSpaceTitle },
+      function (response) {
+        if (response) {
+          setSpaces((s) => [...s, { title: newSpaceTitle, id: response.id }]);
+          return;
+        }
+      },
+    );
+    // setSpaces((s) => [...s, { title: newSpaceTitle, id: newSpaceId }]);
     if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
   }
   return (

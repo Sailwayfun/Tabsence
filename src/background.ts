@@ -97,6 +97,7 @@ chrome.runtime.onMessage.addListener(
       updatedTab: Tab;
       spaceId: string;
       spaceName: string;
+      newSpaceTitle: string;
     },
     _,
     sendResponse,
@@ -118,6 +119,24 @@ chrome.runtime.onMessage.addListener(
             });
         });
       });
+    }
+    if (request.action === "addSpace") {
+      const spaceCollectionRef = collection(db, "spaces");
+      const spaceId: string = doc(spaceCollectionRef).id;
+      const spaceData = {
+        title: request.newSpaceTitle,
+        spaceId: spaceId,
+      };
+      setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
+        merge: true,
+      })
+        .then(() => {
+          sendResponse({ id: spaceId });
+        })
+        .catch((error) => {
+          console.error("Error adding space: ", error);
+          sendResponse(null);
+        });
     }
     return true;
   },

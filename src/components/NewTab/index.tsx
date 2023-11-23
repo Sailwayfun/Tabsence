@@ -50,7 +50,7 @@ const NewTab = () => {
     ]);
   }, [location.pathname]);
   useEffect(() => {
-    const handleTabsChange = (
+    const handleMessagePassing = (
       request: {
         action: string;
         tabId: number | undefined;
@@ -79,9 +79,9 @@ const NewTab = () => {
       }
       return true;
     };
-    chrome.runtime.onMessage.addListener(handleTabsChange);
+    chrome.runtime.onMessage.addListener(handleMessagePassing);
     return () => {
-      chrome.runtime.onMessage.removeListener(handleTabsChange);
+      chrome.runtime.onMessage.removeListener(handleMessagePassing);
     };
   }, []);
   function openLink(

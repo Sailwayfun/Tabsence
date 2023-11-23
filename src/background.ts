@@ -7,38 +7,17 @@ import {
   deleteDoc,
   query,
   where,
-  serverTimestamp,
-  DocumentData,
-  DocumentReference,
-  updateDoc,
   setDoc,
 } from "firebase/firestore";
 
+import {
+  getTabs,
+  getSpaces,
+  saveTabInfo,
+  upDateTabBySpace,
+} from "./utils/useFirestore";
+
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
-  async function getTabs(queryString: string) {
-    const tabsCollection = collection(db, "tabs");
-    if (queryString === "") queryString = "OyUOBRt0XlFnQfG5LSdu";
-    const tabQuery = query(tabsCollection, where("spaceId", "==", queryString));
-    const tabsSnapshot = await getDocs(tabQuery);
-    if (tabsSnapshot.empty) {
-      return [];
-    }
-    const tabs = tabsSnapshot.docs.map((doc) => {
-      return { id: doc.id, ...doc.data() };
-    });
-    return tabs;
-  }
-  async function getSpaces() {
-    const spacesCollection = collection(db, "spaces");
-    const spacesSnapshot = await getDocs(spacesCollection);
-    if (spacesSnapshot.empty) {
-      return [];
-    }
-    const spaces = spacesSnapshot.docs.map((doc) => {
-      return { id: doc.id, ...doc.data() };
-    });
-    return spaces;
-  }
   if (request.action == "getTabs") {
     getTabs(request.query)
       .then((tabs) => sendResponse(tabs))
@@ -71,12 +50,7 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   return true;
 });
 
-function getFaviconUrl(url: string) {
-  return `chrome-extension://${
-    chrome.runtime.id
-  }/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`;
-}
-
+//TODO: 手動建立預設的unsaved space || 不建立unsaved space
 async function saveSpaceInfo(): Promise<string> {
   const spaceName = "Unsaved";
   const spaceCollectionRef = collection(db, "spaces");
@@ -87,23 +61,6 @@ async function saveSpaceInfo(): Promise<string> {
   };
   await setDoc(doc(spaceCollectionRef, spaceId), spaceData, { merge: true });
   return spaceId;
-}
-
-async function saveTabInfo(tab: chrome.tabs.Tab, spaceId: string) {
-  if (tab.url && tab.title && tab.id) {
-    const tabData = {
-      tabId: tab.id,
-      title: tab.title,
-      url: tab.url,
-      favIconUrl: getFaviconUrl(tab.url) || tab.favIconUrl || "",
-      lastAccessed: serverTimestamp(),
-      spaceId,
-      isArchived: false,
-    };
-    const tabDocRef = doc(db, "tabs", tab.id.toString());
-    await setDoc(tabDocRef, tabData, { merge: true });
-    return tabData;
-  }
 }
 
 chrome.runtime.onMessage.addListener(
@@ -125,7 +82,7 @@ chrome.runtime.onMessage.addListener(
       getDocs(q).then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           const tabDocRef = doc.ref;
-          updateSpaceOfTab(request, tabDocRef)
+          upDateTabBySpace(request, tabDocRef)
             .then((updatedTab) => {
               sendResponse(updatedTab);
             })
@@ -157,31 +114,6 @@ chrome.runtime.onMessage.addListener(
     return true;
   },
 );
-async function updateSpaceOfTab(
-  request: {
-    action: string;
-    updatedTab: Tab;
-    spaceId: string;
-    spaceName: string;
-  },
-  tabDocRef: DocumentReference<DocumentData, DocumentData>,
-) {
-  try {
-    const spaceCollectionRef = collection(db, "spaces");
-    const spaceData = {
-      title: request.spaceName,
-      spaceId: request.spaceId,
-    };
-    await setDoc(doc(spaceCollectionRef, request.spaceId), spaceData, {
-      merge: true,
-    });
-    await updateDoc(tabDocRef, { spaceId: request.spaceId });
-    const updatedTab = { ...request.updatedTab, spaceId: request.spaceId };
-    return updatedTab;
-  } catch (error) {
-    console.error("Error getting tabs: ", error);
-  }
-}
 
 chrome.runtime.onMessage.addListener(
   (

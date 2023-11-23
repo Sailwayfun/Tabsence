@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FieldValue } from "firebase/firestore";
 import { useLocation } from "react-router-dom";
 import Spaces from "./Spaces";
@@ -25,6 +25,8 @@ const NewTab = () => {
   const [selectedSpace, setSelectedSpace] = useState<string | undefined>();
   const [showAddSpacePopup, setShowAddSpacePopup] = useState<boolean>(false);
   const location = useLocation();
+  const newSpaceInputRef = useRef<HTMLInputElement>(null);
+  console.log({ spaces });
   useEffect(() => {
     function getNewTabs(response: Tab[], tabs: Tab[]) {
       return response.filter(
@@ -134,6 +136,20 @@ const NewTab = () => {
   function closeAddSpacePopup() {
     setShowAddSpacePopup(false);
   }
+  function addNewSpace() {
+    const newSpaceTitle: string | undefined =
+      newSpaceInputRef.current?.value.trim();
+    const newSpaceId: string = "";
+    if (!newSpaceTitle || newSpaceTitle.trim().length === 0)
+      return alert("Please enter a space name");
+    if (
+      spaces.some(
+        (space) => space.title.toLowerCase() === newSpaceTitle.toLowerCase(),
+      )
+    )
+      return alert("Space name already exists");
+    setSpaces((s) => [...s, { title: newSpaceTitle, id: newSpaceId }]);
+  }
   return (
     <div className="flex w-full gap-5 py-8">
       <Spaces
@@ -141,6 +157,8 @@ const NewTab = () => {
         onOpenAddSpacePopup={openAddSpacePopup}
         onCloseAddSpacePopup={closeAddSpacePopup}
         isAddSpacePopupOpen={showAddSpacePopup}
+        ref={newSpaceInputRef}
+        onAddNewSpace={addNewSpace}
       />
       <div className="flex flex-col">
         <h1 className="mb-4 text-3xl">Your Tabs</h1>

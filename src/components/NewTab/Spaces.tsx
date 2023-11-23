@@ -29,8 +29,8 @@ const Spaces = ({
         </button>
         <label className="text-xl">New Space:</label>
         <input className="h-4 w-full rounded-lg border p-4" />
-        <button className="flex h-5 w-5 items-center justify-center rounded-md border px-4 py-2 text-gray-500 hover:bg-gray-500 hover:text-white">
-          +
+        <button className="flex h-8 w-full items-center justify-center rounded-md border px-4 py-2 text-gray-500 hover:bg-gray-500 hover:text-white">
+          Add a new space
         </button>
       </div>
       <ul className="flex w-full flex-col">

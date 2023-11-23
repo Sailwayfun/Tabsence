@@ -1,6 +1,12 @@
-const AddSpaceBtn = () => {
+interface AddSpaceBtnProps {
+  onAddSpace: () => void;
+}
+const AddSpaceBtn = ({ onAddSpace }: AddSpaceBtnProps) => {
   return (
-    <button className="flex justify-end pb-5 pr-3 pt-32">
+    <button
+      className="flex cursor-pointer justify-end pb-5 pr-3 pt-32"
+      onClick={onAddSpace}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"

@@ -23,6 +23,7 @@ const NewTab = () => {
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [activePopupId, setActivePopupId] = useState<string | undefined>();
   const [selectedSpace, setSelectedSpace] = useState<string | undefined>();
+  const [showAddSpacePopup, setShowAddSpacePopup] = useState<boolean>(false);
   const location = useLocation();
   useEffect(() => {
     function getNewTabs(response: Tab[], tabs: Tab[]) {
@@ -127,9 +128,20 @@ const NewTab = () => {
     });
     setSelectedSpace(undefined);
   }
+  function openAddSpacePopup() {
+    setShowAddSpacePopup(true);
+  }
+  function closeAddSpacePopup() {
+    setShowAddSpacePopup(false);
+  }
   return (
     <div className="flex w-full gap-5 py-8">
-      <Spaces spaces={spaces} />
+      <Spaces
+        spaces={spaces}
+        onOpenAddSpacePopup={openAddSpacePopup}
+        onCloseAddSpacePopup={closeAddSpacePopup}
+        isAddSpacePopupOpen={showAddSpacePopup}
+      />
       <div className="flex flex-col">
         <h1 className="mb-4 text-3xl">Your Tabs</h1>
         <ul className="flex flex-col gap-3">

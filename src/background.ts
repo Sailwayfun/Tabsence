@@ -15,7 +15,7 @@ import {
   getSpaces,
   saveTabInfo,
   upDateTabBySpace,
-} from "./utils/useFirestore";
+} from "./utils/firestore";
 
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
   if (request.action == "getTabs") {

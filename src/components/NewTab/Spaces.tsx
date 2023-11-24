@@ -20,6 +20,7 @@ const Spaces = forwardRef(
     }: SpacesProps = props;
     return (
       <div className="flex min-h-screen w-40 flex-col bg-red-800">
+        <h2 className="self-end pr-4 pt-4 text-xl text-white">Spaces</h2>
         <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
         <div
           className={`absolute left-20 top-40 flex h-36 w-60 flex-col gap-3 border bg-white p-4 shadow ${
@@ -42,9 +43,6 @@ const Spaces = forwardRef(
           </button>
         </div>
         <ul className="flex w-full flex-col">
-          <li className="border px-2 py-4 text-xl text-white">
-            <Link to="/">unsaved</Link>
-          </li>
           {spaces.map(({ id, title }) => {
             return (
               <li className="border px-2 py-4 text-xl text-white" key={id}>

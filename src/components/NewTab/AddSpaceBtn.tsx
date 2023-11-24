@@ -4,7 +4,7 @@ interface AddSpaceBtnProps {
 const AddSpaceBtn = ({ onAddSpace }: AddSpaceBtnProps) => {
   return (
     <button
-      className="flex cursor-pointer justify-end pb-5 pr-3 pt-32"
+      className="flex cursor-pointer justify-end py-6 pr-3"
       onClick={onAddSpace}
     >
       <svg

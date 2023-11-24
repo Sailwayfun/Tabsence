@@ -42,13 +42,13 @@ const Spaces = forwardRef(
           </button>
         </div>
         <ul className="flex w-full flex-col">
+          <li className="border px-2 py-4 text-xl text-white">
+            <Link to="/">unsaved</Link>
+          </li>
           {spaces.map(({ id, title }) => {
             return (
-              <li className="border px-2 py-4 text-white" key={id}>
+              <li className="border px-2 py-4 text-xl text-white" key={id}>
                 <Link to={`/${id}`}>{title.toLowerCase()}</Link>
-                <br />
-                <br />
-                {JSON.stringify(id)}
               </li>
             );
           })}

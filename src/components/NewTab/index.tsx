@@ -126,7 +126,6 @@ const NewTab = () => {
       action: "moveTab",
       updatedTab: tabs.find((tab) => tab.id?.toString() === activePopupId),
       spaceId: e.target.value,
-      spaceName: e.target.selectedOptions[0].text,
     };
     chrome.runtime.sendMessage(request, function (response) {
       const oldTabs = tabs.filter(

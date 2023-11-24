@@ -104,15 +104,6 @@ async function upDateTabBySpace(
   tabDocRef: DocumentReference<DocumentData, DocumentData>,
 ) {
   try {
-    const spaceCollectionRef = collection(db, "spaces");
-    const spaceData = {
-      title: request.spaceName,
-      spaceId: request.spaceId,
-      createdAt: serverTimestamp(),
-    };
-    await setDoc(doc(spaceCollectionRef, request.spaceId), spaceData, {
-      merge: true,
-    });
     await updateDoc(tabDocRef, { spaceId: request.spaceId });
     const updatedTab = { ...request.updatedTab, spaceId: request.spaceId };
     return updatedTab;

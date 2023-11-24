@@ -50,19 +50,6 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   return true;
 });
 
-//TODO: 手動建立預設的unsaved space || 不建立unsaved space
-// async function saveSpaceInfo(): Promise<string> {
-//   const spaceName = "Unsaved";
-//   const spaceCollectionRef = collection(db, "spaces");
-//   const spaceId = "OyUOBRt0XlFnQfG5LSdu";
-//   const spaceData = {
-//     title: spaceName,
-//     spaceId: spaceId,
-//   };
-//   await setDoc(doc(spaceCollectionRef, spaceId), spaceData, { merge: true });
-//   return spaceId;
-// }
-
 chrome.runtime.onMessage.addListener(
   (
     request: {

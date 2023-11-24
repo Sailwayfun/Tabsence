@@ -22,11 +22,11 @@ const NewTab = () => {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [activePopupId, setActivePopupId] = useState<string | undefined>();
-  const [selectedSpace, setSelectedSpace] = useState<string | undefined>();
+  const [selectedSpace, setSelectedSpace] = useState<string>("");
   const [showAddSpacePopup, setShowAddSpacePopup] = useState<boolean>(false);
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
-  console.log({ spaces });
+  console.log({ selectedSpace });
   useEffect(() => {
     function getNewTabs(response: Tab[], tabs: Tab[]) {
       return response.filter(
@@ -57,6 +57,7 @@ const NewTab = () => {
     );
   }, [location.pathname]);
   useEffect(() => {
+    setSelectedSpace("");
     const handleMessagePassing = (
       request: {
         action: string;
@@ -120,6 +121,7 @@ const NewTab = () => {
   }
   function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
     setSelectedSpace(e.target.value);
+    if (e.target.value === "") return;
     const request = {
       action: "moveTab",
       updatedTab: tabs.find((tab) => tab.id?.toString() === activePopupId),
@@ -132,7 +134,6 @@ const NewTab = () => {
       );
       if (response) setTabs(oldTabs);
     });
-    setSelectedSpace(undefined);
   }
   function openAddSpacePopup() {
     setShowAddSpacePopup(true);
@@ -212,6 +213,7 @@ const NewTab = () => {
                         onChange={selectSpace}
                         value={selectedSpace}
                       >
+                        <option value="">Select a space</option>
                         {spaces.map(({ id, title }) => {
                           return (
                             <option value={id} key={id}>

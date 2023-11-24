@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { FieldValue } from "firebase/firestore";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import Spaces from "./Spaces";
 import MoveToSpace from "./MoveToSpace";
 import CloseBtn from "./CloseBtn";
+import logo from "../../assets/logo.png";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -55,6 +56,7 @@ const NewTab = () => {
           const currentActiveId = response.find(
             (space) => space.id === currentPath,
           )?.id;
+          if (currentPath === "") setActiveSpaceId("");
           if (currentActiveId) setActiveSpaceId(currentActiveId);
           return;
         }
@@ -168,73 +170,81 @@ const NewTab = () => {
     if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
   }
   return (
-    <div className="flex w-full gap-5 py-8">
-      <Spaces
-        spaces={spaces}
-        onOpenAddSpacePopup={openAddSpacePopup}
-        onCloseAddSpacePopup={closeAddSpacePopup}
-        isAddSpacePopupOpen={showAddSpacePopup}
-        ref={newSpaceInputRef}
-        onAddNewSpace={addNewSpace}
-        currentSpaceId={activeSpaceId}
-      />
-      <div className="flex flex-col">
-        <h1 className="mb-4 text-3xl">Your Tabs</h1>
-        <ul className="flex flex-col gap-3">
-          {tabs.length > 0 &&
-            tabs.map((tab) => {
-              const uniqueKey: string = `${tab.url}-${tab.title}`;
-              return (
-                <li
-                  key={uniqueKey}
-                  className="flex items-center gap-3 rounded-lg border px-4 py-2 text-lg hover:bg-slate-300"
-                >
-                  <img
-                    src={tab.favIconUrl}
-                    className="h-4 w-4 border bg-white"
-                  />
-                  <a
-                    onClick={(e) => openLink(e, tab)}
-                    className="cursor-pointer hover:text-gray-500 hover:underline"
+    <>
+      <Link to="/" className="contents">
+        <img src={logo} className="h-16 w-32 rounded-md" />
+      </Link>
+      <div className="flex w-full gap-5 py-8">
+        <Spaces
+          spaces={spaces}
+          onOpenAddSpacePopup={openAddSpacePopup}
+          onCloseAddSpacePopup={closeAddSpacePopup}
+          isAddSpacePopupOpen={showAddSpacePopup}
+          ref={newSpaceInputRef}
+          onAddNewSpace={addNewSpace}
+          currentSpaceId={activeSpaceId}
+        />
+        <div className="flex flex-col">
+          <h1 className="mb-4 text-3xl">Your Tabs</h1>
+          <ul className="flex flex-col gap-3">
+            {tabs.length > 0 &&
+              tabs.map((tab) => {
+                const uniqueKey: string = `${tab.url}-${tab.title}`;
+                return (
+                  <li
+                    key={uniqueKey}
+                    className="flex items-center gap-3 rounded-lg border px-4 py-2 text-lg hover:bg-slate-300"
                   >
-                    {tab.title}
-                  </a>
-                  <MoveToSpace
-                    spaces={spaces}
-                    id={tab.id?.toString()}
-                    onOpenSpacesPopup={openSpacesPopup}
-                  />
-                  <CloseBtn id={tab.tabId?.toString()} onCloseTab={closeTab} />
-                  {tab.id?.toString() === activePopupId && (
-                    <div className="ml-5 h-14 w-52 rounded-md border px-3">
-                      <label
-                        htmlFor={tab.id?.toString() || "spaces"}
-                        className="text-xl"
-                      >
-                        Move to space:
-                      </label>
-                      <select
-                        id={tab.id?.toString() || "spaces"}
-                        onChange={selectSpace}
-                        value={selectedSpace}
-                      >
-                        <option value="">Select a space</option>
-                        {spaces.map(({ id, title }) => {
-                          return (
-                            <option value={id} key={id}>
-                              {title}
-                            </option>
-                          );
-                        })}
-                      </select>
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-        </ul>
+                    <img
+                      src={tab.favIconUrl}
+                      className="h-4 w-4 border bg-white"
+                    />
+                    <a
+                      onClick={(e) => openLink(e, tab)}
+                      className="cursor-pointer hover:text-gray-500 hover:underline"
+                    >
+                      {tab.title}
+                    </a>
+                    <MoveToSpace
+                      spaces={spaces}
+                      id={tab.id?.toString()}
+                      onOpenSpacesPopup={openSpacesPopup}
+                    />
+                    <CloseBtn
+                      id={tab.tabId?.toString()}
+                      onCloseTab={closeTab}
+                    />
+                    {tab.id?.toString() === activePopupId && (
+                      <div className="ml-5 h-14 w-52 rounded-md border px-3">
+                        <label
+                          htmlFor={tab.id?.toString() || "spaces"}
+                          className="text-xl"
+                        >
+                          Move to space:
+                        </label>
+                        <select
+                          id={tab.id?.toString() || "spaces"}
+                          onChange={selectSpace}
+                          value={selectedSpace}
+                        >
+                          <option value="">Select a space</option>
+                          {spaces.map(({ id, title }) => {
+                            return (
+                              <option value={id} key={id}>
+                                {title}
+                              </option>
+                            );
+                          })}
+                        </select>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

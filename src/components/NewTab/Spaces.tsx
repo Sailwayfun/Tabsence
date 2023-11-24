@@ -20,6 +20,7 @@ const Spaces = forwardRef(
       isAddSpacePopupOpen,
       currentSpaceId,
     }: SpacesProps = props;
+    console.log({ currentSpaceId });
     return (
       <div className="flex min-h-screen w-40 flex-col bg-red-800">
         <h2 className="self-end pr-4 pt-4 text-xl text-white">Spaces</h2>
@@ -52,7 +53,7 @@ const Spaces = forwardRef(
             return (
               <li
                 key={id}
-                className={`border px-2 py-4 text-xl  ${linkClasses} animated-li`}
+                className={`border px-2 py-4 text-xl  ${linkClasses} hover:bg-white hover:text-red-800`}
               >
                 <Link to={`/${id}`}>{title.toLowerCase()}</Link>
               </li>

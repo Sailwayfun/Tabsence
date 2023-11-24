@@ -77,7 +77,6 @@ async function getSpaces() {
 }
 
 async function saveTabInfo(tab: chrome.tabs.Tab) {
-  //TODO: 為了處理hash router尚未產生pathname的狀況，初次寫入tab時，先把spaceId設為""，之後再更新
   if (tab.url && tab.title && tab.id) {
     const tabData = {
       tabId: tab.id,

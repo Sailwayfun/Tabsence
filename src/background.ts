@@ -33,7 +33,6 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
-    // const spaceId: string = await saveSpaceInfo();
     const tabData = await saveTabInfo(tab);
     chrome.runtime.sendMessage(
       {

@@ -18,19 +18,31 @@ import {
   upDateTabBySpace,
 } from "./utils/firestore";
 
-chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
-  if (request.action == "getTabs") {
-    getTabs(request.query)
-      .then((tabs) => sendResponse(tabs))
-      .catch((error) => console.error("Error getting tabs: ", error));
-  }
-  if (request.action == "getSpaces") {
-    getSpaces()
-      .then((spaces) => sendResponse(spaces))
-      .catch((error) => console.error("Error getting spaces: ", error));
-  }
-  return true;
-});
+interface RuntimeMessage {
+  action: string;
+  currentPath: string;
+  updatedTab: Tab;
+  spaceId: string;
+  spaceName: string;
+  newSpaceTitle: string;
+  tabId: number;
+}
+
+chrome.runtime.onMessage.addListener(
+  (request: RuntimeMessage, _, sendResponse) => {
+    if (request.action == "getTabs") {
+      getTabs(request.currentPath)
+        .then((tabs) => sendResponse(tabs))
+        .catch((error) => console.error("Error getting tabs: ", error));
+    }
+    if (request.action == "getSpaces") {
+      getSpaces()
+        .then((spaces) => sendResponse(spaces))
+        .catch((error) => console.error("Error getting spaces: ", error));
+    }
+    return true;
+  },
+);
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
@@ -51,17 +63,7 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
 });
 
 chrome.runtime.onMessage.addListener(
-  (
-    request: {
-      action: string;
-      updatedTab: Tab;
-      spaceId: string;
-      spaceName: string;
-      newSpaceTitle: string;
-    },
-    _,
-    sendResponse,
-  ) => {
+  (request: RuntimeMessage, _, sendResponse) => {
     if (request.action === "moveTab") {
       const tabsCollectionRef = collection(db, "tabs");
       const tabId = request.updatedTab.tabId;
@@ -104,14 +106,7 @@ chrome.runtime.onMessage.addListener(
 );
 
 chrome.runtime.onMessage.addListener(
-  (
-    request: {
-      action: string;
-      tabId: number;
-    },
-    _,
-    sendResponse,
-  ) => {
+  (request: RuntimeMessage, _, sendResponse) => {
     if (request.action === "closeTab") {
       closeTabAndRemoveFromFirestore(request.tabId)
         .then(() => sendResponse({ success: true }))

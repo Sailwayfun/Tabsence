@@ -186,6 +186,14 @@ const NewTab = () => {
         />
         <div className="flex flex-col">
           <h1 className="mb-4 text-3xl">Your Tabs</h1>
+          <a
+            href={`mailto:test123@gmail.com?subject=test&body=${tabs.map(
+              (tab) => tab.url,
+            )}`}
+            className="w-10"
+          >
+            Share Space
+          </a>
           <ul className="flex flex-col gap-3">
             {tabs.length > 0 &&
               tabs.map((tab) => {

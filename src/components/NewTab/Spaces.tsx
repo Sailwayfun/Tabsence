@@ -8,6 +8,7 @@ interface SpacesProps {
   onCloseAddSpacePopup: () => void;
   isAddSpacePopupOpen: boolean;
   onAddNewSpace: () => void;
+  currentSpaceId?: string;
 }
 const Spaces = forwardRef(
   (props: SpacesProps, ref: React.Ref<HTMLInputElement>) => {
@@ -17,6 +18,7 @@ const Spaces = forwardRef(
       onCloseAddSpacePopup,
       onAddNewSpace,
       isAddSpacePopupOpen,
+      currentSpaceId,
     }: SpacesProps = props;
     return (
       <div className="flex min-h-screen w-40 flex-col bg-red-800">
@@ -44,8 +46,14 @@ const Spaces = forwardRef(
         </div>
         <ul className="flex w-full flex-col">
           {spaces.map(({ id, title }) => {
+            const linkClasses: string = `${
+              currentSpaceId === id ? "bg-white text-red-800" : "text-white"
+            }`;
             return (
-              <li className="border px-2 py-4 text-xl text-white" key={id}>
+              <li
+                key={id}
+                className={`border px-2 py-4 text-xl  ${linkClasses} animated-li`}
+              >
                 <Link to={`/${id}`}>{title.toLowerCase()}</Link>
               </li>
             );

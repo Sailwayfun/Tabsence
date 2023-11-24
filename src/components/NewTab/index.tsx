@@ -24,6 +24,7 @@ const NewTab = () => {
   const [activePopupId, setActivePopupId] = useState<string | undefined>();
   const [selectedSpace, setSelectedSpace] = useState<string>("");
   const [showAddSpacePopup, setShowAddSpacePopup] = useState<boolean>(false);
+  const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   console.log({ selectedSpace });
@@ -34,10 +35,10 @@ const NewTab = () => {
           !tabs.some((existingTab) => existingTab.tabId === newTab.tabId),
       );
     }
-    const query = location.pathname.split("/")[1];
-    console.log({ query });
+    const currentPath = location.pathname.split("/")[1];
+    console.log({ currentPath });
     chrome.runtime.sendMessage(
-      { action: "getTabs", query },
+      { action: "getTabs", currentPath },
       function (response) {
         if (response) {
           setTabs((t) => getNewTabs(response, t));
@@ -51,6 +52,10 @@ const NewTab = () => {
         console.log({ response });
         if (response) {
           setSpaces(response);
+          const currentActiveId = response.find(
+            (space) => space.id === currentPath,
+          )?.id;
+          if (currentActiveId) setActiveSpaceId(currentActiveId);
           return;
         }
       },
@@ -171,6 +176,7 @@ const NewTab = () => {
         isAddSpacePopupOpen={showAddSpacePopup}
         ref={newSpaceInputRef}
         onAddNewSpace={addNewSpace}
+        currentSpaceId={activeSpaceId}
       />
       <div className="flex flex-col">
         <h1 className="mb-4 text-3xl">Your Tabs</h1>

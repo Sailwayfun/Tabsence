@@ -8,6 +8,7 @@ import {
   query,
   where,
   setDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 
 import {
@@ -85,6 +86,7 @@ chrome.runtime.onMessage.addListener(
       const spaceData = {
         title: request.newSpaceTitle,
         spaceId: spaceId,
+        createdAt: serverTimestamp(),
       };
       setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
         merge: true,

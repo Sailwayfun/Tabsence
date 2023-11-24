@@ -9,6 +9,7 @@ import {
   doc,
   DocumentReference,
   DocumentData,
+  orderBy,
 } from "firebase/firestore";
 import { Tab } from "../components/NewTab";
 import { db } from "../../firebase-config";
@@ -22,7 +23,8 @@ async function getDocFromFirestore(
   const collectionRef = collection(db, collectionName);
   switch (collectionName) {
     case "spaces": {
-      const spacesSnapshot = await getDocs(collectionRef);
+      const q = query(collectionRef, orderBy("createdAt"));
+      const spacesSnapshot = await getDocs(q);
       if (spacesSnapshot.empty) {
         return [];
       }
@@ -106,6 +108,7 @@ async function upDateTabBySpace(
     const spaceData = {
       title: request.spaceName,
       spaceId: request.spaceId,
+      createdAt: serverTimestamp(),
     };
     await setDoc(doc(spaceCollectionRef, request.spaceId), spaceData, {
       merge: true,

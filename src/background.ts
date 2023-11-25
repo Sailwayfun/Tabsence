@@ -142,7 +142,7 @@ chrome.runtime.onMessage.addListener(
             await setDoc(
               tabOrderDocRef,
               {
-                tabOrder: arrayUnion(...newTabOrderData),
+                tabOrder: newTabOrderData,
               },
               { merge: true },
             );

@@ -1,6 +1,8 @@
 import { Tab, Space } from ".";
 import MoveToSpace from "./MoveToSpace";
 import CloseBtn from "./CloseBtn";
+import ArrowDownBtn from "./ArrowDownBtn";
+import ArrowUpBtn from "./ArrowUpBtn";
 interface TabProps {
   tab: Tab;
   spaces: Space[];
@@ -15,6 +17,8 @@ interface TabProps {
   onSelectSpace: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onCloseTab: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   selectedSpace: string;
+  isLastTab: boolean;
+  isFirstTab: boolean;
 }
 
 const TabCard = ({
@@ -26,6 +30,8 @@ const TabCard = ({
   onSelectSpace,
   onCloseTab,
   selectedSpace,
+  isFirstTab,
+  isLastTab,
 }: TabProps) => {
   return (
     <li className="flex items-center gap-3 rounded-lg border px-4 py-2 text-lg hover:bg-slate-300">
@@ -63,6 +69,8 @@ const TabCard = ({
           </select>
         </div>
       )}
+      {!isFirstTab && <ArrowUpBtn />}
+      {!isLastTab && <ArrowDownBtn />}
     </li>
   );
 };

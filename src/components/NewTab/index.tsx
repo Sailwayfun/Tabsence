@@ -195,7 +195,7 @@ const NewTab = () => {
           </a> */}
           <ul className="flex flex-col gap-3">
             {tabs.length > 0 &&
-              tabs.map((tab) => {
+              tabs.map((tab, index) => {
                 const uniqueKey: string = `${tab.url}-${tab.title}`;
                 return (
                   <TabCard
@@ -208,6 +208,8 @@ const NewTab = () => {
                     onSelectSpace={selectSpace}
                     onCloseTab={closeTab}
                     selectedSpace={selectedSpace}
+                    isFirstTab={index === 0}
+                    isLastTab={tabs.length - 1 === index}
                   ></TabCard>
                 );
               })}

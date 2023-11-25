@@ -63,7 +63,6 @@ const NewTab = () => {
     );
   }, [location.pathname]);
   useEffect(() => {
-    setSelectedSpace("");
     const handleMessagePassing = (
       request: {
         action: string;
@@ -122,6 +121,7 @@ const NewTab = () => {
     }
   }
   function openSpacesPopup(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    setSelectedSpace("");
     const id: string | undefined = e.currentTarget.dataset.id;
     if (id) setActivePopupId(id);
   }

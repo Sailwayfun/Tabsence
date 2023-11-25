@@ -1,4 +1,5 @@
 import { Tab, Space } from ".";
+import { memo } from "react";
 import MoveToSpace from "./MoveToSpace";
 import CloseBtn from "./CloseBtn";
 import ArrowDownBtn from "./ArrowDownBtn";
@@ -22,7 +23,7 @@ interface TabProps {
   isFirstTab: boolean;
 }
 
-const TabCard = ({
+const TabCard = memo(function TabCard({
   tab,
   spaces,
   popupId,
@@ -34,7 +35,7 @@ const TabCard = ({
   selectedSpace,
   isFirstTab,
   isLastTab,
-}: TabProps) => {
+}: TabProps) {
   return (
     <li className="flex items-center gap-3 rounded-lg border px-4 py-2 text-lg hover:bg-slate-300">
       <img src={tab.favIconUrl} className="h-4 w-4 border bg-white" />
@@ -87,6 +88,6 @@ const TabCard = ({
       )}
     </li>
   );
-};
+});
 
 export default TabCard;

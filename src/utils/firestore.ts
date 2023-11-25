@@ -4,6 +4,7 @@ import {
   query,
   where,
   serverTimestamp,
+  getDoc,
   setDoc,
   updateDoc,
   doc,
@@ -13,7 +14,7 @@ import {
 } from "firebase/firestore";
 import { Tab } from "../components/NewTab";
 import { db } from "../../firebase-config";
-interface FirebaseDoc extends DocumentData {
+interface FirebaseTabDoc extends DocumentData {
   id: string;
 }
 async function getDocFromFirestore(
@@ -34,15 +35,17 @@ async function getDocFromFirestore(
       return spaces;
     }
     case "tabs": {
-      // if (queryString === "") queryString = null; //TODO: query 沒有spaceId的tabs
+      const tabOrdersCollectionRef = collection(db, "tabOrders");
       const tabQuery =
         queryString === ""
           ? collectionRef
           : query(collectionRef, where("spaceId", "==", queryString));
       const tabsSnapshot = await getDocs(tabQuery);
       if (queryString === "") {
+        let tabOrder;
+        const tabOrderDocRef = doc(tabOrdersCollectionRef, "global");
         const tabsWithoutSpace = tabsSnapshot.docs.reduce(
-          (accumulator: FirebaseDoc[], doc) => {
+          (accumulator: FirebaseTabDoc[], doc) => {
             if (!doc.data().spaceId) {
               accumulator.push({ id: doc.id, ...doc.data() });
             }
@@ -50,17 +53,34 @@ async function getDocFromFirestore(
           },
           [],
         );
-        return tabsWithoutSpace;
+        if (tabOrderDocRef) {
+          const tabOrderSnapshot = await getDoc(tabOrderDocRef);
+          if (tabOrderSnapshot.exists())
+            tabOrder = tabOrderSnapshot.data()?.tabOrder;
+        }
+        return sortTabs(tabsWithoutSpace, tabOrder);
       }
+      const tabOrderDocRef = doc(tabOrdersCollectionRef, queryString);
+      const tabOrderSnapshot = await getDoc(tabOrderDocRef);
+      const tabOrder: number[] | undefined =
+        tabOrderSnapshot.exists() && tabOrderSnapshot.data()?.tabOrder;
       if (tabsSnapshot.empty) {
         return [];
       }
       const tabs = tabsSnapshot.docs.map((doc) => {
         return { id: doc.id, ...doc.data() };
       });
-      return tabs;
+      return sortTabs(tabs, tabOrder);
     }
   }
+}
+
+function sortTabs(tabs: FirebaseTabDoc[], tabOrder?: number[]) {
+  if (!tabOrder) return tabs;
+  const tabMap = new Map(tabs.map((tab) => [tab.tabId, tab]));
+  const sortByOrder = (index: number) => tabMap.get(tabOrder[index]);
+  console.log({ tabOrder });
+  return tabOrder.map((_, index) => sortByOrder(index)).filter(Boolean);
 }
 
 function _getFaviconUrl(url: string) {

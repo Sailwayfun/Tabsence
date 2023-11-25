@@ -16,6 +16,7 @@ interface TabProps {
   ) => void;
   onSelectSpace: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onCloseTab: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onTabOrderChange: (tabId: number, direction: "up" | "down") => void;
   selectedSpace: string;
   isLastTab: boolean;
   isFirstTab: boolean;
@@ -29,6 +30,7 @@ const TabCard = ({
   onOpenSpacesPopup,
   onSelectSpace,
   onCloseTab,
+  onTabOrderChange,
   selectedSpace,
   isFirstTab,
   isLastTab,
@@ -69,8 +71,20 @@ const TabCard = ({
           </select>
         </div>
       )}
-      {!isFirstTab && <ArrowUpBtn />}
-      {!isLastTab && <ArrowDownBtn />}
+      {!isFirstTab && tab.tabId && (
+        <ArrowUpBtn
+          onMoveUp={onTabOrderChange}
+          tabId={tab.tabId}
+          direction="up"
+        />
+      )}
+      {!isLastTab && tab.tabId && (
+        <ArrowDownBtn
+          onMoveDown={onTabOrderChange}
+          tabId={tab.tabId}
+          direction="down"
+        />
+      )}
     </li>
   );
 };

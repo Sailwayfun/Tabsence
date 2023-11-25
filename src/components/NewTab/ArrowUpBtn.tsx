@@ -1,6 +1,11 @@
-const ArrowUpBtn = () => {
+interface ArrowUpBtnProps {
+  onMoveUp: (tabId: number, direction: "up") => void;
+  tabId: number;
+  direction: "up";
+}
+const ArrowUpBtn = ({ onMoveUp, tabId, direction }: ArrowUpBtnProps) => {
   return (
-    <button className="ml-4">
+    <button className="ml-4" onClick={() => onMoveUp(tabId, direction)}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"

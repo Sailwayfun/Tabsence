@@ -1,6 +1,11 @@
-const ArrowDownBtn = () => {
+interface ArrowDownBtnProps {
+  onMoveDown: (tabId: number, direction: "down") => void;
+  tabId: number;
+  direction: "down";
+}
+const ArrowDownBtn = ({ onMoveDown, tabId, direction }: ArrowDownBtnProps) => {
   return (
-    <button className="ml-4">
+    <button className="ml-4" onClick={() => onMoveDown(tabId, direction)}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"

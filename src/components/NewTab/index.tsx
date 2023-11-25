@@ -168,6 +168,18 @@ const NewTab = () => {
     );
     if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
   }
+  function handleTabOrderChange(tabId: number, direction: "up" | "down"): void {
+    const movedTab = tabs.find((tab) => tab.tabId === tabId);
+    if (!movedTab) return;
+    const newTabs = [...tabs];
+    newTabs.splice(tabs.indexOf(movedTab), 1);
+    newTabs.splice(
+      tabs.indexOf(movedTab) + (direction === "up" ? -1 : 1),
+      0,
+      movedTab,
+    );
+    return setTabs(newTabs);
+  }
   return (
     <>
       <Link to="/" className="contents">
@@ -210,6 +222,7 @@ const NewTab = () => {
                     selectedSpace={selectedSpace}
                     isFirstTab={index === 0}
                     isLastTab={tabs.length - 1 === index}
+                    onTabOrderChange={handleTabOrderChange}
                   ></TabCard>
                 );
               })}

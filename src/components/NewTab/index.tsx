@@ -2,9 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { FieldValue } from "firebase/firestore";
 import { useLocation, Link } from "react-router-dom";
 import Spaces from "./Spaces";
-import MoveToSpace from "./MoveToSpace";
-import CloseBtn from "./CloseBtn";
 import logo from "../../assets/logo.png";
+import TabCard from "./TabCard";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -199,54 +198,17 @@ const NewTab = () => {
               tabs.map((tab) => {
                 const uniqueKey: string = `${tab.url}-${tab.title}`;
                 return (
-                  <li
+                  <TabCard
                     key={uniqueKey}
-                    className="flex items-center gap-3 rounded-lg border px-4 py-2 text-lg hover:bg-slate-300"
-                  >
-                    <img
-                      src={tab.favIconUrl}
-                      className="h-4 w-4 border bg-white"
-                    />
-                    <a
-                      onClick={(e) => openLink(e, tab)}
-                      className="cursor-pointer hover:text-gray-500 hover:underline"
-                    >
-                      {tab.title}
-                    </a>
-                    <MoveToSpace
-                      spaces={spaces}
-                      id={tab.id?.toString()}
-                      onOpenSpacesPopup={openSpacesPopup}
-                    />
-                    <CloseBtn
-                      id={tab.tabId?.toString()}
-                      onCloseTab={closeTab}
-                    />
-                    {tab.id?.toString() === activePopupId && (
-                      <div className="ml-5 h-14 w-52 rounded-md border px-3">
-                        <label
-                          htmlFor={tab.id?.toString() || "spaces"}
-                          className="text-xl"
-                        >
-                          Move to space:
-                        </label>
-                        <select
-                          id={tab.id?.toString() || "spaces"}
-                          onChange={selectSpace}
-                          value={selectedSpace}
-                        >
-                          <option value="">Select a space</option>
-                          {spaces.map(({ id, title }) => {
-                            return (
-                              <option value={id} key={id}>
-                                {title}
-                              </option>
-                            );
-                          })}
-                        </select>
-                      </div>
-                    )}
-                  </li>
+                    tab={tab}
+                    spaces={spaces}
+                    popupId={activePopupId}
+                    onOpenLink={openLink}
+                    onOpenSpacesPopup={openSpacesPopup}
+                    onSelectSpace={selectSpace}
+                    onCloseTab={closeTab}
+                    selectedSpace={selectedSpace}
+                  ></TabCard>
                 );
               })}
           </ul>

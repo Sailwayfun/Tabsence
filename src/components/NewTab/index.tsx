@@ -168,7 +168,10 @@ const NewTab = () => {
     );
     if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
   }
-  function handleTabOrderChange(tabId: number, direction: "up" | "down"): void {
+  async function handleTabOrderChange(
+    tabId: number,
+    direction: "up" | "down",
+  ): Promise<void> {
     const movedTab = tabs.find((tab) => tab.tabId === tabId);
     if (!movedTab) return;
     const newTabs = [...tabs];
@@ -178,7 +181,27 @@ const NewTab = () => {
       0,
       movedTab,
     );
-    return setTabs(newTabs);
+    return await onTabOrderChange(newTabs, activeSpaceId);
+  }
+
+  function onTabOrderChange(
+    newTabs: Tab[],
+    spaceId: string | undefined,
+  ): Promise<void> {
+    setTabs(newTabs);
+    //TODO:傳送訊息通知背景腳本同步Firestore
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(
+        { action: "updateTabOrder", newTabs, spaceId },
+        function (response) {
+          if (response) {
+            resolve(console.log(response));
+            return;
+          }
+          reject(console.log(response));
+        },
+      );
+    });
   }
   return (
     <>

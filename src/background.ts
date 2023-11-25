@@ -27,6 +27,7 @@ interface RuntimeMessage {
   spaceName: string;
   newSpaceTitle: string;
   tabId: number;
+  newTabs: Tab[];
 }
 
 chrome.runtime.onMessage.addListener(
@@ -121,6 +122,37 @@ chrome.runtime.onMessage.addListener(
           console.error("Error closing tab: ", error);
           sendResponse({ success: false });
         });
+    }
+    return true;
+  },
+);
+
+chrome.runtime.onMessage.addListener(
+  async (request: RuntimeMessage, _, sendResponse) => {
+    switch (request.action) {
+      case "updateTabOrder":
+        {
+          try {
+            const tabOrdersCollectionRef = collection(db, "tabOrders");
+            const spaceId = request.spaceId || "global";
+            const tabOrderDocRef = doc(tabOrdersCollectionRef, spaceId);
+            const newTabOrderData = request.newTabs
+              .map((tab) => tab.tabId)
+              .filter(Boolean);
+            await setDoc(
+              tabOrderDocRef,
+              {
+                tabOrder: arrayUnion(...newTabOrderData),
+              },
+              { merge: true },
+            );
+            sendResponse({ success: true });
+          } catch (error) {
+            console.error("Error updating tab order: ", error);
+            sendResponse({ success: false });
+          }
+        }
+        break;
     }
     return true;
   },

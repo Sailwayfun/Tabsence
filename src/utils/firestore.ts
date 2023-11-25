@@ -108,7 +108,7 @@ async function upDateTabBySpace(
     const updatedTab = { ...request.updatedTab, spaceId: request.spaceId };
     return updatedTab;
   } catch (error) {
-    console.error("Error getting tabs: ", error);
+    console.error("Error updating tabs: ", error);
   }
 }
 

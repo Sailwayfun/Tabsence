@@ -9,6 +9,7 @@ import {
   where,
   setDoc,
   serverTimestamp,
+  arrayUnion,
 } from "firebase/firestore";
 
 import {
@@ -63,23 +64,29 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
 });
 
 chrome.runtime.onMessage.addListener(
-  (request: RuntimeMessage, _, sendResponse) => {
-    if (request.action === "moveTab") {
+  async (request: RuntimeMessage, _, sendResponse) => {
+    if (request.action === "moveTabToSpace") {
+      const tabOrdersCollectionRef = collection(db, "tabOrders");
+      const tabOrderDocRef = doc(tabOrdersCollectionRef, request.spaceId);
       const tabsCollectionRef = collection(db, "tabs");
       const tabId = request.updatedTab.tabId;
+      await setDoc(
+        tabOrderDocRef,
+        { tabOrder: arrayUnion(tabId) },
+        { merge: true },
+      );
       const q = query(tabsCollectionRef, where("tabId", "==", tabId));
-      getDocs(q).then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          const tabDocRef = doc.ref;
-          upDateTabBySpace(request, tabDocRef)
-            .then((updatedTab) => {
-              sendResponse(updatedTab);
-            })
-            .catch((error) => {
-              console.error("Error updating tab: ", error);
-              sendResponse(null);
-            });
-        });
+      const tabsQuerySnapshot = await getDocs(q);
+      tabsQuerySnapshot.forEach((doc) => {
+        const tabDocRef = doc.ref;
+        upDateTabBySpace(request, tabDocRef)
+          .then((updatedTab) => {
+            sendResponse(updatedTab);
+          })
+          .catch((error) => {
+            console.error("Error updating tab: ", error);
+            sendResponse(null);
+          });
       });
     }
     if (request.action === "addSpace") {
@@ -90,7 +97,7 @@ chrome.runtime.onMessage.addListener(
         spaceId: spaceId,
         createdAt: serverTimestamp(),
       };
-      setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
+      await setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
         merge: true,
       })
         .then(() => {

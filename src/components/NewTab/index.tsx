@@ -130,7 +130,7 @@ const NewTab = () => {
     setSelectedSpace(e.target.value);
     if (e.target.value === "") return;
     const request = {
-      action: "moveTab",
+      action: "moveTabToSpace",
       updatedTab: tabs.find((tab) => tab.id?.toString() === activePopupId),
       spaceId: e.target.value,
     };
@@ -186,14 +186,14 @@ const NewTab = () => {
         />
         <div className="flex flex-col">
           <h1 className="mb-4 text-3xl">Your Tabs</h1>
-          <a
+          {/* <a
             href={`mailto:test123@gmail.com?subject=test&body=${tabs.map(
               (tab) => tab.url,
             )}`}
             className="w-10"
           >
             Share Space
-          </a>
+          </a> */}
           <ul className="flex flex-col gap-3">
             {tabs.length > 0 &&
               tabs.map((tab) => {

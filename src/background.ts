@@ -181,3 +181,12 @@ chrome.tabs.onRemoved.addListener((tabId: number) => {
   chrome.runtime.sendMessage({ action: "tabClosed", tabId });
   return true;
 });
+
+chrome.runtime.onMessage.addListener(
+  (request: RuntimeMessage, _, sendResponse) => {
+    if (request.action === "signOut") {
+      sendResponse({ success: true });
+    }
+    return true;
+  },
+);

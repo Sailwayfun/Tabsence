@@ -203,6 +203,16 @@ const NewTab = () => {
       );
     });
   }
+  function signOut() {
+    chrome.runtime.sendMessage(
+      { action: "signOut" },
+      (response: { success: boolean }) => {
+        if (response.success) {
+          window.location.replace("/index.html");
+        }
+      },
+    );
+  }
   return (
     <>
       <Link to="/" className="contents">
@@ -219,7 +229,15 @@ const NewTab = () => {
           currentSpaceId={activeSpaceId}
         />
         <div className="flex flex-col">
-          <h1 className="mb-4 text-3xl">Your Tabs</h1>
+          <div className="flex gap-3">
+            <h1 className="mb-4 text-3xl">Your Tabs</h1>
+            <button
+              onClick={signOut}
+              className="h-10 w-40 rounded-md border bg-black text-white"
+            >
+              Sign Out
+            </button>
+          </div>
           {/* <a
             href={`mailto:test123@gmail.com?subject=test&body=${tabs.map(
               (tab) => tab.url,

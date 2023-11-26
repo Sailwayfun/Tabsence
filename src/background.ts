@@ -196,8 +196,12 @@ chrome.runtime.onMessage.addListener(
           const usersCollectionRef = collection(db, "users");
           const userDocRef = doc(usersCollectionRef, userInfo.id);
           await setDoc(userDocRef, { email: userInfo.email }, { merge: true });
+          sendResponse({
+            success: true,
+            token: authToken,
+            userId: userInfo.id,
+          });
         });
-        sendResponse({ success: true, token: authToken });
       });
       return true;
     }

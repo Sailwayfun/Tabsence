@@ -26,6 +26,8 @@ const NewTab = () => {
   const [showAddSpacePopup, setShowAddSpacePopup] = useState<boolean>(false);
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
+  const [currentUserId, setCurrentUserId] = useState<string>("");
+  console.log("current user:", currentUserId);
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   console.log({ selectedSpace });
@@ -195,7 +197,6 @@ const NewTab = () => {
     spaceId: string | undefined,
   ): Promise<void> {
     setTabs(newTabs);
-    //TODO:傳送訊息通知背景腳本同步Firestore
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(
         { action: "updateTabOrder", newTabs, spaceId },
@@ -224,10 +225,11 @@ const NewTab = () => {
   function signIn() {
     chrome.runtime.sendMessage(
       { action: "signIn" },
-      async (response: { success: boolean; token: string }) => {
+      async (response: { success: boolean; token: string; userId: string }) => {
         console.log("response:", { response });
-        if (response.success && response.token) {
+        if (response.success && response.token && response.userId) {
           await chrome.storage.local.set({ isLoggedin: true });
+          setCurrentUserId(response.userId);
           setIsLoggedin(true);
           return;
         }

@@ -1,16 +1,29 @@
 const App = () => {
   function newTab() {
     chrome.tabs.create({ url: "newTab.html" });
-  }
-  function init() {
-    chrome.runtime.sendMessage({ action: "signIn" }, (response) => {
-      if (response.success && response.payload) {
-        newTab();
-        return;
-      }
-      alert("Please sign in to continue");
-      return;
-    });
+
+    // function init() {
+    //   chrome.identity.getAuthToken({ interactive: true }, (token) => {
+    //     chrome.runtime.sendMessage(
+    //       { action: "signIn", payload: token },
+    //       (response) => {
+    //         if (response.success) {
+    //           newTab();
+    //           return;
+    //         }
+    //         alert("Please sign in to continue");
+    //         return;
+    //       },
+    //     );
+    //   });
+    // chrome.runtime.sendMessage({ action: "signIn" }, (response) => {
+    //   if (response.success && response.payload) {
+    //     newTab();
+    //     return;
+    //   }
+    //   alert("Please sign in to continue");
+    //   return;
+    // });
   }
   return (
     <div className="flex h-60 w-80 flex-col gap-10 p-4">
@@ -23,12 +36,12 @@ const App = () => {
         >
           View tabs
         </button>
-        <button
+        {/* <button
           onClick={init}
           className="mb-4 w-24 rounded-md border bg-black px-4 py-2 text-white hover:bg-gray-500 hover:text-white"
         >
           Sign In
-        </button>
+        </button> */}
       </div>
     </div>
   );

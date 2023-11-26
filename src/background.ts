@@ -28,6 +28,7 @@ interface RuntimeMessage {
   newSpaceTitle: string;
   tabId: number;
   newTabs: Tab[];
+  payload: string;
 }
 
 chrome.runtime.onMessage.addListener(
@@ -187,12 +188,23 @@ chrome.runtime.onMessage.addListener(
     if (request.action === "signOut") {
       sendResponse({ success: true });
     }
-    if (request.action === "signIn") {
-      const rs = {
-        success: true,
-        payload: "test",
-      };
-      sendResponse(rs);
+    if (request.action === "signIn" && request.payload) {
+      console.log("token", request.payload);
+      sendResponse({ success: true });
+    }
+    return true;
+  },
+);
+
+//TODO: 從背景腳本取得auth token
+let authToken = "";
+chrome.runtime.onMessage.addListener(
+  (request: RuntimeMessage, _, sendResponse) => {
+    if (request.action === "getAuthToken") {
+      chrome.identity.getAuthToken({ interactive: true }, (token) => {
+        if (token) authToken = token;
+      });
+      sendResponse({ token: authToken });
     }
     return true;
   },

@@ -197,6 +197,7 @@ chrome.runtime.onMessage.addListener(
     }
     if (request.action === "signOut") {
       chrome.identity.removeCachedAuthToken({ token: authToken }, () => {
+        authToken = "";
         sendResponse({ success: true });
       });
       return true;

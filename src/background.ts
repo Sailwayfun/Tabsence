@@ -185,7 +185,6 @@ chrome.tabs.onRemoved.addListener((tabId: number) => {
 
 //TODO:從擴充中將使用者登出
 let authToken = "";
-setInterval(() => console.log("authToken", authToken), 3000);
 chrome.runtime.onMessage.addListener(
   (request: RuntimeMessage, _, sendResponse) => {
     if (request.action === "signIn") {

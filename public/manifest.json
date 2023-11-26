@@ -11,7 +11,14 @@
       "64": "icons/icon-16.png"
     }
   },
-  "permissions": ["tabs", "activeTab", "favicon", "identity", "storage"],
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "favicon",
+    "identity",
+    "storage",
+    "identity.email"
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"

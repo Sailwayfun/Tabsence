@@ -183,14 +183,21 @@ chrome.tabs.onRemoved.addListener((tabId: number) => {
   return true;
 });
 
-//TODO: 從背景腳本取得auth token
+//TODO:從擴充中將使用者登出
 let authToken = "";
+setInterval(() => console.log("authToken", authToken), 3000);
 chrome.runtime.onMessage.addListener(
   (request: RuntimeMessage, _, sendResponse) => {
     if (request.action === "signIn") {
       chrome.identity.getAuthToken({ interactive: true }, (token) => {
         if (!token) sendResponse({ success: false });
         if (token) authToken = token;
+        chrome.identity.getProfileUserInfo(async (userInfo) => {
+          if (!userInfo) return;
+          const usersCollectionRef = collection(db, "users");
+          const userDocRef = doc(usersCollectionRef, userInfo.id);
+          await setDoc(userDocRef, { email: userInfo.email }, { merge: true });
+        });
         sendResponse({ success: true, token: authToken });
       });
       return true;

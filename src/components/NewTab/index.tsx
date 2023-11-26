@@ -101,8 +101,12 @@ const NewTab = () => {
     };
   }, []);
   useEffect(() => {
-    chrome.storage.local.get(["isLoggedin"], function (result) {
-      if (result.isLoggedin) setIsLoggedin(true);
+    chrome.storage.local.get(["isLoggedin", "currentUser"], function (result) {
+      if (result.isLoggedin && result.currentUser) {
+        setIsLoggedin(true);
+        setCurrentUserId(result.currentUser);
+        return;
+      }
     });
   }, []);
   function openLink(
@@ -215,7 +219,10 @@ const NewTab = () => {
       { action: "signOut" },
       async (response: { success: boolean }) => {
         if (response.success) {
-          await chrome.storage.local.set({ isLoggedin: false });
+          await chrome.storage.local.set({
+            isLoggedin: false,
+            currentUser: "",
+          });
           setIsLoggedin(false);
           return;
         }
@@ -228,7 +235,10 @@ const NewTab = () => {
       async (response: { success: boolean; token: string; userId: string }) => {
         console.log("response:", { response });
         if (response.success && response.token && response.userId) {
-          await chrome.storage.local.set({ isLoggedin: true });
+          await chrome.storage.local.set({
+            isLoggedin: true,
+            currentUser: response.userId,
+          });
           setCurrentUserId(response.userId);
           setIsLoggedin(true);
           return;

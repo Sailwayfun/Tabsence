@@ -7,38 +7,48 @@ import {
   deleteDoc,
   query,
   where,
-  serverTimestamp,
-  DocumentData,
-  DocumentReference,
-  updateDoc,
   setDoc,
+  serverTimestamp,
+  arrayUnion,
 } from "firebase/firestore";
 
-chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
-  async function getTabs(queryString: string) {
-    const tabsCollection = collection(db, "tabs");
-    const tabQuery = query(tabsCollection, where("spaceId", "==", queryString));
-    const tabsSnapshot = await getDocs(tabQuery);
-    if (tabsSnapshot.empty) {
-      return [];
+import {
+  getTabs,
+  getSpaces,
+  saveTabInfo,
+  upDateTabBySpace,
+} from "./utils/firestore";
+
+interface RuntimeMessage {
+  action: string;
+  currentPath: string;
+  updatedTab: Tab;
+  spaceId: string;
+  spaceName: string;
+  newSpaceTitle: string;
+  tabId: number;
+  newTabs: Tab[];
+}
+
+chrome.runtime.onMessage.addListener(
+  (request: RuntimeMessage, _, sendResponse) => {
+    if (request.action == "getTabs") {
+      getTabs(request.currentPath)
+        .then((tabs) => sendResponse(tabs))
+        .catch((error) => console.error("Error getting tabs: ", error));
     }
-    const tabs = tabsSnapshot.docs.map((doc) => {
-      return { id: doc.id, ...doc.data() };
-    });
-    return tabs;
-  }
-  if (request.action == "getTabs") {
-    getTabs(request.query)
-      .then((tabs) => sendResponse(tabs))
-      .catch((error) => console.error("Error getting tabs: ", error));
-  }
-  return true;
-});
+    if (request.action == "getSpaces") {
+      getSpaces()
+        .then((spaces) => sendResponse(spaces))
+        .catch((error) => console.error("Error getting spaces: ", error));
+    }
+    return true;
+  },
+);
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
-    const spaceId: string = await saveSpaceInfo();
-    const tabData = await saveTabInfo(tab, spaceId);
+    const tabData = await saveTabInfo(tab);
     chrome.runtime.sendMessage(
       {
         action: "tabUpdated",
@@ -54,108 +64,57 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   return true;
 });
 
-function getFaviconUrl(url: string) {
-  return `chrome-extension://${
-    chrome.runtime.id
-  }/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`;
-}
-
-async function saveSpaceInfo(): Promise<string> {
-  const spaceName = "Unsaved";
-  const spaceCollectionRef = collection(db, "spaces");
-  const spaceId = "OyUOBRt0XlFnQfG5LSdu";
-  const spaceData = {
-    title: spaceName,
-    spaceId: spaceId,
-  };
-  await setDoc(doc(spaceCollectionRef, spaceId), spaceData, { merge: true });
-  return spaceId;
-}
-
-async function saveTabInfo(tab: chrome.tabs.Tab, spaceId: string) {
-  if (tab.url && tab.title && tab.id) {
-    const tabData = {
-      tabId: tab.id,
-      title: tab.title,
-      url: tab.url,
-      favIconUrl: getFaviconUrl(tab.url) || tab.favIconUrl || "",
-      lastAccessed: serverTimestamp(),
-      spaceId,
-      isArchived: false,
-    };
-    const tabDocRef = doc(db, "tabs", tab.id.toString());
-    await setDoc(tabDocRef, tabData, { merge: true });
-    return tabData;
-  }
-}
-
 chrome.runtime.onMessage.addListener(
-  (
-    request: {
-      action: string;
-      updatedTab: Tab;
-      spaceId: string;
-      spaceName: string;
-    },
-    _,
-    sendResponse,
-  ) => {
-    if (request.action === "moveTab") {
+  async (request: RuntimeMessage, _, sendResponse) => {
+    if (request.action === "moveTabToSpace") {
+      const tabOrdersCollectionRef = collection(db, "tabOrders");
+      const tabOrderDocRef = doc(tabOrdersCollectionRef, request.spaceId);
       const tabsCollectionRef = collection(db, "tabs");
       const tabId = request.updatedTab.tabId;
+      await setDoc(
+        tabOrderDocRef,
+        { tabOrder: arrayUnion(tabId) },
+        { merge: true },
+      );
       const q = query(tabsCollectionRef, where("tabId", "==", tabId));
-      getDocs(q).then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          const tabDocRef = doc.ref;
-          updateSpaceOfTab(request, tabDocRef)
-            .then((updatedTab) => {
-              sendResponse(updatedTab);
-            })
-            .catch((error) => {
-              console.error("Error updating tab: ", error);
-              sendResponse(null);
-            });
-        });
+      const tabsQuerySnapshot = await getDocs(q);
+      tabsQuerySnapshot.forEach((doc) => {
+        const tabDocRef = doc.ref;
+        upDateTabBySpace(request, tabDocRef)
+          .then((updatedTab) => {
+            sendResponse(updatedTab);
+          })
+          .catch((error) => {
+            console.error("Error updating tab: ", error);
+            sendResponse(null);
+          });
       });
+    }
+    if (request.action === "addSpace") {
+      const spaceCollectionRef = collection(db, "spaces");
+      const spaceId: string = doc(spaceCollectionRef).id;
+      const spaceData = {
+        title: request.newSpaceTitle,
+        spaceId: spaceId,
+        createdAt: serverTimestamp(),
+      };
+      await setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
+        merge: true,
+      })
+        .then(() => {
+          sendResponse({ id: spaceId });
+        })
+        .catch((error) => {
+          console.error("Error adding space: ", error);
+          sendResponse(null);
+        });
     }
     return true;
   },
 );
-async function updateSpaceOfTab(
-  request: {
-    action: string;
-    updatedTab: Tab;
-    spaceId: string;
-    spaceName: string;
-  },
-  tabDocRef: DocumentReference<DocumentData, DocumentData>,
-) {
-  try {
-    const spaceCollectionRef = collection(db, "spaces");
-    const spaceData = {
-      title: request.spaceName,
-      spaceId: request.spaceId,
-    };
-    await setDoc(doc(spaceCollectionRef, request.spaceId), spaceData, {
-      merge: true,
-    });
-    await updateDoc(tabDocRef, { spaceId: request.spaceId });
-    const updatedTab = { ...request.updatedTab, spaceId: request.spaceId };
-    return updatedTab;
-  } catch (error) {
-    console.error("Error getting tabs: ", error);
-  }
-}
 
 chrome.runtime.onMessage.addListener(
-  (
-    request: {
-      action: string;
-      tabId: number;
-    },
-    _,
-    sendResponse,
-  ) => {
+  (request: RuntimeMessage, _, sendResponse) => {
     if (request.action === "closeTab") {
       closeTabAndRemoveFromFirestore(request.tabId)
         .then(() => sendResponse({ success: true }))
@@ -163,6 +122,37 @@ chrome.runtime.onMessage.addListener(
           console.error("Error closing tab: ", error);
           sendResponse({ success: false });
         });
+    }
+    return true;
+  },
+);
+
+chrome.runtime.onMessage.addListener(
+  async (request: RuntimeMessage, _, sendResponse) => {
+    switch (request.action) {
+      case "updateTabOrder":
+        {
+          try {
+            const tabOrdersCollectionRef = collection(db, "tabOrders");
+            const spaceId = request.spaceId || "global";
+            const tabOrderDocRef = doc(tabOrdersCollectionRef, spaceId);
+            const newTabOrderData = request.newTabs
+              .map((tab) => tab.tabId)
+              .filter(Boolean);
+            await setDoc(
+              tabOrderDocRef,
+              {
+                tabOrder: newTabOrderData,
+              },
+              { merge: true },
+            );
+            sendResponse({ success: true });
+          } catch (error) {
+            console.error("Error updating tab order: ", error);
+            sendResponse({ success: false });
+          }
+        }
+        break;
     }
     return true;
   },

@@ -187,6 +187,13 @@ chrome.runtime.onMessage.addListener(
     if (request.action === "signOut") {
       sendResponse({ success: true });
     }
+    if (request.action === "signIn") {
+      const rs = {
+        success: true,
+        payload: "test",
+      };
+      sendResponse(rs);
+    }
     return true;
   },
 );

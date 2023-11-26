@@ -25,6 +25,7 @@ const NewTab = () => {
   const [selectedSpace, setSelectedSpace] = useState<string>("");
   const [showAddSpacePopup, setShowAddSpacePopup] = useState<boolean>(false);
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
+  const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   console.log({ selectedSpace });
@@ -96,6 +97,11 @@ const NewTab = () => {
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessagePassing);
     };
+  }, []);
+  useEffect(() => {
+    chrome.storage.local.get(["isLoggedin"], function (result) {
+      if (result.isLoggedin) setIsLoggedin(true);
+    });
   }, []);
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
@@ -206,10 +212,26 @@ const NewTab = () => {
   function signOut() {
     chrome.runtime.sendMessage(
       { action: "signOut" },
-      (response: { success: boolean }) => {
+      async (response: { success: boolean }) => {
         if (response.success) {
-          window.location.replace("/index.html");
+          await chrome.storage.local.set({ isLoggedin: false });
+          setIsLoggedin(false);
+          return;
         }
+      },
+    );
+  }
+  function signIn() {
+    chrome.runtime.sendMessage(
+      { action: "signIn" },
+      async (response: { success: boolean; token: string }) => {
+        console.log("response:", { response });
+        if (response.success && response.token) {
+          await chrome.storage.local.set({ isLoggedin: true });
+          setIsLoggedin(true);
+          return;
+        }
+        return;
       },
     );
   }
@@ -219,24 +241,36 @@ const NewTab = () => {
         <img src={logo} className="h-16 w-32 rounded-md" />
       </Link>
       <div className="flex w-full gap-5 py-8">
-        <Spaces
-          spaces={spaces}
-          onOpenAddSpacePopup={openAddSpacePopup}
-          onCloseAddSpacePopup={closeAddSpacePopup}
-          isAddSpacePopupOpen={showAddSpacePopup}
-          ref={newSpaceInputRef}
-          onAddNewSpace={addNewSpace}
-          currentSpaceId={activeSpaceId}
-        />
+        {isLoggedin && (
+          <Spaces
+            spaces={spaces}
+            onOpenAddSpacePopup={openAddSpacePopup}
+            onCloseAddSpacePopup={closeAddSpacePopup}
+            isAddSpacePopupOpen={showAddSpacePopup}
+            ref={newSpaceInputRef}
+            onAddNewSpace={addNewSpace}
+            currentSpaceId={activeSpaceId}
+          />
+        )}
         <div className="flex flex-col">
           <div className="flex gap-3">
             <h1 className="mb-4 text-3xl">Your Tabs</h1>
-            <button
-              onClick={signOut}
-              className="h-10 w-40 rounded-md border bg-black text-white"
-            >
-              Sign Out
-            </button>
+            {isLoggedin && (
+              <button
+                onClick={signOut}
+                className="h-10 w-40 rounded-md border bg-black text-white"
+              >
+                Sign Out
+              </button>
+            )}
+            {!isLoggedin && (
+              <button
+                onClick={signIn}
+                className="h-10 w-40 rounded-md border bg-black text-white"
+              >
+                Sign In
+              </button>
+            )}
           </div>
           {/* <a
             href={`mailto:test123@gmail.com?subject=test&body=${tabs.map(
@@ -247,7 +281,8 @@ const NewTab = () => {
             Share Space
           </a> */}
           <ul className="flex flex-col gap-3">
-            {tabs.length > 0 &&
+            {isLoggedin &&
+              tabs.length > 0 &&
               tabs.map((tab, index) => {
                 const uniqueKey: string = `${tab.url}-${tab.title}`;
                 return (

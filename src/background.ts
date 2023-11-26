@@ -183,29 +183,23 @@ chrome.tabs.onRemoved.addListener((tabId: number) => {
   return true;
 });
 
-chrome.runtime.onMessage.addListener(
-  (request: RuntimeMessage, _, sendResponse) => {
-    if (request.action === "signOut") {
-      sendResponse({ success: true });
-    }
-    if (request.action === "signIn" && request.payload) {
-      console.log("token", request.payload);
-      sendResponse({ success: true });
-    }
-    return true;
-  },
-);
-
 //TODO: 從背景腳本取得auth token
 let authToken = "";
 chrome.runtime.onMessage.addListener(
   (request: RuntimeMessage, _, sendResponse) => {
-    if (request.action === "getAuthToken") {
+    if (request.action === "signIn") {
       chrome.identity.getAuthToken({ interactive: true }, (token) => {
+        if (!token) sendResponse({ success: false });
         if (token) authToken = token;
+        sendResponse({ success: true, token: authToken });
       });
-      sendResponse({ token: authToken });
+      return true;
     }
-    return true;
+    if (request.action === "signOut") {
+      chrome.identity.removeCachedAuthToken({ token: authToken }, () => {
+        sendResponse({ success: true });
+      });
+      return true;
+    }
   },
 );

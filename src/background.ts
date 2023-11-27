@@ -28,17 +28,19 @@ interface RuntimeMessage {
   newSpaceTitle: string;
   tabId: number;
   newTabs: Tab[];
+  payload: string;
+  userId?: string;
 }
 
 chrome.runtime.onMessage.addListener(
   (request: RuntimeMessage, _, sendResponse) => {
-    if (request.action == "getTabs") {
-      getTabs(request.currentPath)
+    if (request.action == "getTabs" && request.userId) {
+      getTabs(request.currentPath, request.userId)
         .then((tabs) => sendResponse(tabs))
         .catch((error) => console.error("Error getting tabs: ", error));
     }
-    if (request.action == "getSpaces") {
-      getSpaces()
+    if (request.action == "getSpaces" && request.userId) {
+      getSpaces(request.userId)
         .then((spaces) => sendResponse(spaces))
         .catch((error) => console.error("Error getting spaces: ", error));
     }
@@ -48,7 +50,10 @@ chrome.runtime.onMessage.addListener(
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
-    const tabData = await saveTabInfo(tab);
+    const userId = await chrome.storage.local
+      .get("userId")
+      .then((res) => res.userId);
+    const tabData = await saveTabInfo(tab, userId);
     chrome.runtime.sendMessage(
       {
         action: "tabUpdated",
@@ -66,10 +71,16 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
 
 chrome.runtime.onMessage.addListener(
   async (request: RuntimeMessage, _, sendResponse) => {
+    if (!request.userId) return;
     if (request.action === "moveTabToSpace") {
-      const tabOrdersCollectionRef = collection(db, "tabOrders");
+      const tabOrdersCollectionRef = collection(
+        db,
+        "users",
+        request.userId,
+        "tabOrders",
+      );
       const tabOrderDocRef = doc(tabOrdersCollectionRef, request.spaceId);
-      const tabsCollectionRef = collection(db, "tabs");
+      const tabsCollectionRef = collection(db, "users", request.userId, "tabs");
       const tabId = request.updatedTab.tabId;
       await setDoc(
         tabOrderDocRef,
@@ -91,7 +102,12 @@ chrome.runtime.onMessage.addListener(
       });
     }
     if (request.action === "addSpace") {
-      const spaceCollectionRef = collection(db, "spaces");
+      const spaceCollectionRef = collection(
+        db,
+        "users",
+        request.userId,
+        "spaces",
+      );
       const spaceId: string = doc(spaceCollectionRef).id;
       const spaceData = {
         title: request.newSpaceTitle,
@@ -115,8 +131,8 @@ chrome.runtime.onMessage.addListener(
 
 chrome.runtime.onMessage.addListener(
   (request: RuntimeMessage, _, sendResponse) => {
-    if (request.action === "closeTab") {
-      closeTabAndRemoveFromFirestore(request.tabId)
+    if (request.action === "closeTab" && request.userId) {
+      closeTabAndRemoveFromFirestore(request.tabId, request.userId)
         .then(() => sendResponse({ success: true }))
         .catch((error) => {
           console.error("Error closing tab: ", error);
@@ -129,11 +145,17 @@ chrome.runtime.onMessage.addListener(
 
 chrome.runtime.onMessage.addListener(
   async (request: RuntimeMessage, _, sendResponse) => {
+    if (!request.userId) return;
     switch (request.action) {
       case "updateTabOrder":
         {
           try {
-            const tabOrdersCollectionRef = collection(db, "tabOrders");
+            const tabOrdersCollectionRef = collection(
+              db,
+              "users",
+              request.userId,
+              "tabOrders",
+            );
             const spaceId = request.spaceId || "global";
             const tabOrderDocRef = doc(tabOrdersCollectionRef, spaceId);
             const newTabOrderData = request.newTabs
@@ -158,17 +180,19 @@ chrome.runtime.onMessage.addListener(
   },
 );
 
-async function closeTabAndRemoveFromFirestore(tabId: number) {
+async function closeTabAndRemoveFromFirestore(tabId: number, userId?: string) {
+  if (!userId) return;
   await closeTab(tabId);
-  await removeTabFromFirestore(tabId);
+  await removeTabFromFirestore(tabId, userId);
 }
 
 async function closeTab(tabId: number) {
   await chrome.tabs.remove(tabId);
 }
 
-async function removeTabFromFirestore(tabId: number) {
-  const tabsCollectionRef = collection(db, "tabs");
+async function removeTabFromFirestore(tabId: number, userId?: string) {
+  if (!userId) return;
+  const tabsCollectionRef = collection(db, "users", userId, "tabs");
   const q = query(tabsCollectionRef, where("tabId", "==", tabId));
   const querySnapshot = await getDocs(q);
   querySnapshot.forEach((doc) => {
@@ -181,3 +205,50 @@ chrome.tabs.onRemoved.addListener((tabId: number) => {
   chrome.runtime.sendMessage({ action: "tabClosed", tabId });
   return true;
 });
+
+async function getUserId() {
+  const result: { [key: string]: string | undefined } =
+    await chrome.storage.local.get("userId");
+  const userId = result.userId;
+  if (!userId) {
+    const userCollectionRef = collection(db, "users");
+    const userId: string = doc(userCollectionRef).id;
+    return userId;
+  }
+  return userId;
+}
+
+//TODO:從擴充中將使用者登出
+let authToken = "";
+chrome.runtime.onMessage.addListener(
+  async (request: RuntimeMessage, _, sendResponse) => {
+    if (request.action === "signIn") {
+      const userId = await getUserId();
+      await chrome.storage.local.set({ userId });
+      sendResponse({ success: true, userId });
+      // chrome.identity.getAuthToken({ interactive: true }, (token) => {
+      //   if (!token) sendResponse({ success: false });
+      //   if (token) authToken = token;
+      //   chrome.identity.getProfileUserInfo(async (userInfo) => {
+      //     if (!userInfo) return;
+      //     const usersCollectionRef = collection(db, "users");
+      //     const userDocRef = doc(usersCollectionRef, userInfo.id);
+      //     await setDoc(userDocRef, { email: userInfo.email }, { merge: true });
+      //     sendResponse({
+      //       success: true,
+      //       token: authToken,
+      //       userId: userInfo.id,
+      //     });
+      //   });
+      // });
+      return true;
+    }
+    if (request.action === "signOut") {
+      chrome.identity.removeCachedAuthToken({ token: authToken }, () => {
+        authToken = "";
+        sendResponse({ success: true });
+      });
+      return true;
+    }
+  },
+);

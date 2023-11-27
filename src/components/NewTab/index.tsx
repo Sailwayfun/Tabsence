@@ -25,9 +25,27 @@ const NewTab = () => {
   const [selectedSpace, setSelectedSpace] = useState<string>("");
   const [showAddSpacePopup, setShowAddSpacePopup] = useState<boolean>(false);
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
+  const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
+  const [currentUserId, setCurrentUserId] = useState<string>("");
+  console.log("tabs:", tabs);
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
-  console.log({ selectedSpace });
+  useEffect(() => {
+    function getUserId(): Promise<void> {
+      return new Promise((resolve, reject) => {
+        chrome.storage.local.get(["userId"], function (result) {
+          if (result.userId) {
+            setCurrentUserId(result.userId);
+            setIsLoggedin(true);
+            resolve();
+            return;
+          }
+          reject();
+        });
+      });
+    }
+    getUserId().catch((err) => console.error(err));
+  }, []);
   useEffect(() => {
     function getNewTabs(response: Tab[], tabs: Tab[]) {
       return response.filter(
@@ -36,9 +54,8 @@ const NewTab = () => {
       );
     }
     const currentPath = location.pathname.split("/")[1];
-    console.log({ currentPath });
     chrome.runtime.sendMessage(
-      { action: "getTabs", currentPath },
+      { action: "getTabs", currentPath, userId: currentUserId },
       function (response) {
         if (response) {
           setTabs((t) => getNewTabs(response, t));
@@ -47,9 +64,8 @@ const NewTab = () => {
       },
     );
     chrome.runtime.sendMessage(
-      { action: "getSpaces" },
+      { action: "getSpaces", userId: currentUserId },
       function (response: Space[]) {
-        console.log({ response });
         if (response) {
           setSpaces(response);
           const currentActiveId = response.find(
@@ -61,7 +77,7 @@ const NewTab = () => {
         }
       },
     );
-  }, [location.pathname]);
+  }, [location.pathname, currentUserId]);
   useEffect(() => {
     const handleMessagePassing = (
       request: {
@@ -72,7 +88,6 @@ const NewTab = () => {
       _: chrome.runtime.MessageSender | undefined,
       sendResponse: <T extends Response>(response: T) => void,
     ) => {
-      console.log({ request });
       if (request.action === "tabClosed") {
         const deletedTabId = request.tabId;
         setTabs((t) => t.filter((tab) => tab.tabId !== deletedTabId));
@@ -97,6 +112,15 @@ const NewTab = () => {
       chrome.runtime.onMessage.removeListener(handleMessagePassing);
     };
   }, []);
+  // useEffect(() => {
+  //   chrome.storage.local.get(["isLoggedin", "currentUser"], function (result) {
+  //     if (result.isLoggedin && result.currentUser) {
+  //       setIsLoggedin(true);
+  //       setCurrentUserId(result.currentUser);
+  //       return;
+  //     }
+  //   });
+  // }, []);
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
     tab: Tab,
@@ -112,6 +136,7 @@ const NewTab = () => {
       const request = {
         action: "closeTab",
         tabId: parseInt(id),
+        userId: currentUserId,
       };
       chrome.runtime.sendMessage(request, function (response) {
         const oldTabs = tabs.filter((tab) => tab.tabId !== parseInt(id));
@@ -132,6 +157,7 @@ const NewTab = () => {
       action: "moveTabToSpace",
       updatedTab: tabs.find((tab) => tab.id?.toString() === activePopupId),
       spaceId: e.target.value,
+      userId: currentUserId,
     };
     chrome.runtime.sendMessage(request, function (response) {
       const oldTabs = tabs.filter(
@@ -158,7 +184,7 @@ const NewTab = () => {
     )
       return alert("Space name already exists");
     chrome.runtime.sendMessage(
-      { action: "addSpace", newSpaceTitle },
+      { action: "addSpace", newSpaceTitle, userId: currentUserId },
       function (response) {
         if (response) {
           setSpaces((s) => [...s, { title: newSpaceTitle, id: response.id }]);
@@ -174,67 +200,108 @@ const NewTab = () => {
   ): Promise<void> {
     const movedTab = tabs.find((tab) => tab.tabId === tabId);
     if (!movedTab) return;
+    const movedTabIndex = tabs.indexOf(movedTab);
     const newTabs = [...tabs];
-    newTabs.splice(tabs.indexOf(movedTab), 1);
-    newTabs.splice(
-      tabs.indexOf(movedTab) + (direction === "up" ? -1 : 1),
-      0,
-      movedTab,
-    );
-    return await onTabOrderChange(newTabs, activeSpaceId);
+    newTabs.splice(movedTabIndex, 1);
+    newTabs.splice(movedTabIndex + (direction === "up" ? -1 : 1), 0, movedTab);
+    setTabs(newTabs);
+    await onTabOrderChange(newTabs, activeSpaceId);
   }
 
   function onTabOrderChange(
     newTabs: Tab[],
     spaceId: string | undefined,
   ): Promise<void> {
-    setTabs(newTabs);
-    //TODO:傳送訊息通知背景腳本同步Firestore
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(
-        { action: "updateTabOrder", newTabs, spaceId },
+        { action: "updateTabOrder", newTabs, spaceId, userId: currentUserId },
         function (response) {
           if (response) {
-            resolve(console.log(response));
-            return;
+            resolve(response);
           }
-          reject(console.log(response));
+          reject();
         },
       );
     });
   }
+  // function signOut() {
+  //   chrome.runtime.sendMessage(
+  //     { action: "signOut" },
+  //     async (response: { success: boolean }) => {
+  //       if (response.success) {
+  //         await chrome.storage.local.set({
+  //           isLoggedin: false,
+  //           currentUser: "",
+  //         });
+  //         setIsLoggedin(false);
+  //         return;
+  //       }
+  //     },
+  //   );
+  // }
+  // function signIn() {
+  //   chrome.runtime.sendMessage(
+  //     { action: "signIn" },
+  //     async (response: { success: boolean; token: string; userId: string }) => {
+  //       console.log("response:", { response });
+  //       if (response.success && response.token && response.userId) {
+  //         await chrome.storage.local.set({
+  //           isLoggedin: true,
+  //           currentUser: response.userId,
+  //         });
+  //         setCurrentUserId(response.userId);
+  //         setIsLoggedin(true);
+  //         return;
+  //       }
+  //       return;
+  //     },
+  //   );
+  // }
   return (
     <>
       <Link to="/" className="contents">
         <img src={logo} className="h-16 w-32 rounded-md" />
       </Link>
       <div className="flex w-full gap-5 py-8">
-        <Spaces
-          spaces={spaces}
-          onOpenAddSpacePopup={openAddSpacePopup}
-          onCloseAddSpacePopup={closeAddSpacePopup}
-          isAddSpacePopupOpen={showAddSpacePopup}
-          ref={newSpaceInputRef}
-          onAddNewSpace={addNewSpace}
-          currentSpaceId={activeSpaceId}
-        />
+        {isLoggedin && (
+          <Spaces
+            spaces={spaces}
+            onOpenAddSpacePopup={openAddSpacePopup}
+            onCloseAddSpacePopup={closeAddSpacePopup}
+            isAddSpacePopupOpen={showAddSpacePopup}
+            ref={newSpaceInputRef}
+            onAddNewSpace={addNewSpace}
+            currentSpaceId={activeSpaceId}
+          />
+        )}
         <div className="flex flex-col">
-          <h1 className="mb-4 text-3xl">Your Tabs</h1>
-          {/* <a
-            href={`mailto:test123@gmail.com?subject=test&body=${tabs.map(
-              (tab) => tab.url,
-            )}`}
-            className="w-10"
-          >
-            Share Space
-          </a> */}
+          <div className="flex gap-3">
+            <h1 className="mb-4 text-3xl">Your Tabs</h1>
+            {/* {isLoggedin && (
+              <button
+                onClick={signOut}
+                className="h-10 w-40 rounded-md border bg-black text-white"
+              >
+                Sign Out
+              </button>
+            )}
+            {!isLoggedin && (
+              <button
+                onClick={signIn}
+                className="h-10 w-40 rounded-md border bg-black text-white"
+              >
+                Sign In
+              </button>
+            )} */}
+            {/* TODO: 新增一個按鈕讓使用者分享當下觀看的space的連結 */}
+          </div>
           <ul className="flex flex-col gap-3">
-            {tabs.length > 0 &&
+            {isLoggedin &&
+              tabs.length > 0 &&
               tabs.map((tab, index) => {
-                const uniqueKey: string = `${tab.url}-${tab.title}`;
                 return (
                   <TabCard
-                    key={uniqueKey}
+                    key={tab.tabId}
                     tab={tab}
                     spaces={spaces}
                     popupId={activePopupId}

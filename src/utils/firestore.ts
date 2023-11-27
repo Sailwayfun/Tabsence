@@ -20,8 +20,10 @@ interface FirebaseTabDoc extends DocumentData {
 async function getDocFromFirestore(
   collectionName: string,
   queryString?: string,
+  userId?: string,
 ) {
-  const collectionRef = collection(db, collectionName);
+  if (!userId) return;
+  const collectionRef = collection(db, "users", userId, collectionName);
   switch (collectionName) {
     case "spaces": {
       const q = query(collectionRef, orderBy("createdAt"));
@@ -35,7 +37,12 @@ async function getDocFromFirestore(
       return spaces;
     }
     case "tabs": {
-      const tabOrdersCollectionRef = collection(db, "tabOrders");
+      const tabOrdersCollectionRef = collection(
+        db,
+        "users",
+        userId,
+        "tabOrders",
+      );
       const tabQuery =
         queryString === ""
           ? collectionRef
@@ -89,18 +96,17 @@ function _getFaviconUrl(url: string) {
   }/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`;
 }
 
-async function getTabs(queryString: string) {
-  const tabs = await getDocFromFirestore("tabs", queryString);
+async function getTabs(queryString: string, userId?: string) {
+  const tabs = await getDocFromFirestore("tabs", queryString, userId);
   return tabs;
 }
-async function getSpaces() {
-  const spaces = await getDocFromFirestore("spaces");
+async function getSpaces(userId?: string) {
+  const spaces = await getDocFromFirestore("spaces", userId);
   return spaces;
 }
 
-async function saveTabInfo(tab: chrome.tabs.Tab) {
-  //const userId = await chrome.storage.local.get("userId")
-  //.then((res) => res.userId);
+async function saveTabInfo(tab: chrome.tabs.Tab, userId?: string) {
+  if (!userId) return;
   if (tab.url && tab.title && tab.id) {
     const tabData = {
       tabId: tab.id,
@@ -110,19 +116,7 @@ async function saveTabInfo(tab: chrome.tabs.Tab) {
       lastAccessed: serverTimestamp(),
       isArchived: false,
     };
-    // if(!userId) {
-    // const storedTabs  = await chrome.storage.local.get("tabs").then((res) => JSON.parse(res.tabData))
-    // storedTabs.push(tabData)
-    // await chrome.storage.local.set({tabs: JSON.stringify(storedTabData)})
-    // if (userId) {
-    // const storedTabs = await chrome.storage.local.get("tabs").then((res) => JSON.parse(res.tabData))
-    // const tabDocRef = doc(db, "users", userId, "tabs", tab.id.toString());
-    // storedTabs.forEach(async (tab) => {
-    //   await setDoc(tabDocRef, tab, { merge: true });
-    //});
-    // chrome.storage.local.set({tabs: JSON.stringify([])})
-    //}
-    const tabDocRef = doc(db, "tabs", tab.id.toString());
+    const tabDocRef = doc(db, "users", userId, "tabs", tab.id.toString());
     await setDoc(tabDocRef, tabData, { merge: true });
     return tabData;
   }

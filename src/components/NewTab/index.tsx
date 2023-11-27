@@ -55,7 +55,7 @@ const NewTab = () => {
     }
     const currentPath = location.pathname.split("/")[1];
     chrome.runtime.sendMessage(
-      { action: "getTabs", currentPath },
+      { action: "getTabs", currentPath, userId: currentUserId },
       function (response) {
         if (response) {
           setTabs((t) => getNewTabs(response, t));
@@ -64,7 +64,7 @@ const NewTab = () => {
       },
     );
     chrome.runtime.sendMessage(
-      { action: "getSpaces" },
+      { action: "getSpaces", userId: currentUserId },
       function (response: Space[]) {
         if (response) {
           setSpaces(response);
@@ -77,7 +77,7 @@ const NewTab = () => {
         }
       },
     );
-  }, [location.pathname]);
+  }, [location.pathname, currentUserId]);
   useEffect(() => {
     const handleMessagePassing = (
       request: {
@@ -112,15 +112,15 @@ const NewTab = () => {
       chrome.runtime.onMessage.removeListener(handleMessagePassing);
     };
   }, []);
-  useEffect(() => {
-    chrome.storage.local.get(["isLoggedin", "currentUser"], function (result) {
-      if (result.isLoggedin && result.currentUser) {
-        setIsLoggedin(true);
-        setCurrentUserId(result.currentUser);
-        return;
-      }
-    });
-  }, []);
+  // useEffect(() => {
+  //   chrome.storage.local.get(["isLoggedin", "currentUser"], function (result) {
+  //     if (result.isLoggedin && result.currentUser) {
+  //       setIsLoggedin(true);
+  //       setCurrentUserId(result.currentUser);
+  //       return;
+  //     }
+  //   });
+  // }, []);
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
     tab: Tab,
@@ -136,6 +136,7 @@ const NewTab = () => {
       const request = {
         action: "closeTab",
         tabId: parseInt(id),
+        userId: currentUserId,
       };
       chrome.runtime.sendMessage(request, function (response) {
         const oldTabs = tabs.filter((tab) => tab.tabId !== parseInt(id));
@@ -156,6 +157,7 @@ const NewTab = () => {
       action: "moveTabToSpace",
       updatedTab: tabs.find((tab) => tab.id?.toString() === activePopupId),
       spaceId: e.target.value,
+      userId: currentUserId,
     };
     chrome.runtime.sendMessage(request, function (response) {
       const oldTabs = tabs.filter(
@@ -182,7 +184,7 @@ const NewTab = () => {
     )
       return alert("Space name already exists");
     chrome.runtime.sendMessage(
-      { action: "addSpace", newSpaceTitle },
+      { action: "addSpace", newSpaceTitle, userId: currentUserId },
       function (response) {
         if (response) {
           setSpaces((s) => [...s, { title: newSpaceTitle, id: response.id }]);
@@ -215,7 +217,7 @@ const NewTab = () => {
     setTabs(newTabs);
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(
-        { action: "updateTabOrder", newTabs, spaceId },
+        { action: "updateTabOrder", newTabs, spaceId, userId: currentUserId },
         function (response) {
           if (response) {
             resolve(console.log(response));

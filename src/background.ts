@@ -183,26 +183,41 @@ chrome.tabs.onRemoved.addListener((tabId: number) => {
   return true;
 });
 
+async function getUserId() {
+  const result: { [key: string]: string | undefined } =
+    await chrome.storage.local.get("userId");
+  const userId = result.userId;
+  if (!userId) {
+    const userCollectionRef = collection(db, "users");
+    const userId: string = doc(userCollectionRef).id;
+    return userId;
+  }
+  return userId;
+}
+
 //TODO:從擴充中將使用者登出
 let authToken = "";
 chrome.runtime.onMessage.addListener(
-  (request: RuntimeMessage, _, sendResponse) => {
+  async (request: RuntimeMessage, _, sendResponse) => {
     if (request.action === "signIn") {
-      chrome.identity.getAuthToken({ interactive: true }, (token) => {
-        if (!token) sendResponse({ success: false });
-        if (token) authToken = token;
-        chrome.identity.getProfileUserInfo(async (userInfo) => {
-          if (!userInfo) return;
-          const usersCollectionRef = collection(db, "users");
-          const userDocRef = doc(usersCollectionRef, userInfo.id);
-          await setDoc(userDocRef, { email: userInfo.email }, { merge: true });
-          sendResponse({
-            success: true,
-            token: authToken,
-            userId: userInfo.id,
-          });
-        });
-      });
+      const userId = await getUserId();
+      await chrome.storage.local.set({ userId });
+      sendResponse({ success: true, userId });
+      // chrome.identity.getAuthToken({ interactive: true }, (token) => {
+      //   if (!token) sendResponse({ success: false });
+      //   if (token) authToken = token;
+      //   chrome.identity.getProfileUserInfo(async (userInfo) => {
+      //     if (!userInfo) return;
+      //     const usersCollectionRef = collection(db, "users");
+      //     const userDocRef = doc(usersCollectionRef, userInfo.id);
+      //     await setDoc(userDocRef, { email: userInfo.email }, { merge: true });
+      //     sendResponse({
+      //       success: true,
+      //       token: authToken,
+      //       userId: userInfo.id,
+      //     });
+      //   });
+      // });
       return true;
     }
     if (request.action === "signOut") {

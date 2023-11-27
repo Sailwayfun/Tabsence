@@ -1,6 +1,15 @@
 const App = () => {
   function newTab() {
-    chrome.tabs.create({ url: "newTab.html" });
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ action: "signIn" }, (response) => {
+        if (response.success && response.userId) {
+          resolve(chrome.tabs.create({ url: "newTab.html" }));
+          return;
+        }
+        reject(console.log("Please sign in to continue"));
+        return;
+      });
+    });
 
     // function init() {
     //   chrome.identity.getAuthToken({ interactive: true }, (token) => {

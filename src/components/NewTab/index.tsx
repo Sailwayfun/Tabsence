@@ -10,6 +10,7 @@ export interface Tab extends chrome.tabs.Tab {
   spaceId?: string;
   tabId: number | undefined;
   isArchived: boolean;
+  isPinned: boolean;
 }
 export interface Space {
   id: string;
@@ -27,8 +28,7 @@ const NewTab = () => {
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
-  console.log("user:", currentUserId);
-  console.log("spaces:", spaces);
+  console.log("currentTabs:", tabs);
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -258,6 +258,20 @@ const NewTab = () => {
   //     },
   //   );
   // }
+  function toggleTabPin(tabId?: number) {
+    setTabs((t) => {
+      const newTabs = t.map((tab) => {
+        if (tabId && tab.tabId === tabId) {
+          return {
+            ...tab,
+            isPinned: !tab.isPinned,
+          };
+        }
+        return tab;
+      });
+      return newTabs.sort((a, b) => Number(b.isPinned) - Number(a.isPinned));
+    });
+  }
   async function copySpaceLink() {
     try {
       const link = window.location.href;
@@ -330,6 +344,7 @@ const NewTab = () => {
                     isFirstTab={index === 0}
                     isLastTab={tabs.length - 1 === index}
                     onTabOrderChange={handleTabOrderChange}
+                    onToggleTabPin={toggleTabPin}
                   ></TabCard>
                 );
               })}

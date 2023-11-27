@@ -115,6 +115,7 @@ async function saveTabInfo(tab: chrome.tabs.Tab, userId?: string) {
       favIconUrl: _getFaviconUrl(tab.url) || tab.favIconUrl || "",
       lastAccessed: serverTimestamp(),
       isArchived: false,
+      isPinned: false,
     };
     const tabDocRef = doc(db, "users", userId, "tabs", tab.id.toString());
     await setDoc(tabDocRef, tabData, { merge: true });

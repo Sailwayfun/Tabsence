@@ -5,6 +5,7 @@ import {
   doc,
   getDocs,
   deleteDoc,
+  updateDoc,
   query,
   where,
   setDoc,
@@ -30,6 +31,7 @@ interface RuntimeMessage {
   newTabs: Tab[];
   payload: string;
   userId?: string;
+  isPinned: boolean;
 }
 
 chrome.runtime.onMessage.addListener(
@@ -250,5 +252,25 @@ chrome.runtime.onMessage.addListener(
       });
       return true;
     }
+  },
+);
+
+chrome.runtime.onMessage.addListener(
+  async (request: RuntimeMessage, _, sendResponse) => {
+    const result = await chrome.storage.local.get("userId");
+    if (!result.userId) return;
+    if (request.action === "toggleTabPin" && request.tabId) {
+      await chrome.tabs.update(request.tabId, { pinned: !request.isPinned });
+      const tabDocRef = doc(
+        db,
+        "users",
+        result.userId,
+        "tabs",
+        request.tabId.toString(),
+      );
+      await updateDoc(tabDocRef, { isPinned: !request.isPinned });
+      sendResponse({ success: true });
+    }
+    return true;
   },
 );

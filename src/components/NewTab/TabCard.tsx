@@ -19,7 +19,7 @@ interface TabProps {
   onSelectSpace: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onCloseTab: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onTabOrderChange: (tabId: number, direction: "up" | "down") => Promise<void>;
-  onToggleTabPin: (tabId?: number) => void;
+  onToggleTabPin: (tabId?: number, isPinned?: boolean) => void;
   selectedSpace: string;
   isLastTab: boolean;
   isFirstTab: boolean;

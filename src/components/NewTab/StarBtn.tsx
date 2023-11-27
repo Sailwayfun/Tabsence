@@ -1,11 +1,14 @@
 interface StarBtnProps {
   id?: number;
   isPinned: boolean;
-  onToggleTabPin: (tabId?: number) => void;
+  onToggleTabPin: (tabId?: number, isPinned?: boolean) => void;
 }
 const StarBtn = ({ onToggleTabPin, id, isPinned }: StarBtnProps) => {
   return (
-    <button onClick={() => onToggleTabPin(id)} className="ml-4 text-gray-800">
+    <button
+      onClick={() => onToggleTabPin(id, isPinned)}
+      className="ml-4 text-gray-800"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"

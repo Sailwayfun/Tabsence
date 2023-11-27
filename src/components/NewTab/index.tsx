@@ -258,7 +258,7 @@ const NewTab = () => {
   //     },
   //   );
   // }
-  function toggleTabPin(tabId?: number) {
+  function toggleTabPin(tabId?: number, isPinned?: boolean) {
     setTabs((t) => {
       const newTabs = t.map((tab) => {
         if (tabId && tab.tabId === tabId) {
@@ -270,6 +270,18 @@ const NewTab = () => {
         return tab;
       });
       return newTabs.sort((a, b) => Number(b.isPinned) - Number(a.isPinned));
+    });
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(
+        { action: "toggleTabPin", tabId, isPinned },
+        function (response) {
+          if (response) {
+            resolve(response);
+            return;
+          }
+          reject();
+        },
+      );
     });
   }
   async function copySpaceLink() {

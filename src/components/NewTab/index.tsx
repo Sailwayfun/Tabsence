@@ -27,7 +27,7 @@ const NewTab = () => {
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
-  console.log("current user:", currentUserId);
+  console.log("tabs:", tabs);
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -200,30 +200,26 @@ const NewTab = () => {
   ): Promise<void> {
     const movedTab = tabs.find((tab) => tab.tabId === tabId);
     if (!movedTab) return;
+    const movedTabIndex = tabs.indexOf(movedTab);
     const newTabs = [...tabs];
-    newTabs.splice(tabs.indexOf(movedTab), 1);
-    newTabs.splice(
-      tabs.indexOf(movedTab) + (direction === "up" ? -1 : 1),
-      0,
-      movedTab,
-    );
-    return await onTabOrderChange(newTabs, activeSpaceId);
+    newTabs.splice(movedTabIndex, 1);
+    newTabs.splice(movedTabIndex + (direction === "up" ? -1 : 1), 0, movedTab);
+    setTabs(newTabs);
+    await onTabOrderChange(newTabs, activeSpaceId);
   }
 
   function onTabOrderChange(
     newTabs: Tab[],
     spaceId: string | undefined,
   ): Promise<void> {
-    setTabs(newTabs);
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(
         { action: "updateTabOrder", newTabs, spaceId, userId: currentUserId },
         function (response) {
           if (response) {
-            resolve(console.log(response));
-            return;
+            resolve(response);
           }
-          reject(console.log(response));
+          reject();
         },
       );
     });
@@ -303,10 +299,9 @@ const NewTab = () => {
             {isLoggedin &&
               tabs.length > 0 &&
               tabs.map((tab, index) => {
-                const uniqueKey: string = `${tab.url}-${tab.title}`;
                 return (
                   <TabCard
-                    key={uniqueKey}
+                    key={tab.tabId}
                     tab={tab}
                     spaces={spaces}
                     popupId={activePopupId}

@@ -258,22 +258,30 @@ const NewTab = () => {
   //     },
   //   );
   // }
-  function toggleTabPin(tabId?: number, isPinned?: boolean) {
-    setTabs((t) => {
-      const newTabs = t.map((tab) => {
-        if (tabId && tab.tabId === tabId) {
-          return {
-            ...tab,
-            isPinned: !tab.isPinned,
-          };
-        }
-        return tab;
-      });
-      return newTabs.sort((a, b) => Number(b.isPinned) - Number(a.isPinned));
+
+  function sortTabsByPin(tabs: Tab[], tabId?: number) {
+    const newTabs = tabs.map((tab) => {
+      if (tabId && tab.tabId === tabId) {
+        return {
+          ...tab,
+          isPinned: !tab.isPinned,
+        };
+      }
+      return tab;
     });
+    return newTabs.sort((a, b) => Number(b.isPinned) - Number(a.isPinned));
+  }
+  function toggleTabPin(tabId?: number, isPinned?: boolean) {
+    setTabs((t) => sortTabsByPin(t, tabId));
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(
-        { action: "toggleTabPin", tabId, isPinned },
+        {
+          action: "toggleTabPin",
+          tabId,
+          isPinned,
+          newTabs: sortTabsByPin(tabs, tabId),
+          spaceId: location.pathname.split("/")[1] || "global",
+        },
         function (response) {
           if (response) {
             resolve(response);

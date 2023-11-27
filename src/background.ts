@@ -268,6 +268,17 @@ chrome.runtime.onMessage.addListener(
         "tabs",
         request.tabId.toString(),
       );
+      const tabOrderDocRef = doc(
+        db,
+        "users",
+        result.userId,
+        "tabOrders",
+        request.spaceId,
+      );
+      const newTabOrder = request.newTabs
+        .map((tab) => tab.tabId)
+        .filter(Boolean);
+      await setDoc(tabOrderDocRef, { tabOrder: newTabOrder }, { merge: true });
       await updateDoc(tabDocRef, { isPinned: !request.isPinned });
       sendResponse({ success: true });
     }

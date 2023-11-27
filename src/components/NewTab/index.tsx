@@ -226,39 +226,39 @@ const NewTab = () => {
       );
     });
   }
-  function signOut() {
-    chrome.runtime.sendMessage(
-      { action: "signOut" },
-      async (response: { success: boolean }) => {
-        if (response.success) {
-          await chrome.storage.local.set({
-            isLoggedin: false,
-            currentUser: "",
-          });
-          setIsLoggedin(false);
-          return;
-        }
-      },
-    );
-  }
-  function signIn() {
-    chrome.runtime.sendMessage(
-      { action: "signIn" },
-      async (response: { success: boolean; token: string; userId: string }) => {
-        console.log("response:", { response });
-        if (response.success && response.token && response.userId) {
-          await chrome.storage.local.set({
-            isLoggedin: true,
-            currentUser: response.userId,
-          });
-          setCurrentUserId(response.userId);
-          setIsLoggedin(true);
-          return;
-        }
-        return;
-      },
-    );
-  }
+  // function signOut() {
+  //   chrome.runtime.sendMessage(
+  //     { action: "signOut" },
+  //     async (response: { success: boolean }) => {
+  //       if (response.success) {
+  //         await chrome.storage.local.set({
+  //           isLoggedin: false,
+  //           currentUser: "",
+  //         });
+  //         setIsLoggedin(false);
+  //         return;
+  //       }
+  //     },
+  //   );
+  // }
+  // function signIn() {
+  //   chrome.runtime.sendMessage(
+  //     { action: "signIn" },
+  //     async (response: { success: boolean; token: string; userId: string }) => {
+  //       console.log("response:", { response });
+  //       if (response.success && response.token && response.userId) {
+  //         await chrome.storage.local.set({
+  //           isLoggedin: true,
+  //           currentUser: response.userId,
+  //         });
+  //         setCurrentUserId(response.userId);
+  //         setIsLoggedin(true);
+  //         return;
+  //       }
+  //       return;
+  //     },
+  //   );
+  // }
   return (
     <>
       <Link to="/" className="contents">
@@ -279,7 +279,7 @@ const NewTab = () => {
         <div className="flex flex-col">
           <div className="flex gap-3">
             <h1 className="mb-4 text-3xl">Your Tabs</h1>
-            {isLoggedin && (
+            {/* {isLoggedin && (
               <button
                 onClick={signOut}
                 className="h-10 w-40 rounded-md border bg-black text-white"
@@ -294,7 +294,7 @@ const NewTab = () => {
               >
                 Sign In
               </button>
-            )}
+            )} */}
             {/* TODO: 新增一個按鈕讓使用者分享當下觀看的space的連結 */}
           </div>
           <ul className="flex flex-col gap-3">

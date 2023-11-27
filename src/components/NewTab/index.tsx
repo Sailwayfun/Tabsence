@@ -30,7 +30,6 @@ const NewTab = () => {
   console.log("current user:", currentUserId);
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
-  console.log({ selectedSpace });
   useEffect(() => {
     function getNewTabs(response: Tab[], tabs: Tab[]) {
       return response.filter(
@@ -39,7 +38,6 @@ const NewTab = () => {
       );
     }
     const currentPath = location.pathname.split("/")[1];
-    console.log({ currentPath });
     chrome.runtime.sendMessage(
       { action: "getTabs", currentPath },
       function (response) {
@@ -52,7 +50,6 @@ const NewTab = () => {
     chrome.runtime.sendMessage(
       { action: "getSpaces" },
       function (response: Space[]) {
-        console.log({ response });
         if (response) {
           setSpaces(response);
           const currentActiveId = response.find(
@@ -75,7 +72,6 @@ const NewTab = () => {
       _: chrome.runtime.MessageSender | undefined,
       sendResponse: <T extends Response>(response: T) => void,
     ) => {
-      console.log({ request });
       if (request.action === "tabClosed") {
         const deletedTabId = request.tabId;
         setTabs((t) => t.filter((tab) => tab.tabId !== deletedTabId));
@@ -283,15 +279,8 @@ const NewTab = () => {
                 Sign In
               </button>
             )}
+            {/* TODO: 新增一個按鈕讓使用者分享當下觀看的space的連結 */}
           </div>
-          {/* <a
-            href={`mailto:test123@gmail.com?subject=test&body=${tabs.map(
-              (tab) => tab.url,
-            )}`}
-            className="w-10"
-          >
-            Share Space
-          </a> */}
           <ul className="flex flex-col gap-3">
             {isLoggedin &&
               tabs.length > 0 &&

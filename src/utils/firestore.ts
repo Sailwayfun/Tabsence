@@ -99,6 +99,8 @@ async function getSpaces() {
 }
 
 async function saveTabInfo(tab: chrome.tabs.Tab) {
+  //const userId = await chrome.storage.local.get("userId")
+  //.then((res) => res.userId);
   if (tab.url && tab.title && tab.id) {
     const tabData = {
       tabId: tab.id,
@@ -108,6 +110,18 @@ async function saveTabInfo(tab: chrome.tabs.Tab) {
       lastAccessed: serverTimestamp(),
       isArchived: false,
     };
+    // if(!userId) {
+    // const storedTabs  = await chrome.storage.local.get("tabs").then((res) => JSON.parse(res.tabData))
+    // storedTabs.push(tabData)
+    // await chrome.storage.local.set({tabs: JSON.stringify(storedTabData)})
+    // if (userId) {
+    // const storedTabs = await chrome.storage.local.get("tabs").then((res) => JSON.parse(res.tabData))
+    // const tabDocRef = doc(db, "users", userId, "tabs", tab.id.toString());
+    // storedTabs.forEach(async (tab) => {
+    //   await setDoc(tabDocRef, tab, { merge: true });
+    //});
+    // chrome.storage.local.set({tabs: JSON.stringify([])})
+    //}
     const tabDocRef = doc(db, "tabs", tab.id.toString());
     await setDoc(tabDocRef, tabData, { merge: true });
     return tabData;

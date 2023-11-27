@@ -31,6 +31,22 @@ const NewTab = () => {
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
+    function getUserId(): Promise<void> {
+      return new Promise((resolve, reject) => {
+        chrome.storage.local.get(["userId"], function (result) {
+          if (result.userId) {
+            setCurrentUserId(result.userId);
+            setIsLoggedin(true);
+            resolve();
+            return;
+          }
+          reject();
+        });
+      });
+    }
+    getUserId().catch((err) => console.error(err));
+  }, []);
+  useEffect(() => {
     function getNewTabs(response: Tab[], tabs: Tab[]) {
       return response.filter(
         (newTab: Tab) =>

@@ -101,7 +101,7 @@ async function getTabs(queryString: string, userId?: string) {
   return tabs;
 }
 async function getSpaces(userId?: string) {
-  const spaces = await getDocFromFirestore("spaces", userId);
+  const spaces = await getDocFromFirestore("spaces", undefined, userId);
   return spaces;
 }
 

@@ -27,7 +27,8 @@ const NewTab = () => {
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
-  console.log("tabs:", tabs);
+  console.log("user:", currentUserId);
+  console.log("spaces:", spaces);
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -257,6 +258,16 @@ const NewTab = () => {
   //     },
   //   );
   // }
+  async function copySpaceLink() {
+    try {
+      const link = window.location.href;
+      await navigator.clipboard.writeText(link);
+      alert("Link copied!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to copy link. Please try again.");
+    }
+  }
   return (
     <>
       <Link to="/" className="contents">
@@ -277,6 +288,12 @@ const NewTab = () => {
         <div className="flex flex-col">
           <div className="flex gap-3">
             <h1 className="mb-4 text-3xl">Your Tabs</h1>
+            <button
+              onClick={copySpaceLink}
+              className="h-8 w-36 rounded-md bg-gray-500 text-lg text-white hover:bg-black"
+            >
+              Copy Space Link
+            </button>
             {/* {isLoggedin && (
               <button
                 onClick={signOut}

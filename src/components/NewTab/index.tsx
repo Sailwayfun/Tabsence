@@ -29,12 +29,24 @@ const NewTab = () => {
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
-  // const archivedSpaces: string[] = useSpaceStore((state) => state.archivedSpaces);
+  const archivedSpaces: string[] = useSpaceStore(
+    (state) => state.archivedSpaces,
+  );
   console.log("currentTabs:", tabs);
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {}, []);
+  useEffect(() => {
+    function hideArchivedSpacesTabs(
+      currentTabs: Tab[],
+      archivedSpaces: string[],
+    ) {
+      return currentTabs.filter(
+        (tab) => !archivedSpaces.includes(tab.spaceId || ""),
+      );
+    }
+    const newTabs = hideArchivedSpacesTabs(tabs, archivedSpaces);
+    setTabs(newTabs);
+  }, [archivedSpaces]);
   useEffect(() => {
     function getUserId(): Promise<void> {
       return new Promise((resolve, reject) => {

@@ -33,8 +33,20 @@ const Spaces = forwardRef(
       const target = spaces.find(({ id: spaceId }) => spaceId === id);
       setActivePopup(target?.id || "");
     }
-    function closeSpacePopup() {
+    async function closeSpacePopup(id: string) {
       setActivePopup("");
+      return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage(
+          { action: "archiveSpace", spaceId: id },
+          (res) => {
+            if (res) {
+              resolve(res);
+            } else {
+              reject();
+            }
+          },
+        );
+      });
     }
     return (
       <div className="flex min-h-screen w-40 flex-col bg-red-800">
@@ -81,6 +93,7 @@ const Spaces = forwardRef(
                 <SpacePopup
                   isOpen={activePopup === id}
                   onClose={closeSpacePopup}
+                  id={id}
                 />
               </li>
             );

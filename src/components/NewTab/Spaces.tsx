@@ -1,9 +1,7 @@
-import { Link } from "react-router-dom";
 import { forwardRef, useState } from "react";
 import { Space } from ".";
 import AddSpaceBtn from "./AddSpaceBtn";
-import KebabMenu from "./KebabMenu";
-import SpacePopup from "./SpacePopup";
+import SpaceTab from "./SpaceTab";
 interface SpacesProps {
   spaces: Space[];
   onOpenAddSpacePopup: () => void;
@@ -80,24 +78,18 @@ const Spaces = forwardRef(
               currentSpaceId === id ? "bg-white text-red-800" : "text-white"
             }`;
             return (
-              <li
+              <SpaceTab
                 key={id}
-                className={`relative border px-2 py-4 text-xl  ${linkClasses} hover:bg-white hover:text-red-800`}
-              >
-                <Link to={`/${id}`} onClick={() => handleLinkClick(id)}>
-                  {title.toLowerCase()}
-                </Link>
-                <KebabMenu
-                  activeLink={activeLink}
-                  id={id}
-                  onOpenPopup={openSpacePopup}
-                />
-                <SpacePopup
-                  isOpen={activePopup === id}
-                  onClose={closeSpacePopup}
-                  id={id}
-                />
-              </li>
+                linkClasses={linkClasses}
+                id={id}
+                title={title}
+                onLinkClick={handleLinkClick}
+                activeLink={activeLink}
+                onOpenPopup={openSpacePopup}
+                isPopupOpen={activePopup === id}
+                onClosePopup={closeSpacePopup}
+                isArchived={archivedSpaces.includes(id)}
+              ></SpaceTab>
             );
           })}
         </ul>

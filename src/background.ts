@@ -286,3 +286,22 @@ chrome.runtime.onMessage.addListener(
     return true;
   },
 );
+
+chrome.runtime.onMessage.addListener(
+  async (request: RuntimeMessage, _, sendResponse) => {
+    const result = await chrome.storage.local.get("userId");
+    if (!result.userId) return sendResponse({ success: false });
+    if (request.action === "archiveSpace" && request.spaceId) {
+      const spaceDocRef = doc(
+        db,
+        "users",
+        result.userId,
+        "spaces",
+        request.spaceId,
+      );
+      await updateDoc(spaceDocRef, { isArchived: true });
+      sendResponse({ success: true });
+    }
+    return true;
+  },
+);

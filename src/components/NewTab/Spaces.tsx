@@ -25,6 +25,7 @@ const Spaces = forwardRef(
     console.log({ currentSpaceId });
     const [activeLink, setActiveLink] = useState<string>("");
     const [activePopup, setActivePopup] = useState<string>("");
+    const [archivedSpaces, setArchivedSpaces] = useState<string[]>([]);
     function handleLinkClick(linkId: string) {
       const targetLink = spaces.find(({ id }) => id === linkId);
       setActiveLink(targetLink?.id || "");
@@ -40,6 +41,7 @@ const Spaces = forwardRef(
           { action: "archiveSpace", spaceId: id },
           (res) => {
             if (res) {
+              setArchivedSpaces((a) => [...a, id]);
               resolve(res);
             } else {
               reject();

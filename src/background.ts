@@ -115,6 +115,7 @@ chrome.runtime.onMessage.addListener(
         title: request.newSpaceTitle,
         spaceId: spaceId,
         createdAt: serverTimestamp(),
+        isArchived: false,
       };
       await setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
         merge: true,

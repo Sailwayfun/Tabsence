@@ -9,12 +9,12 @@ export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
   spaceId?: string;
   tabId: number | undefined;
-  isArchived: boolean;
   isPinned: boolean;
 }
 export interface Space {
   id: string;
   title: string;
+  isArchived?: boolean;
 }
 interface Response {
   success: boolean;

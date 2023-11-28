@@ -1,4 +1,5 @@
 import { forwardRef, useState } from "react";
+import { useSpaceStore } from "../../store";
 import { Space } from ".";
 import AddSpaceBtn from "./AddSpaceBtn";
 import SpaceTab from "./SpaceTab";
@@ -23,7 +24,9 @@ const Spaces = forwardRef(
     console.log({ currentSpaceId });
     const [activeLink, setActiveLink] = useState<string>("");
     const [activePopup, setActivePopup] = useState<string>("");
-    const [archivedSpaces, setArchivedSpaces] = useState<string[]>([]);
+    // const [archivedSpaces, setArchivedSpaces] = useState<string[]>([]);
+    const archivedSpaces = useSpaceStore((state) => state.archivedSpaces);
+    const setArchivedSpaces = useSpaceStore((state) => state.setArchivedSpaces);
     function handleLinkClick(linkId: string) {
       const targetLink = spaces.find(({ id }) => id === linkId);
       setActiveLink(targetLink?.id || "");
@@ -39,7 +42,7 @@ const Spaces = forwardRef(
           { action: "archiveSpace", spaceId: id },
           (res) => {
             if (res) {
-              setArchivedSpaces((a) => [...a, id]);
+              setArchivedSpaces(id);
               resolve(res);
             } else {
               reject();

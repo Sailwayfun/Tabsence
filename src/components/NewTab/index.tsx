@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useSpaceStore } from "../../store";
 import { FieldValue } from "firebase/firestore";
 import { useLocation, Link } from "react-router-dom";
 import Spaces from "./Spaces";
@@ -28,9 +29,12 @@ const NewTab = () => {
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
+  // const archivedSpaces: string[] = useSpaceStore((state) => state.archivedSpaces);
   console.log("currentTabs:", tabs);
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {}, []);
   useEffect(() => {
     function getUserId(): Promise<void> {
       return new Promise((resolve, reject) => {

@@ -33,6 +33,9 @@ const Spaces = forwardRef(
       const target = spaces.find(({ id: spaceId }) => spaceId === id);
       setActivePopup(target?.id || "");
     }
+    function closeSpacePopup() {
+      setActivePopup("");
+    }
     return (
       <div className="flex min-h-screen w-40 flex-col bg-red-800">
         <h2 className="self-end pr-4 pt-4 text-xl text-white">Spaces</h2>
@@ -75,7 +78,10 @@ const Spaces = forwardRef(
                   id={id}
                   onOpenPopup={openSpacePopup}
                 />
-                <SpacePopup isOpen={activePopup === id} />
+                <SpacePopup
+                  isOpen={activePopup === id}
+                  onClose={closeSpacePopup}
+                />
               </li>
             );
           })}

@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import { Space } from ".";
 import AddSpaceBtn from "./AddSpaceBtn";
+import KebabMenu from "./KebabMenu";
 interface SpacesProps {
   spaces: Space[];
   onOpenAddSpacePopup: () => void;
@@ -21,12 +22,17 @@ const Spaces = forwardRef(
       currentSpaceId,
     }: SpacesProps = props;
     console.log({ currentSpaceId });
+    const [activeLink, setActiveLink] = useState<string>("");
+    function handleLinkClick(linkId: string) {
+      const targetLink = spaces.find(({ id }) => id === linkId);
+      setActiveLink(targetLink?.id || "");
+    }
     return (
       <div className="flex min-h-screen w-40 flex-col bg-red-800">
         <h2 className="self-end pr-4 pt-4 text-xl text-white">Spaces</h2>
         <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
         <div
-          className={`absolute left-20 top-40 flex h-36 w-60 flex-col gap-3 border bg-white p-4 shadow ${
+          className={`absolute left-20 top-40 z-10 flex h-36 w-60 flex-col gap-3 border bg-white p-4 shadow ${
             isAddSpacePopupOpen ? "block" : "hidden"
           }`}
         >
@@ -53,9 +59,12 @@ const Spaces = forwardRef(
             return (
               <li
                 key={id}
-                className={`border px-2 py-4 text-xl  ${linkClasses} hover:bg-white hover:text-red-800`}
+                className={`relative border px-2 py-4 text-xl  ${linkClasses} hover:bg-white hover:text-red-800`}
               >
-                <Link to={`/${id}`}>{title.toLowerCase()}</Link>
+                <Link to={`/${id}`} onClick={() => handleLinkClick(id)}>
+                  {title.toLowerCase()}
+                </Link>
+                <KebabMenu activeLink={activeLink} id={id} />
               </li>
             );
           })}

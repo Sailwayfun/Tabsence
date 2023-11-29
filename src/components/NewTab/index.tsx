@@ -67,12 +67,6 @@ const NewTab = () => {
     getUserId().catch((err) => console.error(err));
   }, []);
   useEffect(() => {
-    // function getNewTabs(response: Tab[], tabs: Tab[]) {
-    //   return response.filter(
-    //     (newTab: Tab) =>
-    //       !tabs.some((existingTab) => existingTab.tabId === newTab.tabId),
-    //   );
-    // }
     const currentPath = location.pathname.split("/")[1];
     chrome.runtime.sendMessage(
       { action: "getTabs", currentPath, userId: currentUserId },

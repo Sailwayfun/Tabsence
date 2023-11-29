@@ -35,7 +35,6 @@ const NewTab = () => {
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
   );
-  console.log("currentSpaces", spaces);
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -72,17 +71,14 @@ const NewTab = () => {
       { action: "getTabs", currentPath, userId: currentUserId },
       function (response: Tab[]) {
         if (response) {
-          console.log("response", response, "showArchived", showArchived);
           setTabs(() => {
             if (showArchived) return response;
             const archivedSpaceIds = spaces
               .filter((space) => space.isArchived)
               .map((space) => space.id);
-            console.log(2, archivedSpaceIds);
             const newTabs = response.filter(
               (tab) => !archivedSpaceIds.includes(tab.spaceId || ""),
             );
-            console.log(3, newTabs);
             return newTabs;
           });
           return;

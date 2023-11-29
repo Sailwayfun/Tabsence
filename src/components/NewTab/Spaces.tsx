@@ -35,7 +35,10 @@ const Spaces = forwardRef(
       const target = spaces.find(({ id: spaceId }) => spaceId === id);
       setActivePopup(target?.id || "");
     }
-    async function closeSpacePopup(id: string) {
+    function closeSpacePopup() {
+      setActivePopup("");
+    }
+    async function archiveSpace(id: string) {
       setActivePopup("");
       return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage(
@@ -90,8 +93,9 @@ const Spaces = forwardRef(
                 onLinkClick={handleLinkClick}
                 activeLink={activeLink}
                 onOpenPopup={openSpacePopup}
-                isPopupOpen={activePopup === id}
                 onClosePopup={closeSpacePopup}
+                isPopupOpen={activePopup === id}
+                onArchiveSpace={archiveSpace}
                 isArchived={archivedSpaces.includes(id)}
               ></SpaceTab>
             );

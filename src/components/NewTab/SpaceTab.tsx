@@ -8,7 +8,8 @@ interface SpaceTabProps {
   onLinkClick: (id: string) => void;
   activeLink: string;
   onOpenPopup: (id: string) => void;
-  onClosePopup: (id: string) => void;
+  onArchiveSpace: (id: string) => void;
+  onClosePopup: () => void;
   isPopupOpen: boolean;
   isArchived: boolean;
 }
@@ -21,6 +22,7 @@ const SpaceTab = ({
   onLinkClick,
   onOpenPopup,
   onClosePopup,
+  onArchiveSpace,
   isPopupOpen,
   isArchived,
 }: SpaceTabProps) => {
@@ -33,7 +35,12 @@ const SpaceTab = ({
           {title.toLowerCase()}
         </Link>
         <KebabMenu activeLink={activeLink} id={id} onOpenPopup={onOpenPopup} />
-        <SpacePopup id={id} isOpen={isPopupOpen} onClose={onClosePopup} />
+        <SpacePopup
+          id={id}
+          isOpen={isPopupOpen}
+          onArchiveSpace={onArchiveSpace}
+          onClose={onClosePopup}
+        />
       </li>
     )
   );

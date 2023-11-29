@@ -22,7 +22,12 @@ const SpacePopup = ({
       >
         X
       </button>
-      <button onClick={() => onArchiveSpace(id)}>Archive</button>
+      <button
+        onClick={() => onArchiveSpace(id)}
+        className="hover:text-gray-400 hover:underline"
+      >
+        Archive
+      </button>
     </div>
   );
 };

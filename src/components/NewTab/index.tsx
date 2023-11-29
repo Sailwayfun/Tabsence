@@ -22,6 +22,9 @@ interface Response {
 }
 const NewTab = () => {
   const [tabs, setTabs] = useState<Tab[]>([]);
+  // const [filteredTabs, setFilteredTabs] = useState<Tab[]>([]);
+  // const [filteredSpaces, setFilteredSpaces] = useState<Space[]>([]);
+  const [showArchived, setShowArchived] = useState<boolean>(false);
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [activePopupId, setActivePopupId] = useState<string | undefined>();
   const [selectedSpace, setSelectedSpace] = useState<string>("");
@@ -32,7 +35,7 @@ const NewTab = () => {
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
   );
-  console.log("currentTabs:", tabs);
+  console.log("currentSpaces", spaces);
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -64,18 +67,30 @@ const NewTab = () => {
     getUserId().catch((err) => console.error(err));
   }, []);
   useEffect(() => {
-    function getNewTabs(response: Tab[], tabs: Tab[]) {
-      return response.filter(
-        (newTab: Tab) =>
-          !tabs.some((existingTab) => existingTab.tabId === newTab.tabId),
-      );
-    }
+    // function getNewTabs(response: Tab[], tabs: Tab[]) {
+    //   return response.filter(
+    //     (newTab: Tab) =>
+    //       !tabs.some((existingTab) => existingTab.tabId === newTab.tabId),
+    //   );
+    // }
     const currentPath = location.pathname.split("/")[1];
     chrome.runtime.sendMessage(
       { action: "getTabs", currentPath, userId: currentUserId },
-      function (response) {
+      function (response: Tab[]) {
         if (response) {
-          setTabs((t) => getNewTabs(response, t));
+          console.log("response", response, "showArchived", showArchived);
+          setTabs(() => {
+            if (showArchived) return response;
+            const archivedSpaceIds = spaces
+              .filter((space) => space.isArchived)
+              .map((space) => space.id);
+            console.log(2, archivedSpaceIds);
+            const newTabs = response.filter(
+              (tab) => !archivedSpaceIds.includes(tab.spaceId || ""),
+            );
+            console.log(3, newTabs);
+            return newTabs;
+          });
           return;
         }
       },
@@ -84,17 +99,21 @@ const NewTab = () => {
       { action: "getSpaces", userId: currentUserId },
       function (response: Space[]) {
         if (response) {
-          setSpaces(response);
-          const currentActiveId = response.find(
-            (space) => space.id === currentPath,
-          )?.id;
-          if (currentPath === "") setActiveSpaceId("");
-          if (currentActiveId) setActiveSpaceId(currentActiveId);
-          return;
+          if (showArchived) {
+            setSpaces(response);
+            const currentActiveId = response.find(
+              (space) => space.id === currentPath,
+            )?.id;
+            if (currentPath === "") setActiveSpaceId("");
+            if (currentActiveId) setActiveSpaceId(currentActiveId);
+            return;
+          }
+          const newSpaces = response.filter((space) => !space.isArchived);
+          setSpaces(newSpaces);
         }
       },
     );
-  }, [location.pathname, currentUserId]);
+  }, [location.pathname, currentUserId, showArchived, spaces.length]);
   useEffect(() => {
     const handleMessagePassing = (
       request: {
@@ -343,6 +362,13 @@ const NewTab = () => {
               className="h-8 w-36 rounded-md bg-gray-500 text-lg text-white hover:bg-black"
             >
               Copy Space Link
+            </button>
+            <button
+              onClick={() => setShowArchived(!showArchived)}
+              className="h-8 w-36 rounded-md bg-gray-500 text-lg
+               text-white hover:bg-black"
+            >
+              {showArchived ? "Hide Archive" : "Show Archive"}
             </button>
             {/* {isLoggedin && (
               <button

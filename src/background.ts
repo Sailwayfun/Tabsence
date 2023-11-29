@@ -73,7 +73,7 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
 
 chrome.runtime.onMessage.addListener(
   async (request: RuntimeMessage, _, sendResponse) => {
-    if (!request.userId) return;
+    if (!request.userId) return true;
     if (request.action === "moveTabToSpace") {
       const tabOrdersCollectionRef = collection(
         db,
@@ -102,6 +102,7 @@ chrome.runtime.onMessage.addListener(
             sendResponse(null);
           });
       });
+      return true;
     }
     if (request.action === "addSpace") {
       const spaceCollectionRef = collection(
@@ -127,6 +128,7 @@ chrome.runtime.onMessage.addListener(
           console.error("Error adding space: ", error);
           sendResponse(null);
         });
+      return true;
     }
     return true;
   },

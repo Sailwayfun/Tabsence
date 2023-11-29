@@ -51,7 +51,7 @@ chrome.runtime.onMessage.addListener(
 );
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
-  if (changeInfo.status === "complete") {
+  if (changeInfo.status === "complete" && tab.title !== "Tabsence") {
     const userId = await chrome.storage.local
       .get("userId")
       .then((res) => res.userId);

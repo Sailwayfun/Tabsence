@@ -88,18 +88,17 @@ const NewTab = () => {
     chrome.runtime.sendMessage(
       { action: "getSpaces", userId: currentUserId },
       function (response: Space[]) {
+        console.log(1, response, spaces);
         if (response) {
-          if (showArchived) {
-            setSpaces(response);
-            const currentActiveId = response.find(
-              (space) => space.id === currentPath,
-            )?.id;
-            if (currentPath === "") setActiveSpaceId("");
-            if (currentActiveId) setActiveSpaceId(currentActiveId);
-            return;
-          }
-          const newSpaces = response.filter((space) => !space.isArchived);
-          setSpaces(newSpaces);
+          showArchived
+            ? setSpaces(() => response)
+            : setSpaces(() => response.filter((space) => !space.isArchived));
+          const currentActiveId = response.find(
+            (space) => space.id === currentPath,
+          )?.id;
+          if (currentPath === "") setActiveSpaceId("");
+          if (currentActiveId) setActiveSpaceId(currentActiveId);
+          return;
         }
       },
     );

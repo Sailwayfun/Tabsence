@@ -43,6 +43,7 @@ const Spaces = forwardRef(
           (res) => {
             if (res) {
               setArchivedSpaces(id);
+              alert("Space archived");
               resolve(res);
             } else {
               reject();

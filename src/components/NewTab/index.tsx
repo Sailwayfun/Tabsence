@@ -387,6 +387,7 @@ const NewTab = () => {
           <ul className="flex flex-col gap-3">
             {isLoggedin &&
               tabs.length > 0 &&
+              location.pathname.split("/")[1] !== "webtime" &&
               tabs.map((tab, index) => {
                 return (
                   <TabCard

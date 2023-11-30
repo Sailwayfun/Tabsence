@@ -28,7 +28,7 @@ async function getDocFromFirestore(
     case "spaces": {
       const q = query(collectionRef, orderBy("createdAt"));
       const spacesSnapshot = await getDocs(q);
-      if (spacesSnapshot.empty) {
+      if (spacesSnapshot.empty || queryString === "webtime") {
         return [];
       }
       const spaces = spacesSnapshot.docs.map((doc) => {
@@ -71,7 +71,7 @@ async function getDocFromFirestore(
       const tabOrderSnapshot = await getDoc(tabOrderDocRef);
       const tabOrder: number[] | undefined =
         tabOrderSnapshot.exists() && tabOrderSnapshot.data()?.tabOrder;
-      if (tabsSnapshot.empty) {
+      if (tabsSnapshot.empty || queryString === "webtime") {
         return [];
       }
       const tabs = tabsSnapshot.docs.map((doc) => {

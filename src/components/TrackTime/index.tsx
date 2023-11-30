@@ -69,7 +69,7 @@ const TrackTime = () => {
 
   const labelFields = [
     "Domain Name",
-    "Total Duration",
+    "Total Duration (sec)",
     "Visit Counts",
     "Spent Time (%)",
   ];

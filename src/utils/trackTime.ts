@@ -47,6 +47,8 @@ export async function updateTabDuration(tabId?: number): Promise<void> {
   if (!userId) return;
   try {
     const domain = new URL(url).hostname;
+    const myDomain: string = "icdbgchingbnboklhnagfckgjpdfjfeg";
+    if (domain === myDomain) return;
     const debouncedWriteToFirestore = getDebouncedWrite(userId, domain);
     debouncedWriteToFirestore(durationBySecond, url);
     console.log("writeToFirestore", domain, durationBySecond, url);

@@ -75,10 +75,12 @@ const TrackTime = () => {
   ];
 
   return (
-    <div className="max-w-6xl border border-red-400 p-5">
-      <div className="mb-3 grid grid-cols-4 justify-center text-lg">
+    <div className="max-w-6xl border border-red-400 p-8">
+      <div className="mb-3 grid grid-cols-4 text-lg">
         {labelFields.map((label, index) => (
-          <label key={index}>{label}</label>
+          <label key={index} className="mx-auto my-0">
+            {label}
+          </label>
         ))}
       </div>
       <div>
@@ -86,7 +88,7 @@ const TrackTime = () => {
           {urlDurations.map((website) => (
             <li
               key={website.id}
-              className="grid w-full grid-cols-4 rounded-md border border-gray-300 p-3"
+              className="grid w-full grid-cols-4 rounded-md border border-gray-300 p-3 shadow hover:scale-105"
             >
               <div className="flex gap-2 text-xl">
                 <img
@@ -96,13 +98,11 @@ const TrackTime = () => {
                 />
                 <span>{website.id}</span>
               </div>
-              <div className="flex justify-center text-lg">
+              <div className="mx-auto my-0 text-lg">
                 {website.durationBySecond}
               </div>
-              <div className="flex justify-center text-xl">
-                {website.visitCounts}
-              </div>
-              <div className="text-xl">
+              <div className="mx-auto my-0 text-xl">{website.visitCounts}</div>
+              <div className="mx-auto my-0 text-xl">
                 {getDurationPercentge(website.durationBySecond)}
               </div>
             </li>

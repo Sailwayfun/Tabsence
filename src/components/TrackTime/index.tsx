@@ -66,13 +66,19 @@ const TrackTime = () => {
     return ((duration / totalDuration) * 100).toFixed(2);
   }
 
+  const labelFields = [
+    "Domain Name",
+    "Total Duration",
+    "Visit Counts",
+    "Spent Time (%)",
+  ];
+
   return (
     <div className="max-w-6xl border border-red-400 p-5">
       <div className="mb-3 grid grid-cols-4 justify-center text-lg">
-        <label>Domain Name</label>
-        <label>Total Duration</label>
-        <label>Visit Counts</label>
-        <label>Spent Time (%)</label>
+        {labelFields.map((label, index) => (
+          <label key={index}>{label}</label>
+        ))}
       </div>
       <div>
         <ul className="flex flex-col gap-3">

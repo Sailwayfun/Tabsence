@@ -7,7 +7,10 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
+import debounce from "lodash.debounce";
+
 import { db } from "../../firebase-config";
+
 async function getUserId(): Promise<string | undefined> {
   return await chrome.storage.local.get("userId").then((res) => res.userId);
 }
@@ -19,7 +22,7 @@ interface TabInfo {
 
 export const tabTimes: Record<number, TabInfo> = {};
 
-export function trackTabTime(url: string, tabId?: number) {
+export function trackTabTime(url: string, tabId?: number): void {
   if (!tabId) return;
   tabTimes[tabId] = {
     startTime: Date.now(),
@@ -28,7 +31,7 @@ export function trackTabTime(url: string, tabId?: number) {
   console.log("tabTimes", tabTimes);
 }
 
-export async function updateTabDuration(tabId?: number) {
+export async function updateTabDuration(tabId?: number): Promise<void> {
   if (!tabId) return;
   const userId = await getUserId();
   console.log("userId", userId);
@@ -44,36 +47,43 @@ export async function updateTabDuration(tabId?: number) {
   if (!userId) return;
   try {
     const domain = new URL(url).hostname;
-    writeToFirestore(userId, domain, durationBySecond, url);
+    const debouncedWriteToFirestore = getDebouncedWrite(userId, domain);
+    debouncedWriteToFirestore(durationBySecond, url);
     console.log("writeToFirestore", domain, durationBySecond, url);
   } catch (error) {
     console.error("Error updating tab duration: ", error);
   }
 }
-async function writeToFirestore(
-  userId: string,
-  domain: string,
-  durationBySecond: number,
-  url: string,
-) {
-  const urlRef = doc(db, "users", userId, "urlDurations", domain);
-  const urlSnapShot = await getDoc(urlRef);
-  if (urlSnapShot.exists()) {
-    await updateDoc(urlRef, {
-      durationBySecond: increment(durationBySecond),
-      visitCounts: increment(1),
-      lastVisit: serverTimestamp(),
-    });
-  } else {
-    await setDoc(
-      urlRef,
-      {
-        url,
-        durationBySecond,
-        visitCounts: 1,
-        lastVisit: serverTimestamp(),
-      },
-      { merge: true },
-    );
+
+type DebouncedFunction = (durationBySecond: number, url: string) => void;
+
+const debouncedWrites: Record<string, DebouncedFunction> = {};
+
+function getDebouncedWrite(userId: string, domain: string): DebouncedFunction {
+  if (!debouncedWrites[domain]) {
+    debouncedWrites[domain] = debounce(async (durationBySecond, url) => {
+      const urlRef = doc(db, "users", userId, "urlDurations", domain);
+      const urlSnapShot = await getDoc(urlRef);
+
+      if (urlSnapShot.exists()) {
+        await updateDoc(urlRef, {
+          durationBySecond: increment(durationBySecond),
+          visitCounts: increment(1),
+          lastVisit: serverTimestamp(),
+        });
+      } else {
+        await setDoc(
+          urlRef,
+          {
+            url,
+            durationBySecond,
+            visitCounts: 1,
+            lastVisit: serverTimestamp(),
+          },
+          { merge: true },
+        );
+      }
+    }, 1000);
   }
+  return debouncedWrites[domain];
 }

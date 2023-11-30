@@ -6,6 +6,7 @@ import {
   increment,
   serverTimestamp,
 } from "firebase/firestore";
+import { getFaviconUrl } from "./firestore";
 
 import debounce from "lodash.debounce";
 
@@ -77,6 +78,7 @@ function getDebouncedWrite(userId: string, domain: string): DebouncedFunction {
         await setDoc(
           urlRef,
           {
+            faviconUrl: getFaviconUrl(url),
             url,
             durationBySecond,
             visitCounts: 1,

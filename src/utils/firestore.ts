@@ -90,7 +90,7 @@ function sortTabs(tabs: FirebaseTabDoc[], tabOrder?: number[]) {
   return tabOrder.map((_, index) => sortByOrder(index)).filter(Boolean);
 }
 
-function _getFaviconUrl(url: string) {
+export function getFaviconUrl(url: string) {
   return `chrome-extension://${
     chrome.runtime.id
   }/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`;
@@ -112,7 +112,7 @@ async function saveTabInfo(tab: chrome.tabs.Tab, userId?: string) {
       tabId: tab.id,
       title: tab.title,
       url: tab.url,
-      favIconUrl: _getFaviconUrl(tab.url) || tab.favIconUrl || "",
+      favIconUrl: getFaviconUrl(tab.url) || tab.favIconUrl || "",
       lastAccessed: serverTimestamp(),
       isPinned: false,
     };

@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 interface UrlDuration {
   id: string;
   url: string;
+  faviconUrl: string;
   durationBySecond: number;
   lastVisitTime: FieldValue;
   visitCounts: number;
@@ -87,7 +88,14 @@ const TrackTime = () => {
               key={website.id}
               className="grid w-full grid-cols-4 rounded-md border border-gray-300 p-3"
             >
-              <div className="text-xl">{website.id}</div>
+              <div className="flex gap-2 text-xl">
+                <img
+                  className="h-8 w-8"
+                  src={website.faviconUrl}
+                  alt={website.id}
+                />
+                <span>{website.id}</span>
+              </div>
               <div className="flex justify-center text-lg">
                 {website.durationBySecond}
               </div>

@@ -5,6 +5,7 @@ import {
   doc,
   getDocs,
   deleteDoc,
+  updateDoc,
   query,
   where,
   setDoc,
@@ -30,6 +31,7 @@ interface RuntimeMessage {
   newTabs: Tab[];
   payload: string;
   userId?: string;
+  isPinned: boolean;
 }
 
 chrome.runtime.onMessage.addListener(
@@ -49,7 +51,7 @@ chrome.runtime.onMessage.addListener(
 );
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
-  if (changeInfo.status === "complete") {
+  if (changeInfo.status === "complete" && tab.title !== "Tabsence") {
     const userId = await chrome.storage.local
       .get("userId")
       .then((res) => res.userId);
@@ -71,7 +73,7 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
 
 chrome.runtime.onMessage.addListener(
   async (request: RuntimeMessage, _, sendResponse) => {
-    if (!request.userId) return;
+    if (!request.userId) return true;
     if (request.action === "moveTabToSpace") {
       const tabOrdersCollectionRef = collection(
         db,
@@ -100,6 +102,7 @@ chrome.runtime.onMessage.addListener(
             sendResponse(null);
           });
       });
+      return true;
     }
     if (request.action === "addSpace") {
       const spaceCollectionRef = collection(
@@ -113,6 +116,7 @@ chrome.runtime.onMessage.addListener(
         title: request.newSpaceTitle,
         spaceId: spaceId,
         createdAt: serverTimestamp(),
+        isArchived: false,
       };
       await setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
         merge: true,
@@ -124,6 +128,7 @@ chrome.runtime.onMessage.addListener(
           console.error("Error adding space: ", error);
           sendResponse(null);
         });
+      return true;
     }
     return true;
   },
@@ -250,5 +255,55 @@ chrome.runtime.onMessage.addListener(
       });
       return true;
     }
+  },
+);
+
+chrome.runtime.onMessage.addListener(
+  async (request: RuntimeMessage, _, sendResponse) => {
+    const result = await chrome.storage.local.get("userId");
+    if (!result.userId) return;
+    if (request.action === "toggleTabPin" && request.tabId) {
+      await chrome.tabs.update(request.tabId, { pinned: !request.isPinned });
+      const tabDocRef = doc(
+        db,
+        "users",
+        result.userId,
+        "tabs",
+        request.tabId.toString(),
+      );
+      const tabOrderDocRef = doc(
+        db,
+        "users",
+        result.userId,
+        "tabOrders",
+        request.spaceId,
+      );
+      const newTabOrder = request.newTabs
+        .map((tab) => tab.tabId)
+        .filter(Boolean);
+      await setDoc(tabOrderDocRef, { tabOrder: newTabOrder }, { merge: true });
+      await updateDoc(tabDocRef, { isPinned: !request.isPinned });
+      sendResponse({ success: true });
+    }
+    return true;
+  },
+);
+
+chrome.runtime.onMessage.addListener(
+  async (request: RuntimeMessage, _, sendResponse) => {
+    const result = await chrome.storage.local.get("userId");
+    if (!result.userId) return sendResponse({ success: false });
+    if (request.action === "archiveSpace" && request.spaceId) {
+      const spaceDocRef = doc(
+        db,
+        "users",
+        result.userId,
+        "spaces",
+        request.spaceId,
+      );
+      await updateDoc(spaceDocRef, { isArchived: true });
+      sendResponse({ success: true });
+    }
+    return true;
   },
 );

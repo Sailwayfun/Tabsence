@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useSpaceStore } from "../../store";
 import { FieldValue } from "firebase/firestore";
 import { useLocation, Link } from "react-router-dom";
 import Spaces from "./Spaces";
@@ -9,17 +10,21 @@ export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
   spaceId?: string;
   tabId: number | undefined;
-  isArchived: boolean;
+  isPinned: boolean;
 }
 export interface Space {
   id: string;
   title: string;
+  isArchived?: boolean;
 }
 interface Response {
   success: boolean;
 }
 const NewTab = () => {
   const [tabs, setTabs] = useState<Tab[]>([]);
+  // const [filteredTabs, setFilteredTabs] = useState<Tab[]>([]);
+  // const [filteredSpaces, setFilteredSpaces] = useState<Space[]>([]);
+  const [showArchived, setShowArchived] = useState<boolean>(false);
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [activePopupId, setActivePopupId] = useState<string | undefined>();
   const [selectedSpace, setSelectedSpace] = useState<string>("");
@@ -27,10 +32,23 @@ const NewTab = () => {
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
-  console.log("user:", currentUserId);
-  console.log("spaces:", spaces);
+  const archivedSpaces: string[] = useSpaceStore(
+    (state) => state.archivedSpaces,
+  );
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    function hideArchivedSpacesTabs(
+      currentTabs: Tab[],
+      archivedSpaces: string[],
+    ) {
+      return currentTabs.filter(
+        (tab) => !archivedSpaces.includes(tab.spaceId || ""),
+      );
+    }
+    const newTabs = hideArchivedSpacesTabs(tabs, archivedSpaces);
+    setTabs(newTabs);
+  }, [archivedSpaces]);
   useEffect(() => {
     function getUserId(): Promise<void> {
       return new Promise((resolve, reject) => {
@@ -48,18 +66,21 @@ const NewTab = () => {
     getUserId().catch((err) => console.error(err));
   }, []);
   useEffect(() => {
-    function getNewTabs(response: Tab[], tabs: Tab[]) {
-      return response.filter(
-        (newTab: Tab) =>
-          !tabs.some((existingTab) => existingTab.tabId === newTab.tabId),
-      );
-    }
     const currentPath = location.pathname.split("/")[1];
     chrome.runtime.sendMessage(
       { action: "getTabs", currentPath, userId: currentUserId },
-      function (response) {
+      function (response: Tab[]) {
         if (response) {
-          setTabs((t) => getNewTabs(response, t));
+          setTabs(() => {
+            if (showArchived) return response;
+            const archivedSpaceIds = spaces
+              .filter((space) => space.isArchived)
+              .map((space) => space.id);
+            const newTabs = response.filter(
+              (tab) => !archivedSpaceIds.includes(tab.spaceId || ""),
+            );
+            return newTabs;
+          });
           return;
         }
       },
@@ -67,8 +88,11 @@ const NewTab = () => {
     chrome.runtime.sendMessage(
       { action: "getSpaces", userId: currentUserId },
       function (response: Space[]) {
+        console.log(1, response, spaces);
         if (response) {
-          setSpaces(response);
+          showArchived
+            ? setSpaces(() => response)
+            : setSpaces(() => response.filter((space) => !space.isArchived));
           const currentActiveId = response.find(
             (space) => space.id === currentPath,
           )?.id;
@@ -78,7 +102,7 @@ const NewTab = () => {
         }
       },
     );
-  }, [location.pathname, currentUserId]);
+  }, [location.pathname, currentUserId, showArchived, spaces.length]);
   useEffect(() => {
     const handleMessagePassing = (
       request: {
@@ -258,6 +282,40 @@ const NewTab = () => {
   //     },
   //   );
   // }
+
+  function sortTabsByPin(tabs: Tab[], tabId?: number) {
+    const newTabs = tabs.map((tab) => {
+      if (tabId && tab.tabId === tabId) {
+        return {
+          ...tab,
+          isPinned: !tab.isPinned,
+        };
+      }
+      return tab;
+    });
+    return newTabs.sort((a, b) => Number(b.isPinned) - Number(a.isPinned));
+  }
+  function toggleTabPin(tabId?: number, isPinned?: boolean) {
+    setTabs((t) => sortTabsByPin(t, tabId));
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(
+        {
+          action: "toggleTabPin",
+          tabId,
+          isPinned,
+          newTabs: sortTabsByPin(tabs, tabId),
+          spaceId: location.pathname.split("/")[1] || "global",
+        },
+        function (response) {
+          if (response) {
+            resolve(response);
+            return;
+          }
+          reject();
+        },
+      );
+    });
+  }
   async function copySpaceLink() {
     try {
       const link = window.location.href;
@@ -293,6 +351,13 @@ const NewTab = () => {
               className="h-8 w-36 rounded-md bg-gray-500 text-lg text-white hover:bg-black"
             >
               Copy Space Link
+            </button>
+            <button
+              onClick={() => setShowArchived(!showArchived)}
+              className="h-8 w-36 rounded-md bg-gray-500 text-lg
+               text-white hover:bg-black"
+            >
+              {showArchived ? "Hide Archive" : "Show Archive"}
             </button>
             {/* {isLoggedin && (
               <button
@@ -330,6 +395,7 @@ const NewTab = () => {
                     isFirstTab={index === 0}
                     isLastTab={tabs.length - 1 === index}
                     onTabOrderChange={handleTabOrderChange}
+                    onToggleTabPin={toggleTabPin}
                   ></TabCard>
                 );
               })}

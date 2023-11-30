@@ -4,6 +4,7 @@ import MoveToSpace from "./MoveToSpace";
 import CloseBtn from "./CloseBtn";
 import ArrowDownBtn from "./ArrowDownBtn";
 import ArrowUpBtn from "./ArrowUpBtn";
+import StarBtn from "./StarBtn";
 interface TabProps {
   tab: Tab;
   spaces: Space[];
@@ -18,6 +19,7 @@ interface TabProps {
   onSelectSpace: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onCloseTab: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onTabOrderChange: (tabId: number, direction: "up" | "down") => Promise<void>;
+  onToggleTabPin: (tabId?: number, isPinned?: boolean) => void;
   selectedSpace: string;
   isLastTab: boolean;
   isFirstTab: boolean;
@@ -32,6 +34,7 @@ const TabCard = memo(function TabCard({
   onSelectSpace,
   onCloseTab,
   onTabOrderChange,
+  onToggleTabPin,
   selectedSpace,
   isFirstTab,
   isLastTab,
@@ -86,6 +89,11 @@ const TabCard = memo(function TabCard({
           direction="down"
         />
       )}
+      <StarBtn
+        onToggleTabPin={onToggleTabPin}
+        isPinned={tab.isPinned}
+        id={tab.tabId}
+      />
     </li>
   );
 });

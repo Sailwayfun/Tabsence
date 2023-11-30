@@ -20,6 +20,8 @@ import {
   upDateTabBySpace,
 } from "./utils/firestore";
 
+import { trackTabTime, updateTabDuration } from "./utils/trackTime";
+
 interface RuntimeMessage {
   action: string;
   currentPath: string;
@@ -51,6 +53,11 @@ chrome.runtime.onMessage.addListener(
 );
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
+  if (changeInfo.url) {
+    await updateTabDuration(tab.id);
+    await trackTabTime(changeInfo.url, tab.id);
+    return true;
+  }
   if (changeInfo.status === "complete" && tab.title !== "Tabsence") {
     const userId = await chrome.storage.local
       .get("userId")
@@ -205,8 +212,9 @@ async function removeTabFromFirestore(tabId: number, userId?: string) {
   });
 }
 
-chrome.tabs.onRemoved.addListener((tabId: number) => {
+chrome.tabs.onRemoved.addListener(async (tabId: number) => {
   removeTabFromFirestore(tabId);
+  await updateTabDuration(tabId);
   chrome.runtime.sendMessage({ action: "tabClosed", tabId });
   return true;
 });

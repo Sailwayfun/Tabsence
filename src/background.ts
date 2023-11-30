@@ -54,8 +54,10 @@ chrome.runtime.onMessage.addListener(
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   if (changeInfo.url) {
-    await updateTabDuration(tab.id);
-    await trackTabTime(changeInfo.url, tab.id);
+    const tabDurationUpdated = await updateTabDuration(tab.id);
+    console.log(1, "updateTabDuration", tabDurationUpdated);
+    const tabTimeTracked = trackTabTime(changeInfo.url, tab.id);
+    console.log(2, "tracktabtime", tabTimeTracked);
     return true;
   }
   if (changeInfo.status === "complete" && tab.title !== "Tabsence") {
@@ -214,7 +216,8 @@ async function removeTabFromFirestore(tabId: number, userId?: string) {
 
 chrome.tabs.onRemoved.addListener(async (tabId: number) => {
   removeTabFromFirestore(tabId);
-  await updateTabDuration(tabId);
+  const tabDurationUpdated = await updateTabDuration(tabId);
+  console.log(3, "updateTabDuration", tabDurationUpdated);
   chrome.runtime.sendMessage({ action: "tabClosed", tabId });
   return true;
 });

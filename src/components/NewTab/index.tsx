@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSpaceStore } from "../../store";
 import { FieldValue } from "firebase/firestore";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, Outlet } from "react-router-dom";
 import Spaces from "./Spaces";
 import logo from "../../assets/logo.png";
 import TabCard from "./TabCard";
@@ -359,6 +359,12 @@ const NewTab = () => {
             >
               {showArchived ? "Hide Archive" : "Show Archive"}
             </button>
+            <button
+              className="h-8 w-80 rounded-md bg-gray-500 text-lg
+               text-white hover:bg-black"
+            >
+              <Link to="/webtime">Check Your Browsing Habits</Link>
+            </button>
             {/* {isLoggedin && (
               <button
                 onClick={signOut}
@@ -377,6 +383,7 @@ const NewTab = () => {
             )} */}
             {/* TODO: 新增一個按鈕讓使用者分享當下觀看的space的連結 */}
           </div>
+          <Outlet />
           <ul className="flex flex-col gap-3">
             {isLoggedin &&
               tabs.length > 0 &&

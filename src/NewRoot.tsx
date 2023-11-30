@@ -3,6 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
+import TrackTime from "./components/TrackTime";
 
 const router = createHashRouter([
   {
@@ -12,6 +13,10 @@ const router = createHashRouter([
       {
         path: "/:spaceId",
         element: <NewTab />,
+      },
+      {
+        path: "/webtime",
+        element: <TrackTime />,
       },
     ],
   },

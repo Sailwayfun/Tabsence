@@ -7,8 +7,9 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import { useEffect, useState } from "react";
+import Chart from "./Chart";
 
-interface UrlDuration {
+export interface UrlDuration {
   id: string;
   url: string;
   faviconUrl: string;
@@ -109,6 +110,7 @@ const TrackTime = () => {
           ))}
         </ul>
       </div>
+      <Chart durationData={urlDurations} />
     </div>
   );
 };

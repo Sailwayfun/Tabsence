@@ -68,6 +68,10 @@ const TrackTime = () => {
     return ((duration / totalDuration) * 100).toFixed(2);
   }
 
+  function getTotalDuration() {
+    return urlDurations.reduce((acc, cur) => acc + cur.durationBySecond, 0);
+  }
+
   const labelFields = [
     "Domain Name",
     "Total Duration (sec)",
@@ -109,6 +113,10 @@ const TrackTime = () => {
             </li>
           ))}
         </ul>
+        <div className="mx-auto my-3 border-t-2 border-gray-200 pl-80 pt-3 text-xl">
+          <span className="pr-3 tracking-wide">Total Duration:</span>
+          <span>{getTotalDuration()} s</span>
+        </div>
       </div>
       <Chart durationData={urlDurations} />
     </div>

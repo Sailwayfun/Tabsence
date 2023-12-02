@@ -61,10 +61,7 @@ const TrackTime = () => {
   }, [userId]);
 
   function getDurationPercentge(duration: number) {
-    const totalDuration = urlDurations.reduce(
-      (acc, cur) => acc + cur.durationBySecond,
-      0,
-    );
+    const totalDuration = getTotalDuration();
     return ((duration / totalDuration) * 100).toFixed(2);
   }
 

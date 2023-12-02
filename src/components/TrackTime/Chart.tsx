@@ -7,6 +7,9 @@ interface ChartProps {
 }
 
 const Chart = ({ durationData }: ChartProps) => {
+  const totalDuration = durationData.reduce((total, current) => {
+    return total + current.durationBySecond;
+  }, 0);
   const options = {
     chart: {
       type: "pie",
@@ -50,7 +53,10 @@ const Chart = ({ durationData }: ChartProps) => {
         colorByPoint: true,
         data: durationData.map((urlDuration) => ({
           name: urlDuration.id,
-          y: urlDuration.durationBySecond,
+          y:
+            Math.round(
+              (urlDuration.durationBySecond / totalDuration) * 100 * 100,
+            ) / 100,
           url: urlDuration.id,
         })),
       },

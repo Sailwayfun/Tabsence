@@ -6,6 +6,10 @@ interface ChartProps {
   durationData: UrlDuration[];
 }
 
+interface CustomPointOptions extends Highcharts.PointOptionsObject {
+  url: string;
+  faviconUrl: string;
+}
 const Chart = ({ durationData }: ChartProps) => {
   const totalDuration = durationData.reduce((total, current) => {
     return total + current.durationBySecond;
@@ -27,14 +31,23 @@ const Chart = ({ durationData }: ChartProps) => {
         dataLabels: [
           {
             enabled: true,
-            distance: 20,
+            useHTML: true,
+            connectorPadding: -5,
+            connectorWidth: 2,
+            formatter: function (this: Highcharts.PointLabelObject) {
+              const { faviconUrl } = this.point.options as CustomPointOptions;
+              console.log(faviconUrl);
+              return `<span style="background:url(${faviconUrl}) no-repeat left center; padding: 20px 40px;display: inline-block;" width="16px" height="16px" />
+              <span style="font-size: 2em; text-outline: none; opacity: 0.6;">${this.point.name}</span>`;
+            },
+            distance: 30,
           },
           {
             enabled: true,
-            distance: -40,
+            distance: -25,
             format: "{point.percentage:.1f}%",
             style: {
-              fontSize: "1.2em",
+              fontSize: "1em",
               textOutline: "none",
               opacity: 0.7,
             },
@@ -58,6 +71,7 @@ const Chart = ({ durationData }: ChartProps) => {
               (urlDuration.durationBySecond / totalDuration) * 100 * 100,
             ) / 100,
           url: urlDuration.id,
+          faviconUrl: urlDuration.faviconUrl,
         })),
       },
     ],

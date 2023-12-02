@@ -46,8 +46,7 @@ const NewTab = () => {
         (tab) => !archivedSpaces.includes(tab.spaceId || ""),
       );
     }
-    const newTabs = hideArchivedSpacesTabs(tabs, archivedSpaces);
-    setTabs(newTabs);
+    setTabs((t) => hideArchivedSpacesTabs(t, archivedSpaces));
   }, [archivedSpaces]);
   useEffect(() => {
     function getUserId(): Promise<void> {

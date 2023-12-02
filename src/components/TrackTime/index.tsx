@@ -77,7 +77,7 @@ const TrackTime = () => {
   ];
 
   return (
-    <div className="max-w-6xl border border-red-400 p-8">
+    <div className="max-w-6xl rounded-lg border p-8 shadow-md">
       <div className="mb-3 grid grid-cols-4 text-lg">
         {labelFields.map((label, index) => (
           <label key={index} className="mx-auto my-0">

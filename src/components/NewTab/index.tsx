@@ -24,7 +24,7 @@ const NewTab = () => {
   const [tabs, setTabs] = useState<Tab[]>([]);
   // const [filteredTabs, setFilteredTabs] = useState<Tab[]>([]);
   // const [filteredSpaces, setFilteredSpaces] = useState<Space[]>([]);
-  const [showArchived, setShowArchived] = useState<boolean>(false);
+  // const [showArchived, setShowArchived] = useState<boolean>(false);
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [activePopupId, setActivePopupId] = useState<string | undefined>();
   const [selectedSpace, setSelectedSpace] = useState<string>("");
@@ -72,14 +72,7 @@ const NewTab = () => {
       function (response: Tab[]) {
         if (response) {
           setTabs(() => {
-            if (showArchived) return response;
-            const archivedSpaceIds = spaces
-              .filter((space) => space.isArchived)
-              .map((space) => space.id);
-            const newTabs = response.filter(
-              (tab) => !archivedSpaceIds.includes(tab.spaceId || ""),
-            );
-            return newTabs;
+            return response;
           });
           return;
         }
@@ -88,11 +81,9 @@ const NewTab = () => {
     chrome.runtime.sendMessage(
       { action: "getSpaces", userId: currentUserId },
       function (response: Space[]) {
-        console.log(1, response, spaces);
+        // console.log(1, response, spaces);
         if (response) {
-          showArchived
-            ? setSpaces(() => response)
-            : setSpaces(() => response.filter((space) => !space.isArchived));
+          setSpaces(() => response);
           const currentActiveId = response.find(
             (space) => space.id === currentPath,
           )?.id;
@@ -102,7 +93,7 @@ const NewTab = () => {
         }
       },
     );
-  }, [location.pathname, currentUserId, showArchived, spaces.length]);
+  }, [location.pathname, currentUserId]);
   useEffect(() => {
     const handleMessagePassing = (
       request: {
@@ -352,13 +343,13 @@ const NewTab = () => {
             >
               Copy Space Link
             </button>
-            <button
+            {/* <button
               onClick={() => setShowArchived(!showArchived)}
               className="h-8 w-36 rounded-md bg-gray-500 text-lg
                text-white hover:bg-black"
             >
               {showArchived ? "Hide Archive" : "Show Archive"}
-            </button>
+            </button> */}
             <button
               className="h-8 w-80 rounded-md bg-gray-500 text-lg
                text-white hover:bg-black"

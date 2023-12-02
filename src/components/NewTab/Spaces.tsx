@@ -1,4 +1,5 @@
 import { forwardRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSpaceStore } from "../../store";
 import { Space } from ".";
 import AddSpaceBtn from "./AddSpaceBtn";
@@ -27,6 +28,7 @@ const Spaces = forwardRef(
     // const [archivedSpaces, setArchivedSpaces] = useState<string[]>([]);
     const archivedSpaces = useSpaceStore((state) => state.archivedSpaces);
     const setArchivedSpaces = useSpaceStore((state) => state.setArchivedSpaces);
+    const navigate = useNavigate();
     function handleLinkClick(linkId: string) {
       const targetLink = spaces.find(({ id }) => id === linkId);
       setActiveLink(targetLink?.id || "");
@@ -47,6 +49,7 @@ const Spaces = forwardRef(
             if (res) {
               setArchivedSpaces(id);
               alert("Space archived");
+              navigate("/");
               resolve(res);
             } else {
               reject();

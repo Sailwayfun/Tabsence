@@ -23,6 +23,9 @@ const Chart = ({ durationData }: ChartProps) => {
     },
     tooltip: {
       valueSuffix: "%",
+      style: {
+        fontSize: "1.2em",
+      },
     },
     plotOptions: {
       series: {

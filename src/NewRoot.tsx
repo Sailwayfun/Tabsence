@@ -12,7 +12,6 @@ const router = createHashRouter([
     children: [
       {
         path: "/:spaceId",
-        element: <NewTab />,
       },
       {
         path: "/webtime",

@@ -36,7 +36,6 @@ const Chart = ({ durationData }: ChartProps) => {
             connectorWidth: 2,
             formatter: function (this: Highcharts.PointLabelObject) {
               const { faviconUrl } = this.point.options as CustomPointOptions;
-              console.log(faviconUrl);
               return `<span style="background:url(${faviconUrl}) no-repeat left center; padding: 20px 40px;display: inline-block;" width="16px" height="16px" />
               <span style="font-size: 2em; text-outline: none; opacity: 0.6;">${this.point.name}</span>`;
             },

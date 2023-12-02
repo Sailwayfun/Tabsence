@@ -28,7 +28,7 @@ async function getDocFromFirestore(
     case "spaces": {
       const q = query(collectionRef, orderBy("createdAt"));
       const spacesSnapshot = await getDocs(q);
-      if (spacesSnapshot.empty) {
+      if (spacesSnapshot.empty || queryString === "webtime") {
         return [];
       }
       const spaces = spacesSnapshot.docs.map((doc) => {
@@ -71,7 +71,7 @@ async function getDocFromFirestore(
       const tabOrderSnapshot = await getDoc(tabOrderDocRef);
       const tabOrder: number[] | undefined =
         tabOrderSnapshot.exists() && tabOrderSnapshot.data()?.tabOrder;
-      if (tabsSnapshot.empty) {
+      if (tabsSnapshot.empty || queryString === "webtime") {
         return [];
       }
       const tabs = tabsSnapshot.docs.map((doc) => {
@@ -90,7 +90,7 @@ function sortTabs(tabs: FirebaseTabDoc[], tabOrder?: number[]) {
   return tabOrder.map((_, index) => sortByOrder(index)).filter(Boolean);
 }
 
-function _getFaviconUrl(url: string) {
+export function getFaviconUrl(url: string) {
   return `chrome-extension://${
     chrome.runtime.id
   }/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`;
@@ -112,7 +112,7 @@ async function saveTabInfo(tab: chrome.tabs.Tab, userId?: string) {
       tabId: tab.id,
       title: tab.title,
       url: tab.url,
-      favIconUrl: _getFaviconUrl(tab.url) || tab.favIconUrl || "",
+      favIconUrl: getFaviconUrl(tab.url) || tab.favIconUrl || "",
       lastAccessed: serverTimestamp(),
       isPinned: false,
     };

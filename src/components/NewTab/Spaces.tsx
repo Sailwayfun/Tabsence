@@ -61,12 +61,12 @@ const Spaces = forwardRef(
     }
     return (
       <div className="fixed left-0 top-0 z-10 flex min-h-screen w-40 flex-col overflow-hidden bg-red-800">
-        <div className="h-12 flex-1">
+        <div className="h-12">
           <Link className="btn btn-ghost text-xl" to="/">
             <img src={logo} className="h-12 w-28 rounded-md" />
           </Link>
         </div>
-        <h2 className="self-end pr-4 pt-4 text-xl text-white">Spaces</h2>
+        <h2 className="self-end pr-4 pt-12 text-xl text-white">Spaces</h2>
         <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
         <div
           className={`absolute left-20 top-40 z-10 flex h-36 w-60 flex-col gap-3 border bg-white p-4 shadow ${

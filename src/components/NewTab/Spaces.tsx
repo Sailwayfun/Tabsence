@@ -5,11 +5,10 @@ import { Space } from ".";
 import AddSpaceBtn from "./AddSpaceBtn";
 import SpaceTab from "./SpaceTab";
 import logo from "../../assets/logo.png";
+import AddSpace from "./AddSpace";
 interface SpacesProps {
   spaces: Space[];
   onOpenAddSpacePopup: () => void;
-  onCloseAddSpacePopup: () => void;
-  isAddSpacePopupOpen: boolean;
   onAddNewSpace: () => void;
   currentSpaceId?: string;
 }
@@ -18,9 +17,7 @@ const Spaces = forwardRef(
     const {
       spaces,
       onOpenAddSpacePopup,
-      onCloseAddSpacePopup,
       onAddNewSpace,
-      isAddSpacePopupOpen,
       currentSpaceId,
     }: SpacesProps = props;
     console.log({ currentSpaceId });
@@ -59,6 +56,15 @@ const Spaces = forwardRef(
         );
       });
     }
+    function handleAddNewSpace(
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+      ref: React.Ref<HTMLDialogElement>,
+    ) {
+      e.preventDefault();
+      onAddNewSpace();
+      const modalRef = ref as React.RefObject<HTMLDialogElement>;
+      modalRef.current?.close();
+    }
     return (
       <div className="fixed left-0 top-0 z-10 flex min-h-screen w-72 flex-col overflow-hidden bg-red-800">
         <div className="h-12">
@@ -68,7 +74,7 @@ const Spaces = forwardRef(
         </div>
         <h2 className="self-end pr-4 pt-12 text-xl text-white">Spaces</h2>
         <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
-        <div
+        {/* <div
           className={`absolute left-20 top-40 z-10 flex h-36 w-60 flex-col gap-3 border bg-white p-4 shadow ${
             isAddSpacePopupOpen ? "block" : "hidden"
           }`}
@@ -87,7 +93,8 @@ const Spaces = forwardRef(
           >
             Add a new space
           </button>
-        </div>
+        </div> */}
+        <AddSpace ref={ref} onAddNewSpace={handleAddNewSpace} />
         <ul className="flex w-full flex-col">
           {spaces.map(({ id, title }) => {
             const linkClasses: string = `${

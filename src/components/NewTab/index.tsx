@@ -29,7 +29,6 @@ const NewTab = () => {
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [activePopupId, setActivePopupId] = useState<string | undefined>();
   const [selectedSpace, setSelectedSpace] = useState<string>("");
-  const [showAddSpacePopup, setShowAddSpacePopup] = useState<boolean>(false);
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
@@ -183,10 +182,11 @@ const NewTab = () => {
     });
   }
   function openAddSpacePopup() {
-    setShowAddSpacePopup(true);
-  }
-  function closeAddSpacePopup() {
-    setShowAddSpacePopup(false);
+    const targetModal = document.getElementById(
+      "add_space",
+    ) as HTMLDialogElement | null;
+    if (targetModal) targetModal.showModal();
+    console.log("open modal", targetModal);
   }
   function addNewSpace() {
     const newSpaceTitle: string | undefined =
@@ -325,8 +325,6 @@ const NewTab = () => {
           <Spaces
             spaces={spaces}
             onOpenAddSpacePopup={openAddSpacePopup}
-            onCloseAddSpacePopup={closeAddSpacePopup}
-            isAddSpacePopupOpen={showAddSpacePopup}
             ref={newSpaceInputRef}
             onAddNewSpace={addNewSpace}
             currentSpaceId={activeSpaceId}

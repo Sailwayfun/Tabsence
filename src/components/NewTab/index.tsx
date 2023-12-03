@@ -3,7 +3,7 @@ import { useSpaceStore } from "../../store";
 import { FieldValue } from "firebase/firestore";
 import { useLocation, Link, Outlet } from "react-router-dom";
 import Spaces from "./Spaces";
-import logo from "../../assets/logo.png";
+import Header from "./Header";
 import TabCard from "./TabCard";
 
 export interface Tab extends chrome.tabs.Tab {
@@ -318,9 +318,7 @@ const NewTab = () => {
   }
   return (
     <>
-      <Link to="/" className="contents">
-        <img src={logo} className="h-16 w-32 rounded-md" />
-      </Link>
+      <Header />
       <div className="flex w-full gap-5 py-8">
         {isLoggedin && (
           <Spaces

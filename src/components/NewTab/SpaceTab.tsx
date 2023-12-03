@@ -29,7 +29,7 @@ const SpaceTab = ({
   return (
     !isArchived && (
       <li
-        className={`relative border px-2 py-4 text-xl  ${linkClasses} hover:bg-white hover:text-red-800`}
+        className={`relative border px-2 py-4 text-xl  ${linkClasses} hover:bg-white hover:text-blue-800`}
       >
         <Link to={`/${id}`} onClick={() => onLinkClick(id)}>
           {title.toLowerCase()}

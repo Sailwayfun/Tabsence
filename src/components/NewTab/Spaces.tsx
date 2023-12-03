@@ -1,9 +1,10 @@
 import { forwardRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useSpaceStore } from "../../store";
 import { Space } from ".";
 import AddSpaceBtn from "./AddSpaceBtn";
 import SpaceTab from "./SpaceTab";
+import logo from "../../assets/logo.png";
 interface SpacesProps {
   spaces: Space[];
   onOpenAddSpacePopup: () => void;
@@ -59,7 +60,12 @@ const Spaces = forwardRef(
       });
     }
     return (
-      <div className="flex min-h-screen w-40 flex-col bg-red-800">
+      <div className="fixed left-0 top-0 z-10 flex min-h-screen w-40 flex-col overflow-hidden bg-red-800">
+        <div className="h-12 flex-1">
+          <Link className="btn btn-ghost text-xl" to="/">
+            <img src={logo} className="h-12 w-28 rounded-md" />
+          </Link>
+        </div>
         <h2 className="self-end pr-4 pt-4 text-xl text-white">Spaces</h2>
         <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
         <div

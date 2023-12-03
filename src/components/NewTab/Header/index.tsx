@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import logo from "../../../assets/logo.png";
-// import Dropdown from "./Dropdown";
 import Clock from "./Clock";
 const Header = () => {
   return (

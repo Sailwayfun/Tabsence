@@ -5,6 +5,7 @@ import { useLocation, Outlet } from "react-router-dom";
 import Spaces from "./Spaces";
 import Header from "./Header";
 import TabCard from "./TabCard";
+import CopyToClipboard from "./CopyToClipboard";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -239,6 +240,16 @@ const NewTab = () => {
       );
     });
   }
+  async function copySpaceLink() {
+    try {
+      const link = window.location.href;
+      await navigator.clipboard.writeText(link);
+      alert("Link copied!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to copy link. Please try again.");
+    }
+  }
   // function signOut() {
   //   chrome.runtime.sendMessage(
   //     { action: "signOut" },
@@ -324,6 +335,7 @@ const NewTab = () => {
         <div className="flex flex-col">
           <div className="flex gap-3">
             <h1 className="mb-4 text-3xl">Your Tabs</h1>
+            <CopyToClipboard onCopySpaceLink={copySpaceLink} />
             {/* <button
               onClick={() => setShowArchived(!showArchived)}
               className="h-8 w-36 rounded-md bg-gray-500 text-lg

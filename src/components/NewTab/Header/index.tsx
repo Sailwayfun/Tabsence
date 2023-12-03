@@ -3,16 +3,6 @@ import logo from "../../../assets/logo.png";
 // import Dropdown from "./Dropdown";
 import Clock from "./Clock";
 const Header = () => {
-  // async function copySpaceLink() {
-  //   try {
-  //     const link = window.location.href;
-  //     await navigator.clipboard.writeText(link);
-  //     alert("Link copied!");
-  //   } catch (err) {
-  //     console.error(err);
-  //     alert("Failed to copy link. Please try again.");
-  //   }
-  // }
   return (
     <div className="navbar bg-base-200 flex">
       <div className="h-12 flex-1">

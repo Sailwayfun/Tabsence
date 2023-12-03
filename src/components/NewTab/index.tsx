@@ -320,7 +320,7 @@ const NewTab = () => {
   return (
     <>
       <Header />
-      <div className="flex w-full gap-5 py-8 pl-60">
+      <div className="flex w-full gap-5 overflow-x-hidden py-8 pl-48">
         {isLoggedin && (
           <Spaces
             spaces={spaces}

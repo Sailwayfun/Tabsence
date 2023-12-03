@@ -333,8 +333,8 @@ const NewTab = () => {
           />
         )}
         <div className="flex flex-col">
-          <div className="flex gap-3">
-            <h1 className="mb-4 text-3xl">Your Tabs</h1>
+          <div className="flex items-center gap-8 pb-4">
+            <h1 className="text-3xl">Your Tabs</h1>
             <CopyToClipboard onCopySpaceLink={copySpaceLink} />
             {/* <button
               onClick={() => setShowArchived(!showArchived)}

@@ -4,7 +4,10 @@ interface CopyToClipboardProps {
 
 const CopyToClipboard = ({ onCopySpaceLink }: CopyToClipboardProps) => {
   return (
-    <div className="tooltip ml-4 text-sm" data-tip="Copy Space Link">
+    <div
+      className="tooltip flex items-center text-sm"
+      data-tip="Copy Space Link"
+    >
       <button onClick={onCopySpaceLink}>
         <svg
           xmlns="http://www.w3.org/2000/svg"

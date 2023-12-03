@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useSpaceStore } from "../../store";
 import { FieldValue } from "firebase/firestore";
-import { useLocation, Link, Outlet } from "react-router-dom";
+import { useLocation, Outlet } from "react-router-dom";
 import Spaces from "./Spaces";
-import logo from "../../assets/logo.png";
+import Header from "./Header";
 import TabCard from "./TabCard";
+import CopyToClipboard from "./CopyToClipboard";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -239,6 +240,16 @@ const NewTab = () => {
       );
     });
   }
+  async function copySpaceLink() {
+    try {
+      const link = window.location.href;
+      await navigator.clipboard.writeText(link);
+      alert("Link copied!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to copy link. Please try again.");
+    }
+  }
   // function signOut() {
   //   chrome.runtime.sendMessage(
   //     { action: "signOut" },
@@ -306,21 +317,9 @@ const NewTab = () => {
       );
     });
   }
-  async function copySpaceLink() {
-    try {
-      const link = window.location.href;
-      await navigator.clipboard.writeText(link);
-      alert("Link copied!");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to copy link. Please try again.");
-    }
-  }
   return (
     <>
-      <Link to="/" className="contents">
-        <img src={logo} className="h-16 w-32 rounded-md" />
-      </Link>
+      <Header />
       <div className="flex w-full gap-5 py-8">
         {isLoggedin && (
           <Spaces
@@ -334,14 +333,9 @@ const NewTab = () => {
           />
         )}
         <div className="flex flex-col">
-          <div className="flex gap-3">
-            <h1 className="mb-4 text-3xl">Your Tabs</h1>
-            <button
-              onClick={copySpaceLink}
-              className="h-8 w-36 rounded-md bg-gray-500 text-lg text-white hover:bg-black"
-            >
-              Copy Space Link
-            </button>
+          <div className="flex items-center gap-8 pb-4">
+            <h1 className="text-3xl">Your Tabs</h1>
+            <CopyToClipboard onCopySpaceLink={copySpaceLink} />
             {/* <button
               onClick={() => setShowArchived(!showArchived)}
               className="h-8 w-36 rounded-md bg-gray-500 text-lg
@@ -349,12 +343,6 @@ const NewTab = () => {
             >
               {showArchived ? "Hide Archive" : "Show Archive"}
             </button> */}
-            <button
-              className="h-8 w-80 rounded-md bg-gray-500 text-lg
-               text-white hover:bg-black"
-            >
-              <Link to="/webtime">Check Your Browsing Habits</Link>
-            </button>
             {/* {isLoggedin && (
               <button
                 onClick={signOut}

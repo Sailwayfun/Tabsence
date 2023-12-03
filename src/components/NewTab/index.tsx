@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSpaceStore } from "../../store";
 import { FieldValue } from "firebase/firestore";
-import { useLocation, Link, Outlet } from "react-router-dom";
+import { useLocation, Outlet } from "react-router-dom";
 import Spaces from "./Spaces";
 import Header from "./Header";
 import TabCard from "./TabCard";
@@ -331,12 +331,6 @@ const NewTab = () => {
             >
               {showArchived ? "Hide Archive" : "Show Archive"}
             </button> */}
-            <button
-              className="h-8 w-80 rounded-md bg-gray-500 text-lg
-               text-white hover:bg-black"
-            >
-              <Link to="/webtime">Check Your Browsing Habits</Link>
-            </button>
             {/* {isLoggedin && (
               <button
                 onClick={signOut}

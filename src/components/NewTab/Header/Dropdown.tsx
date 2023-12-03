@@ -1,8 +1,13 @@
+import { Link } from "react-router-dom";
 interface DropdownProps {
   onCopySpaceLink: () => void;
 }
 
 const Dropdown = ({ onCopySpaceLink }: DropdownProps) => {
+  const handleClick = () => {
+    const elem = document.activeElement as HTMLElement;
+    elem?.blur();
+  };
   return (
     <div className="dropdown dropdown-end">
       <div tabIndex={0} role="button" className="btn btn-ghost rounded-btn">
@@ -24,10 +29,10 @@ const Dropdown = ({ onCopySpaceLink }: DropdownProps) => {
         tabIndex={0}
         className="menu dropdown-content bg-base-100 rounded-box z-[1] mt-4 w-52 p-2 shadow"
       >
-        <li>
-          <a>Website Time Tracker</a>
+        <li onClick={handleClick}>
+          <Link to="/webtime">Website Time Tracker</Link>
         </li>
-        <li>
+        <li onClick={handleClick}>
           <a onClick={onCopySpaceLink}>Copy Space Link</a>
         </li>
       </ul>

@@ -1,4 +1,8 @@
-const Dropdown = () => {
+interface DropdownProps {
+  onCopySpaceLink: () => void;
+}
+
+const Dropdown = ({ onCopySpaceLink }: DropdownProps) => {
   return (
     <div className="dropdown dropdown-end">
       <div tabIndex={0} role="button" className="btn btn-ghost rounded-btn">
@@ -24,7 +28,7 @@ const Dropdown = () => {
           <a>Website Time Tracker</a>
         </li>
         <li>
-          <a>Copy Space Link</a>
+          <a onClick={onCopySpaceLink}>Copy Space Link</a>
         </li>
       </ul>
     </div>

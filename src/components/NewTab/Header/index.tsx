@@ -14,7 +14,7 @@ const Header = () => {
           <Link to="/webtime">
             <div className="flex items-center">
               <Clock />
-              <span className="text-lg">Website Time Checker</span>
+              <span className="text-lg">Website Time Tracker</span>
             </div>
           </Link>
         </button>

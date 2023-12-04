@@ -92,7 +92,9 @@ const Spaces = forwardRef(
           <ul className="flex flex-col">
             {spaces.map(({ id, title }) => {
               const linkClasses: string = `${
-                currentSpaceId === id ? "bg-white text-red-800" : "text-white"
+                currentSpaceId === id
+                  ? "text-yellow-400"
+                  : "bg-blue-600 text-white"
               }`;
               return (
                 <SpaceTab

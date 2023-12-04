@@ -6,6 +6,7 @@ import AddSpaceBtn from "./AddSpaceBtn";
 import SpaceTab from "./SpaceTab";
 import logo from "../../assets/logo.png";
 import tabs from "../../assets/tabs.png";
+import Folder from "../icons/Folder";
 import AddSpace from "./AddSpace";
 interface SpacesProps {
   spaces: Space[];
@@ -78,7 +79,12 @@ const Spaces = forwardRef(
           </Link>
         </div>
         <div className="flex max-h-full w-full flex-col overflow-y-auto [&::-webkit-scrollbar]:hidden">
-          <h2 className="self-end pr-4 pt-12 text-xl text-white">Spaces</h2>
+          <div className="flex items-center gap-3 pl-4 pt-10">
+            <div className="h-4 w-4">
+              <Folder />
+            </div>
+            <h2 className="text-xl text-white">SPACES</h2>
+          </div>
           <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
           <AddSpace ref={ref} onAddNewSpace={handleAddNewSpace} />
           <ul className="flex flex-col">

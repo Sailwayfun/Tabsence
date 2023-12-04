@@ -332,8 +332,15 @@ const NewTab = () => {
         )}
         <div className="flex flex-col">
           <div className="flex items-center gap-8 pb-4">
-            <h1 className="text-3xl">Your Tabs</h1>
-            <CopyToClipboard onCopySpaceLink={copySpaceLink} />
+            {location.pathname !== "/webtime" && (
+              <>
+                <h1 className="text-3xl">Your Tabs</h1>
+                <CopyToClipboard onCopySpaceLink={copySpaceLink} />
+              </>
+            )}
+            {location.pathname === "/webtime" && (
+              <h1 className="text-3xl">Your Time Spent on Websites</h1>
+            )}
             {/* <button
               onClick={() => setShowArchived(!showArchived)}
               className="h-8 w-36 rounded-md bg-gray-500 text-lg

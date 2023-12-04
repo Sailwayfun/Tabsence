@@ -23,16 +23,11 @@ const Spaces = forwardRef(
       currentSpaceId,
     }: SpacesProps = props;
     console.log({ currentSpaceId });
-    const [activeLink, setActiveLink] = useState<string>("");
     const [activePopup, setActivePopup] = useState<string>("");
     // const [archivedSpaces, setArchivedSpaces] = useState<string[]>([]);
     const archivedSpaces = useSpaceStore((state) => state.archivedSpaces);
     const setArchivedSpaces = useSpaceStore((state) => state.setArchivedSpaces);
     const navigate = useNavigate();
-    function handleLinkClick(linkId: string) {
-      const targetLink = spaces.find(({ id }) => id === linkId);
-      setActiveLink(targetLink?.id || "");
-    }
     function openSpacePopup(id: string) {
       const target = spaces.find(({ id: spaceId }) => spaceId === id);
       setActivePopup(target?.id || "");
@@ -102,8 +97,6 @@ const Spaces = forwardRef(
                   linkClasses={linkClasses}
                   id={id}
                   title={title}
-                  onLinkClick={handleLinkClick}
-                  activeLink={activeLink}
                   onOpenPopup={openSpacePopup}
                   onClosePopup={closeSpacePopup}
                   isPopupOpen={activePopup === id}

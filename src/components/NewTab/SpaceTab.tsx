@@ -5,8 +5,6 @@ interface SpaceTabProps {
   linkClasses: string;
   id: string;
   title: string;
-  onLinkClick: (id: string) => void;
-  activeLink: string;
   onOpenPopup: (id: string) => void;
   onArchiveSpace: (id: string) => void;
   onClosePopup: () => void;
@@ -18,8 +16,6 @@ const SpaceTab = ({
   linkClasses,
   title,
   id,
-  activeLink,
-  onLinkClick,
   onOpenPopup,
   onClosePopup,
   onArchiveSpace,
@@ -28,13 +24,9 @@ const SpaceTab = ({
 }: SpaceTabProps) => {
   return (
     !isArchived && (
-      <li
-        className={`relative p-4 text-xl  ${linkClasses} hover:bg-blue-800`}
-      >
-        <Link to={`/${id}`} onClick={() => onLinkClick(id)}>
-          {title.toLowerCase()}
-        </Link>
-        <KebabMenu activeLink={activeLink} id={id} onOpenPopup={onOpenPopup} />
+      <li className={`relative p-4 text-xl  ${linkClasses} hover:bg-blue-800`}>
+        <Link to={`/${id}`}>{title.toLowerCase()}</Link>
+        <KebabMenu id={id} onOpenPopup={onOpenPopup} />
         <SpacePopup
           id={id}
           isOpen={isPopupOpen}

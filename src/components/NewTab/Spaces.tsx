@@ -5,6 +5,7 @@ import { Space } from ".";
 import AddSpaceBtn from "./AddSpaceBtn";
 import SpaceTab from "./SpaceTab";
 import logo from "../../assets/logo.png";
+import tabs from "../../assets/tabs.png";
 import AddSpace from "./AddSpace";
 interface SpacesProps {
   spaces: Space[];
@@ -67,9 +68,13 @@ const Spaces = forwardRef(
     }
     return (
       <div className="fixed left-0 top-0 z-10 flex min-h-screen w-72 flex-col bg-blue-600">
-        <div className="h-12">
-          <Link className="btn btn-ghost text-xl" to="/">
-            <img src={logo} className="h-12 w-28 rounded-md" />
+        <div className="h-16">
+          <Link
+            className="btn btn-ghost group/logo h-full justify-start rounded-sm pl-0 text-xl"
+            to="/"
+          >
+            <img src={logo} className="w-1/2 object-contain" />
+            <img src={tabs} className="hidden h-8 w-8 group-hover/logo:block" />
           </Link>
         </div>
         <h2 className="self-end pr-4 pt-12 text-xl text-white">Spaces</h2>

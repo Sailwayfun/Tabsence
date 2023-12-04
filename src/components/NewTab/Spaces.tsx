@@ -66,7 +66,7 @@ const Spaces = forwardRef(
       modalRef.current?.close();
     }
     return (
-      <div className="fixed left-0 top-0 z-10 flex min-h-screen w-72 flex-col overflow-hidden bg-blue-600">
+      <div className="fixed left-0 top-0 z-10 flex min-h-screen w-72 flex-col bg-blue-600">
         <div className="h-12">
           <Link className="btn btn-ghost text-xl" to="/">
             <img src={logo} className="h-12 w-28 rounded-md" />

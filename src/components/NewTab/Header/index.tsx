@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Clock from "./Clock";
+import Clock from "../../icons/Clock";
 const Header = () => {
   return (
     <div className="navbar bg-base-200 sticky top-0 flex justify-end">

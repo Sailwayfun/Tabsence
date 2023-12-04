@@ -18,7 +18,6 @@ const Header = () => {
             </div>
           </Link>
         </button>
-        {/* <Dropdown onCopySpaceLink={copySpaceLink} /> */}
       </div>
     </div>
   );

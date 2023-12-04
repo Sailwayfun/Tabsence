@@ -67,7 +67,7 @@ const Spaces = forwardRef(
       modalRef.current?.close();
     }
     return (
-      <div className="fixed left-0 top-0 z-10 flex min-h-screen w-72 flex-col bg-blue-600">
+      <div className="fixed left-0 top-0 z-10 flex h-full w-72 flex-col bg-blue-600">
         <div className="h-16">
           <Link
             className="btn btn-ghost group/logo h-full justify-start rounded-sm pl-0 text-xl"
@@ -77,31 +77,33 @@ const Spaces = forwardRef(
             <img src={tabs} className="hidden h-8 w-8 group-hover/logo:block" />
           </Link>
         </div>
-        <h2 className="self-end pr-4 pt-12 text-xl text-white">Spaces</h2>
-        <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
-        <AddSpace ref={ref} onAddNewSpace={handleAddNewSpace} />
-        <ul className="flex w-full flex-col">
-          {spaces.map(({ id, title }) => {
-            const linkClasses: string = `${
-              currentSpaceId === id ? "bg-white text-red-800" : "text-white"
-            }`;
-            return (
-              <SpaceTab
-                key={id}
-                linkClasses={linkClasses}
-                id={id}
-                title={title}
-                onLinkClick={handleLinkClick}
-                activeLink={activeLink}
-                onOpenPopup={openSpacePopup}
-                onClosePopup={closeSpacePopup}
-                isPopupOpen={activePopup === id}
-                onArchiveSpace={archiveSpace}
-                isArchived={archivedSpaces.includes(id)}
-              ></SpaceTab>
-            );
-          })}
-        </ul>
+        <div className="flex max-h-full w-full flex-col overflow-y-auto [&::-webkit-scrollbar]:hidden">
+          <h2 className="self-end pr-4 pt-12 text-xl text-white">Spaces</h2>
+          <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
+          <AddSpace ref={ref} onAddNewSpace={handleAddNewSpace} />
+          <ul className="flex flex-col">
+            {spaces.map(({ id, title }) => {
+              const linkClasses: string = `${
+                currentSpaceId === id ? "bg-white text-red-800" : "text-white"
+              }`;
+              return (
+                <SpaceTab
+                  key={id}
+                  linkClasses={linkClasses}
+                  id={id}
+                  title={title}
+                  onLinkClick={handleLinkClick}
+                  activeLink={activeLink}
+                  onOpenPopup={openSpacePopup}
+                  onClosePopup={closeSpacePopup}
+                  isPopupOpen={activePopup === id}
+                  onArchiveSpace={archiveSpace}
+                  isArchived={archivedSpaces.includes(id)}
+                ></SpaceTab>
+              );
+            })}
+          </ul>
+        </div>
       </div>
     );
   },

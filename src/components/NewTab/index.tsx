@@ -188,6 +188,7 @@ const NewTab = () => {
     if (targetModal) targetModal.showModal();
     console.log("open modal", targetModal);
   }
+  //TODO:限制spaces數量上限為10個，因為可以不去考慮這個區塊的往下滾動造成popup和overflow-y的衝突
   function addNewSpace() {
     const newSpaceTitle: string | undefined =
       newSpaceInputRef.current?.value.trim();
@@ -199,6 +200,8 @@ const NewTab = () => {
       )
     )
       return alert("Space name already exists");
+    if (spaces.length >= 10)
+      return alert("You can only create up to 10 spaces");
     chrome.runtime.sendMessage(
       { action: "addSpace", newSpaceTitle, userId: currentUserId },
       function (response) {

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Clock from "./Clock";
 const Header = () => {
   return (
-    <div className="navbar bg-base-200 flex justify-end">
+    <div className="navbar bg-base-200 sticky top-0 flex justify-end">
       <div className="pr-4">
         <button className="btn btn-ghost">
           <Link to="/webtime">

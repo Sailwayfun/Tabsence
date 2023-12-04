@@ -83,7 +83,9 @@ const Spaces = forwardRef(
             <div className="h-4 w-4">
               <Folder />
             </div>
-            <h2 className="text-xl text-white">SPACES</h2>
+            <h2 className="text-xl font-bold tracking-widest text-white">
+              SPACES
+            </h2>
           </div>
           <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
           <AddSpace ref={ref} onAddNewSpace={handleAddNewSpace} />

@@ -217,6 +217,7 @@ const NewTab = () => {
     const removedSpace = spaces.find((space) => space.id === id);
     if (!removedSpace) return;
     setSpaces(spaces.filter((space) => space.id !== id));
+    setTabs(tabs.filter((tab) => tab.spaceId !== id));
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(
         { action: "removeSpace", spaceId: id, userId: currentUserId },

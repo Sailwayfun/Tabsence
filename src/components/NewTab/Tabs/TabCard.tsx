@@ -53,11 +53,6 @@ const TabCard = memo(function TabCard({
         {tab.title}
       </a>
       <div className="mr-3 flex xl:pointer-events-none xl:invisible xl:ml-auto xl:group-hover/tab-card:pointer-events-auto xl:group-hover/tab-card:visible">
-        {/* <MoveToSpace
-          spaces={spaces}
-          id={tab.id?.toString()}
-          onOpenSpacesPopup={onOpenSpacesPopup}
-        /> */}
         <CloseBtn id={tab.tabId?.toString()} onCloseTab={onCloseTab} />
         <Dropdown
           button={

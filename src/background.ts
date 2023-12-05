@@ -9,6 +9,7 @@ import {
   query,
   where,
   setDoc,
+  getDoc,
   serverTimestamp,
   arrayUnion,
 } from "firebase/firestore";
@@ -318,3 +319,43 @@ chrome.runtime.onMessage.addListener(
     return true;
   },
 );
+
+
+async function handleRemoveSpace(request: RuntimeMessage) {
+  if (!request.userId || !request.spaceId) {
+    return { success: false };
+  }
+
+  const spaceDocRef = doc(db, "users", request.userId, "spaces", request.spaceId);
+  const tabCollectionRef = collection(db, "users", request.userId, "tabs");
+
+  await deleteDoc(spaceDocRef);
+
+  
+  const tabQuery = query(tabCollectionRef, where("spaceId", "==", request.spaceId));
+
+  
+  const tabOrderDocRef = doc(db, "users", request.userId, "tabOrders", request.spaceId);
+  const tabOrderSnapshot = await getDoc(tabOrderDocRef);
+  if (!tabOrderSnapshot.exists()) {
+    return { success: false };
+  }
+  await deleteDoc(tabOrderSnapshot.ref);
+
+  const deletedTabsSnapshot = await getDocs(tabQuery);
+  if (deletedTabsSnapshot.empty) {
+    return { success: false };
+  }
+  await Promise.all(deletedTabsSnapshot.docs.map((doc) => deleteDoc(doc.ref)));
+
+  return { success: true };
+}
+
+
+chrome.runtime.onMessage.addListener(async (request: RuntimeMessage, _, sendResponse) => {
+  if (request.action === "removeSpace") {
+    const result = await handleRemoveSpace(request);
+    sendResponse(result);
+  }
+  return true;
+});

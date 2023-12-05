@@ -4,7 +4,7 @@ import { FieldValue } from "firebase/firestore";
 import { useLocation, Outlet } from "react-router-dom";
 import Spaces from "./Spaces";
 import Header from "./Header";
-import TabCard from "./TabCard";
+import Tabs from "./Tabs";
 import CopyToClipboard from "./CopyToClipboard";
 
 export interface Tab extends chrome.tabs.Tab {
@@ -391,7 +391,7 @@ const NewTab = () => {
             {/* TODO: 新增一個按鈕讓使用者分享當下觀看的space的連結 */}
           </div>
           <Outlet />
-          <ul className="flex flex-col gap-3">
+          {/* <ul className="flex flex-col gap-3">
             {isLoggedin &&
               tabs.length > 0 &&
               location.pathname.split("/")[1] !== "webtime" &&
@@ -414,7 +414,20 @@ const NewTab = () => {
                   ></TabCard>
                 );
               })}
-          </ul>
+          </ul> */}
+          <Tabs
+            tabs={tabs}
+            spaces={spaces}
+            activePopupId={activePopupId}
+            selectedSpace={selectedSpace}
+            isLoggedin={isLoggedin}
+            openLink={openLink}
+            openSpacesPopup={openSpacesPopup}
+            selectSpace={selectSpace}
+            closeTab={closeTab}
+            handleTabOrderChange={handleTabOrderChange}
+            toggleTabPin={toggleTabPin}
+          />
         </div>
       </div>
     </>

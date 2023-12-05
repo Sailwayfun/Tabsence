@@ -4,7 +4,7 @@ interface RemoveSpaceBtnProps {
 
 const RemoveSpaceBtn = ({ id }: RemoveSpaceBtnProps) => {
   return (
-    <button id={id} className="hidden group-hover/space-tab:block">
+    <button id={id} className="mr-6 hidden group-hover/space-tab:block">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"

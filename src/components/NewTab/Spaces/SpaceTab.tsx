@@ -26,7 +26,7 @@ const SpaceTab = ({
   return (
     !isArchived && (
       <li
-        className={`relative p-4 text-xl  ${linkClasses} group/space-tab flex gap-28 hover:bg-blue-800`}
+        className={`relative p-4 text-xl  ${linkClasses} group/space-tab flex justify-between hover:bg-blue-800`}
       >
         <Link to={`/${id}`}>{title.toLowerCase()}</Link>
         <RemoveSpaceBtn id={id} />

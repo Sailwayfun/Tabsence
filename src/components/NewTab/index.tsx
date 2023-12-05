@@ -358,7 +358,7 @@ const NewTab = () => {
           <div className="flex items-center gap-8 pb-4">
             {location.pathname !== "/webtime" && (
               <>
-                <h1 className="text-3xl">Your Tabs</h1>
+                <h1 className="text-3xl font-bold">Your Tabs</h1>
                 <CopyToClipboard onCopySpaceLink={copySpaceLink} />
               </>
             )}

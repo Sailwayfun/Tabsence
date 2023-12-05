@@ -1,4 +1,4 @@
-import { Space } from ".";
+import { Space } from "..";
 interface MoveToSpaceProps {
   spaces: Space[];
   id: string | undefined;

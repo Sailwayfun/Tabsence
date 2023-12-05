@@ -1,4 +1,4 @@
-import TabCard from "../TabCard";
+import TabCard from "./TabCard";
 import { Tab, Space } from "../index";
 import { useLocation } from "react-router-dom";
 

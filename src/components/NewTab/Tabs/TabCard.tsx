@@ -1,4 +1,4 @@
-import { Tab, Space } from ".";
+import { Tab, Space } from "..";
 import { memo } from "react";
 import MoveToSpace from "./MoveToSpace";
 import CloseBtn from "./CloseBtn";

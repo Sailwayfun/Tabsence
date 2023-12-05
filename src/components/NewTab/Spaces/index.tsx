@@ -12,6 +12,7 @@ interface SpacesProps {
   spaces: Space[];
   onOpenAddSpacePopup: () => void;
   onAddNewSpace: () => void;
+  onRemoveSpace: (id: string) => void;
   currentSpaceId?: string;
 }
 const Spaces = forwardRef(
@@ -20,6 +21,7 @@ const Spaces = forwardRef(
       spaces,
       onOpenAddSpacePopup,
       onAddNewSpace,
+      onRemoveSpace,
       currentSpaceId,
     }: SpacesProps = props;
     console.log({ currentSpaceId });
@@ -102,6 +104,7 @@ const Spaces = forwardRef(
                   isPopupOpen={activePopup === id}
                   onArchiveSpace={archiveSpace}
                   isArchived={archivedSpaces.includes(id)}
+                  onRemoveSpace={onRemoveSpace}
                 ></SpaceTab>
               );
             })}

@@ -9,6 +9,7 @@ interface SpaceTabProps {
   onOpenPopup: (id: string) => void;
   onArchiveSpace: (id: string) => void;
   onClosePopup: () => void;
+  onRemoveSpace: (id: string) => void;
   isPopupOpen: boolean;
   isArchived: boolean;
 }
@@ -20,6 +21,7 @@ const SpaceTab = ({
   onOpenPopup,
   onClosePopup,
   onArchiveSpace,
+  onRemoveSpace,
   isPopupOpen,
   isArchived,
 }: SpaceTabProps) => {
@@ -29,7 +31,7 @@ const SpaceTab = ({
         className={`relative p-4 text-xl  ${linkClasses} group/space-tab flex justify-between hover:bg-blue-800`}
       >
         <Link to={`/${id}`}>{title.toLowerCase()}</Link>
-        <RemoveSpaceBtn id={id} />
+        <RemoveSpaceBtn id={id} onRemoveSpace={onRemoveSpace} />
         <KebabMenu id={id} onOpenPopup={onOpenPopup} />
         <SpacePopup
           id={id}

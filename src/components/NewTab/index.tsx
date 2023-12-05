@@ -213,6 +213,23 @@ const NewTab = () => {
     );
     if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
   }
+  function handleRemoveSpace(id: string) {
+    const removedSpace = spaces.find((space) => space.id === id);
+    if (!removedSpace) return;
+    setSpaces(spaces.filter((space) => space.id !== id));
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(
+        { action: "removeSpace", spaceId: id, userId: currentUserId },
+        function (response) {
+          if (response) {
+            resolve(response);
+            return;
+          }
+          reject();
+        },
+      );
+    });
+  }
   async function handleTabOrderChange(
     tabId: number,
     direction: "up" | "down",
@@ -331,6 +348,7 @@ const NewTab = () => {
             ref={newSpaceInputRef}
             onAddNewSpace={addNewSpace}
             currentSpaceId={activeSpaceId}
+            onRemoveSpace={handleRemoveSpace}
           />
         )}
         <div className="flex flex-col">

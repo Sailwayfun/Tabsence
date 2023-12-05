@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import KebabMenu from "../KebabMenu";
 import SpacePopup from "./SpacePopup";
 import RemoveSpaceBtn from "./RemoveSpaceBtn";
 import RemoveSpaceModal from "./RemoveSpaceModal";
+import ArchiveSpaceBtn from "./ArchiveSpaceBtn";
 interface SpaceTabProps {
   linkClasses: string;
   id: string;
@@ -38,9 +38,11 @@ const SpaceTab = ({
         className={`relative p-4 text-xl  ${linkClasses} group/space-tab flex justify-between hover:bg-blue-800`}
       >
         <Link to={`/${id}`}>{title.toLowerCase()}</Link>
-        <RemoveSpaceBtn id={id} onOpenModal={openModal} />
         <RemoveSpaceModal id={id} onRemoveSpace={onRemoveSpace} />
-        <KebabMenu id={id} onOpenPopup={onOpenPopup} />
+        <div className="ml-36 flex gap-4">
+          <RemoveSpaceBtn id={id} onOpenModal={openModal} />
+          <ArchiveSpaceBtn id={id} onOpenPopup={onOpenPopup} />
+        </div>
         <SpacePopup
           id={id}
           isOpen={isPopupOpen}

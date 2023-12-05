@@ -7,7 +7,7 @@ const RemoveSpaceBtn = ({ id, onOpenModal }: RemoveSpaceBtnProps) => {
   return (
     <button
       id={id}
-      className="mr-6 hidden group-hover/space-tab:block"
+      className="hidden group-hover/space-tab:block"
       onClick={() => onOpenModal(id)}
     >
       <svg

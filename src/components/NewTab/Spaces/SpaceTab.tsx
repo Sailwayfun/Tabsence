@@ -39,7 +39,7 @@ const SpaceTab = ({
       >
         <Link to={`/${id}`}>{title.toLowerCase()}</Link>
         <RemoveSpaceModal id={id} onRemoveSpace={onRemoveSpace} />
-        <div className="ml-36 flex gap-4">
+        <div className="absolute right-4 flex gap-4">
           <RemoveSpaceBtn id={id} onOpenModal={openModal} />
           <ArchiveSpaceBtn id={id} onOpenPopup={onOpenPopup} />
         </div>

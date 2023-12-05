@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import KebabMenu from "./KebabMenu";
+import KebabMenu from "../KebabMenu";
 import SpacePopup from "./SpacePopup";
 interface SpaceTabProps {
   linkClasses: string;

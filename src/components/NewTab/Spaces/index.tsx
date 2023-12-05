@@ -1,12 +1,12 @@
 import { forwardRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useSpaceStore } from "../../store";
-import { Space } from ".";
+import { useSpaceStore } from "../../../store";
+import { Space } from "..";
 import AddSpaceBtn from "./AddSpaceBtn";
 import SpaceTab from "./SpaceTab";
-import logo from "../../assets/logo.png";
-import tabs from "../../assets/tabs.png";
-import Folder from "../icons/Folder";
+import logo from "../../../assets/logo.png";
+import tabs from "../../../assets/tabs.png";
+import Folder from "../../icons/Folder";
 import AddSpace from "./AddSpace";
 interface SpacesProps {
   spaces: Space[];

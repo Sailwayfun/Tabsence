@@ -40,60 +40,65 @@ const TabCard = memo(function TabCard({
   isLastTab,
 }: TabProps) {
   return (
-    <li className="flex items-center gap-3 rounded-lg border px-4 py-2 text-lg hover:bg-slate-300">
-      <img src={tab.favIconUrl} className="h-4 w-4 border bg-white" />
+    <li className="grid grid-rows-2 gap-3 rounded-lg border px-4 py-2 text-lg shadow-md hover:bg-slate-300 xl:flex xl:items-center">
+      <img
+        src={tab.favIconUrl}
+        className="h-16 w-16 border bg-white shadow xl:h-4 xl:w-4"
+      />
       <a
         onClick={(e) => onOpenLink(e, tab)}
-        className="cursor-pointer hover:text-gray-500 hover:underline"
+        className="mb-6 flex cursor-pointer flex-wrap hover:text-gray-500 hover:underline xl:mb-0"
       >
         {tab.title}
       </a>
-      <MoveToSpace
-        spaces={spaces}
-        id={tab.id?.toString()}
-        onOpenSpacesPopup={onOpenSpacesPopup}
-      />
-      <CloseBtn id={tab.tabId?.toString()} onCloseTab={onCloseTab} />
-      {tab.id?.toString() === popupId && (
-        <div className="ml-5 h-14 w-52 rounded-md border px-3">
-          <label htmlFor={tab.id?.toString() || "spaces"} className="text-xl">
-            Move to space:
-          </label>
-          <select
-            id={tab.id?.toString() || "spaces"}
-            onChange={onSelectSpace}
-            value={selectedSpace}
-          >
-            <option value="">Select a space</option>
-            {spaces.map(({ id, title }) => {
-              return (
-                <option value={id} key={id}>
-                  {title}
-                </option>
-              );
-            })}
-          </select>
-        </div>
-      )}
-      {!isFirstTab && tab.tabId && (
-        <ArrowUpBtn
-          onMoveUp={onTabOrderChange}
-          tabId={tab.tabId}
-          direction="up"
+      <div className="flex">
+        <MoveToSpace
+          spaces={spaces}
+          id={tab.id?.toString()}
+          onOpenSpacesPopup={onOpenSpacesPopup}
         />
-      )}
-      {!isLastTab && tab.tabId && (
-        <ArrowDownBtn
-          onMoveDown={onTabOrderChange}
-          tabId={tab.tabId}
-          direction="down"
+        <CloseBtn id={tab.tabId?.toString()} onCloseTab={onCloseTab} />
+        {tab.id?.toString() === popupId && (
+          <div className="ml-5 h-14 w-52 rounded-md border px-3">
+            <label htmlFor={tab.id?.toString() || "spaces"} className="text-xl">
+              Move to space:
+            </label>
+            <select
+              id={tab.id?.toString() || "spaces"}
+              onChange={onSelectSpace}
+              value={selectedSpace}
+            >
+              <option value="">Select a space</option>
+              {spaces.map(({ id, title }) => {
+                return (
+                  <option value={id} key={id}>
+                    {title}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+        )}
+        {!isFirstTab && tab.tabId && (
+          <ArrowUpBtn
+            onMoveUp={onTabOrderChange}
+            tabId={tab.tabId}
+            direction="up"
+          />
+        )}
+        {!isLastTab && tab.tabId && (
+          <ArrowDownBtn
+            onMoveDown={onTabOrderChange}
+            tabId={tab.tabId}
+            direction="down"
+          />
+        )}
+        <StarBtn
+          onToggleTabPin={onToggleTabPin}
+          isPinned={tab.isPinned}
+          id={tab.tabId}
         />
-      )}
-      <StarBtn
-        onToggleTabPin={onToggleTabPin}
-        isPinned={tab.isPinned}
-        id={tab.tabId}
-      />
+      </div>
     </li>
   );
 });

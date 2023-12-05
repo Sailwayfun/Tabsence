@@ -40,7 +40,7 @@ const TabCard = memo(function TabCard({
   isLastTab,
 }: TabProps) {
   return (
-    <li className="group/tab-card grid grid-rows-2 gap-3 rounded-lg border px-4 py-2 text-lg shadow-md hover:bg-slate-300 xl:flex xl:items-center">
+    <li className="group/tab-card grid grid-rows-2 gap-3 rounded-lg border px-4 py-2 text-lg shadow-md hover:scale-105 hover:bg-slate-300 xl:flex xl:items-center">
       <img
         src={tab.favIconUrl}
         className="h-16 w-16 border bg-white shadow xl:h-4 xl:w-4"
@@ -51,7 +51,7 @@ const TabCard = memo(function TabCard({
       >
         {tab.title}
       </a>
-      <div className="flex xl:pointer-events-none xl:invisible xl:ml-auto xl:group-hover/tab-card:pointer-events-auto xl:group-hover/tab-card:visible">
+      <div className="mr-3 flex xl:pointer-events-none xl:invisible xl:ml-auto xl:group-hover/tab-card:pointer-events-auto xl:group-hover/tab-card:visible">
         <MoveToSpace
           spaces={spaces}
           id={tab.id?.toString()}

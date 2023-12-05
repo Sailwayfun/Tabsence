@@ -29,7 +29,6 @@ const NewTab = () => {
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [activePopupId, setActivePopupId] = useState<string | undefined>();
   const [selectedSpace, setSelectedSpace] = useState<string>("");
-  const [showAddSpacePopup, setShowAddSpacePopup] = useState<boolean>(false);
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
@@ -183,22 +182,28 @@ const NewTab = () => {
     });
   }
   function openAddSpacePopup() {
-    setShowAddSpacePopup(true);
+    const targetModal = document.getElementById(
+      "add_space",
+    ) as HTMLDialogElement | null;
+    if (targetModal) targetModal.showModal();
+    console.log("open modal", targetModal);
   }
-  function closeAddSpacePopup() {
-    setShowAddSpacePopup(false);
-  }
+  //TODO:限制spaces數量上限為10個，因為可以不去考慮這個區塊的往下滾動造成popup和overflow-y的衝突
   function addNewSpace() {
     const newSpaceTitle: string | undefined =
       newSpaceInputRef.current?.value.trim();
     if (!newSpaceTitle || newSpaceTitle.trim().length === 0)
       return alert("Please enter a space name");
+    if (newSpaceTitle.length > 15)
+      return alert("Space name should be less than 15 characters");
     if (
       spaces.some(
         (space) => space.title.toLowerCase() === newSpaceTitle.toLowerCase(),
       )
     )
       return alert("Space name already exists");
+    if (spaces.length >= 10)
+      return alert("You can only create up to 10 spaces");
     chrome.runtime.sendMessage(
       { action: "addSpace", newSpaceTitle, userId: currentUserId },
       function (response) {
@@ -209,6 +214,24 @@ const NewTab = () => {
       },
     );
     if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
+  }
+  function handleRemoveSpace(id: string) {
+    const removedSpace = spaces.find((space) => space.id === id);
+    if (!removedSpace) return;
+    setSpaces(spaces.filter((space) => space.id !== id));
+    setTabs(tabs.filter((tab) => tab.spaceId !== id));
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(
+        { action: "removeSpace", spaceId: id, userId: currentUserId },
+        function (response) {
+          if (response) {
+            resolve(response);
+            return;
+          }
+          reject();
+        },
+      );
+    });
   }
   async function handleTabOrderChange(
     tabId: number,
@@ -320,22 +343,28 @@ const NewTab = () => {
   return (
     <>
       <Header />
-      <div className="flex w-full gap-5 py-8">
+      <div className="flex w-full gap-5 overflow-x-hidden py-8 pl-80">
         {isLoggedin && (
           <Spaces
             spaces={spaces}
             onOpenAddSpacePopup={openAddSpacePopup}
-            onCloseAddSpacePopup={closeAddSpacePopup}
-            isAddSpacePopupOpen={showAddSpacePopup}
             ref={newSpaceInputRef}
             onAddNewSpace={addNewSpace}
             currentSpaceId={activeSpaceId}
+            onRemoveSpace={handleRemoveSpace}
           />
         )}
         <div className="flex flex-col">
           <div className="flex items-center gap-8 pb-4">
-            <h1 className="text-3xl">Your Tabs</h1>
-            <CopyToClipboard onCopySpaceLink={copySpaceLink} />
+            {location.pathname !== "/webtime" && (
+              <>
+                <h1 className="text-3xl">Your Tabs</h1>
+                <CopyToClipboard onCopySpaceLink={copySpaceLink} />
+              </>
+            )}
+            {location.pathname === "/webtime" && (
+              <h1 className="text-3xl">Your Time Spent on Websites</h1>
+            )}
             {/* <button
               onClick={() => setShowArchived(!showArchived)}
               className="h-8 w-36 rounded-md bg-gray-500 text-lg

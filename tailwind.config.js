@@ -5,7 +5,9 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      "sm": { "max": "1279px" }
+    },
   },
   plugins: [require("daisyui")],
   daisyui: {

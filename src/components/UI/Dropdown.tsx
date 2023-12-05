@@ -6,7 +6,11 @@ interface DropdownProps {
 const Dropdown = ({ children, button }: DropdownProps) => {
   return (
     <div className="dropdown dropdown-top">
-      <div tabIndex={0} role="button">
+      <div
+        tabIndex={0}
+        role="button"
+        className="flex items-center justify-center"
+      >
         {button}
       </div>
       <ul

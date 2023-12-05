@@ -1,15 +1,13 @@
 import { Link } from "react-router-dom";
-import SpacePopup from "./SpacePopup";
 import RemoveSpaceBtn from "./RemoveSpaceBtn";
 import RemoveSpaceModal from "./RemoveSpaceModal";
 import ArchiveSpaceBtn from "./ArchiveSpaceBtn";
+import ArchiveSpaceModal from "./ArchiveSpaceModal";
 interface SpaceTabProps {
   linkClasses: string;
   id: string;
   title: string;
-  onOpenPopup: (id: string) => void;
   onArchiveSpace: (id: string) => void;
-  onClosePopup: () => void;
   onRemoveSpace: (id: string) => void;
   isPopupOpen: boolean;
   isArchived: boolean;
@@ -19,16 +17,13 @@ const SpaceTab = ({
   linkClasses,
   title,
   id,
-  onOpenPopup,
-  onClosePopup,
   onArchiveSpace,
   onRemoveSpace,
-  isPopupOpen,
   isArchived,
 }: SpaceTabProps) => {
-  function openModal(id: string) {
+  function openModal(id: string, action: string) {
     const modal = document.getElementById(
-      `remove_space_${id}`,
+      `${action}_${id}`,
     ) as HTMLDialogElement;
     modal.showModal();
   }
@@ -39,16 +34,19 @@ const SpaceTab = ({
       >
         <Link to={`/${id}`}>{title.toLowerCase()}</Link>
         <RemoveSpaceModal id={id} onRemoveSpace={onRemoveSpace} />
+        <ArchiveSpaceModal id={id} onArchiveSpace={onArchiveSpace} />
         <div className="absolute right-4 flex gap-4">
-          <RemoveSpaceBtn id={id} onOpenModal={openModal} />
-          <ArchiveSpaceBtn id={id} onOpenPopup={onOpenPopup} />
+          <RemoveSpaceBtn
+            id={id}
+            onOpenModal={openModal}
+            action="remove_space"
+          />
+          <ArchiveSpaceBtn
+            id={id}
+            onOpenModal={openModal}
+            action="archive_space"
+          />
         </div>
-        <SpacePopup
-          id={id}
-          isOpen={isPopupOpen}
-          onArchiveSpace={onArchiveSpace}
-          onClose={onClosePopup}
-        />
       </li>
     )
   );

@@ -30,13 +30,6 @@ const Spaces = forwardRef(
     const archivedSpaces = useSpaceStore((state) => state.archivedSpaces);
     const setArchivedSpaces = useSpaceStore((state) => state.setArchivedSpaces);
     const navigate = useNavigate();
-    function openSpacePopup(id: string) {
-      const target = spaces.find(({ id: spaceId }) => spaceId === id);
-      setActivePopup(target?.id || "");
-    }
-    function closeSpacePopup() {
-      setActivePopup("");
-    }
     async function archiveSpace(id: string) {
       setActivePopup("");
       return new Promise((resolve, reject) => {
@@ -99,8 +92,6 @@ const Spaces = forwardRef(
                   linkClasses={linkClasses}
                   id={id}
                   title={title}
-                  onOpenPopup={openSpacePopup}
-                  onClosePopup={closeSpacePopup}
                   isPopupOpen={activePopup === id}
                   onArchiveSpace={archiveSpace}
                   isArchived={archivedSpaces.includes(id)}

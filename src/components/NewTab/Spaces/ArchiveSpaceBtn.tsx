@@ -1,13 +1,14 @@
 // import kebabMenu from "./kebab-menu.png";
 interface ArchiveSpaceBtnProps {
   id: string;
-  onOpenPopup: (id: string) => void;
+  onOpenModal: (id: string, action: string) => void;
+  action: string;
 }
-const ArchiveSpaceBtn = ({ id, onOpenPopup }: ArchiveSpaceBtnProps) => {
+const ArchiveSpaceBtn = ({ id, onOpenModal, action }: ArchiveSpaceBtnProps) => {
   return (
     <button
       className="hidden group-hover/space-tab:block"
-      onClick={() => onOpenPopup(id)}
+      onClick={() => onOpenModal(id, action)}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

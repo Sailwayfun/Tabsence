@@ -1,14 +1,15 @@
 interface RemoveSpaceBtnProps {
   id: string;
-  onOpenModal: (id: string) => void;
+  onOpenModal: (id: string, action: string) => void;
+  action: string;
 }
 
-const RemoveSpaceBtn = ({ id, onOpenModal }: RemoveSpaceBtnProps) => {
+const RemoveSpaceBtn = ({ id, onOpenModal, action }: RemoveSpaceBtnProps) => {
   return (
     <button
       id={id}
       className="hidden group-hover/space-tab:block"
-      onClick={() => onOpenModal(id)}
+      onClick={() => onOpenModal(id, action)}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

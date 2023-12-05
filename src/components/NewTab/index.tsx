@@ -391,30 +391,6 @@ const NewTab = () => {
             {/* TODO: 新增一個按鈕讓使用者分享當下觀看的space的連結 */}
           </div>
           <Outlet />
-          {/* <ul className="flex flex-col gap-3">
-            {isLoggedin &&
-              tabs.length > 0 &&
-              location.pathname.split("/")[1] !== "webtime" &&
-              tabs.map((tab, index) => {
-                return (
-                  <TabCard
-                    key={tab.tabId}
-                    tab={tab}
-                    spaces={spaces}
-                    popupId={activePopupId}
-                    onOpenLink={openLink}
-                    onOpenSpacesPopup={openSpacesPopup}
-                    onSelectSpace={selectSpace}
-                    onCloseTab={closeTab}
-                    selectedSpace={selectedSpace}
-                    isFirstTab={index === 0}
-                    isLastTab={tabs.length - 1 === index}
-                    onTabOrderChange={handleTabOrderChange}
-                    onToggleTabPin={toggleTabPin}
-                  ></TabCard>
-                );
-              })}
-          </ul> */}
           <Tabs
             tabs={tabs}
             spaces={spaces}

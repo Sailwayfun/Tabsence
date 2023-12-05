@@ -194,6 +194,8 @@ const NewTab = () => {
       newSpaceInputRef.current?.value.trim();
     if (!newSpaceTitle || newSpaceTitle.trim().length === 0)
       return alert("Please enter a space name");
+    if (newSpaceTitle.length > 15)
+      return alert("Space name should be less than 15 characters");
     if (
       spaces.some(
         (space) => space.title.toLowerCase() === newSpaceTitle.toLowerCase(),

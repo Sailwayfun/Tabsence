@@ -66,14 +66,14 @@ const Spaces = forwardRef(
       <div className="fixed left-0 top-0 z-10 flex h-full w-72 flex-col bg-blue-600">
         <div className="h-16">
           <Link
-            className="btn btn-ghost group/logo h-full justify-start rounded-sm pl-0 text-xl"
+            className="group/logo btn btn-ghost h-full justify-start rounded-sm pl-0 text-xl"
             to="/"
           >
             <img src={logo} className="w-1/2 object-contain" />
             <img src={tabs} className="hidden h-8 w-8 group-hover/logo:block" />
           </Link>
         </div>
-        <div className="flex max-h-full w-full flex-col overflow-y-auto [&::-webkit-scrollbar]:hidden">
+        <div className="flex max-h-full w-full flex-col [&::-webkit-scrollbar]:hidden">
           <div className="flex items-center gap-3 pl-4 pt-10">
             <div className="h-4 w-4">
               <Folder />

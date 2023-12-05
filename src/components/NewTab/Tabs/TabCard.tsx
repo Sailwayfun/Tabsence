@@ -5,6 +5,7 @@ import CloseBtn from "./CloseBtn";
 import ArrowDownBtn from "./ArrowDownBtn";
 import ArrowUpBtn from "./ArrowUpBtn";
 import StarBtn from "./StarBtn";
+import Dropdown from "../../UI/Dropdown";
 interface TabProps {
   tab: Tab;
   spaces: Space[];
@@ -52,33 +53,46 @@ const TabCard = memo(function TabCard({
         {tab.title}
       </a>
       <div className="mr-3 flex xl:pointer-events-none xl:invisible xl:ml-auto xl:group-hover/tab-card:pointer-events-auto xl:group-hover/tab-card:visible">
-        <MoveToSpace
+        {/* <MoveToSpace
           spaces={spaces}
           id={tab.id?.toString()}
           onOpenSpacesPopup={onOpenSpacesPopup}
-        />
+        /> */}
         <CloseBtn id={tab.tabId?.toString()} onCloseTab={onCloseTab} />
-        {tab.id?.toString() === popupId && (
-          <div className="ml-5 h-14 w-52 rounded-md border px-3">
-            <label htmlFor={tab.id?.toString() || "spaces"} className="text-xl">
-              Move to space:
-            </label>
-            <select
-              id={tab.id?.toString() || "spaces"}
-              onChange={onSelectSpace}
-              value={selectedSpace}
-            >
-              <option value="">Select a space</option>
-              {spaces.map(({ id, title }) => {
-                return (
-                  <option value={id} key={id}>
-                    {title}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-        )}
+        <Dropdown
+          button={
+            <MoveToSpace
+              spaces={spaces}
+              id={tab.id?.toString()}
+              onOpenSpacesPopup={onOpenSpacesPopup}
+            />
+          }
+        >
+          {tab.id?.toString() === popupId && (
+            <div className="ml-5 h-14 w-52 px-3">
+              <label
+                htmlFor={tab.id?.toString() || "spaces"}
+                className="text-xl"
+              >
+                Move to space:
+              </label>
+              <select
+                id={tab.id?.toString() || "spaces"}
+                onChange={onSelectSpace}
+                value={selectedSpace}
+              >
+                <option value="">Select a space</option>
+                {spaces.map(({ id, title }) => {
+                  return (
+                    <option value={id} key={id}>
+                      {title}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          )}
+        </Dropdown>
         {!isFirstTab && tab.tabId && (
           <ArrowUpBtn
             onMoveUp={onTabOrderChange}

@@ -6,6 +6,8 @@ import Spaces from "./Spaces";
 import Header from "./Header";
 import Tabs from "./Tabs";
 import CopyToClipboard from "./CopyToClipboard";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db } from "../../../firebase-config";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -37,6 +39,10 @@ const NewTab = () => {
   );
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
+  console.log(
+    "spaces",
+    spaces.map((space) => (space.id, space.title)),
+  );
   useEffect(() => {
     function hideArchivedSpacesTabs(
       currentTabs: Tab[],
@@ -66,32 +72,82 @@ const NewTab = () => {
   }, []);
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
-    chrome.runtime.sendMessage(
-      { action: "getTabs", currentPath, userId: currentUserId },
-      function (response: Tab[]) {
-        if (response) {
-          setTabs(() => {
-            return response;
+    if (currentUserId) {
+      const tabsCollectionRef = collection(db, "users", currentUserId, "tabs");
+      const spacesCollectionRef = collection(
+        db,
+        "users",
+        currentUserId,
+        "spaces",
+      );
+      const tabQ =
+        currentPath !== ""
+          ? query(tabsCollectionRef, where("spaceId", "==", currentPath))
+          : query(tabsCollectionRef);
+      const unsubscribeTab = onSnapshot(tabQ, (querySnapshot) => {
+        const currentTabs: Tab[] = [];
+        if (currentPath !== "") {
+          querySnapshot.forEach((doc) => {
+            const tab = doc.data() as Tab;
+            currentTabs.push(tab);
           });
+          setTabs(currentTabs);
           return;
         }
-      },
-    );
-    chrome.runtime.sendMessage(
-      { action: "getSpaces", userId: currentUserId },
-      function (response: Space[]) {
-        // console.log(1, response, spaces);
-        if (response) {
-          setSpaces(() => response);
-          const currentActiveId = response.find(
-            (space) => space.id === currentPath,
-          )?.id;
-          if (currentPath === "") setActiveSpaceId("");
-          if (currentActiveId) setActiveSpaceId(currentActiveId);
-          return;
-        }
-      },
-    );
+        querySnapshot.forEach((doc) => {
+          const tab = doc.data() as Tab;
+          if (tab.spaceId) return;
+          currentTabs.push(tab);
+        });
+        setTabs(currentTabs);
+        return;
+      });
+      const spaceQ = query(spacesCollectionRef);
+      const unsubscribeSpace = onSnapshot(spaceQ, (querySnapshot) => {
+        const currentSpaces: Space[] = [];
+        querySnapshot.forEach((doc) => {
+          const space = doc.data() as Space;
+          currentSpaces.push(space);
+        });
+        setSpaces(currentSpaces);
+        const currentActiveId = currentSpaces.find(
+          (space) => space.id === currentPath,
+        )?.id;
+        if (currentPath === "") setActiveSpaceId("");
+        if (currentActiveId) setActiveSpaceId(currentActiveId);
+      });
+      return () => {
+        unsubscribeTab();
+        unsubscribeSpace();
+      };
+    }
+
+    // chrome.runtime.sendMessage(
+    //   { action: "getTabs", currentPath, userId: currentUserId },
+    //   function (response: Tab[]) {
+    //     if (response) {
+    //       setTabs(() => {
+    //         return response;
+    //       });
+    //       return;
+    //     }
+    //   },
+    // );
+    // chrome.runtime.sendMessage(
+    //   { action: "getSpaces", userId: currentUserId },
+    //   function (response: Space[]) {
+    //     // console.log(1, response, spaces);
+    //     if (response) {
+    //       setSpaces(() => response);
+    //       const currentActiveId = response.find(
+    //         (space) => space.id === currentPath,
+    //       )?.id;
+    //       if (currentPath === "") setActiveSpaceId("");
+    //       if (currentActiveId) setActiveSpaceId(currentActiveId);
+    //       return;
+    //     }
+    //   },
+    // );
   }, [location.pathname, currentUserId]);
   useEffect(() => {
     const handleMessagePassing = (

@@ -45,7 +45,7 @@ const NewTab = () => {
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [tabOrder, setTabOrder] = useState<number[]>([]);
-  console.log("current order", tabOrder)
+  console.log("current order", tabOrder);
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
   );
@@ -93,24 +93,10 @@ const NewTab = () => {
         currentUserId,
         "spaces",
       );
-      const spaceId = currentPath !== "" ? currentPath : "global";
-      const tabOrderDocRef = doc(
-        db,
-        "users",
-        currentUserId,
-        "tabOrders",
-        spaceId,
-      );
       const tabQ =
         currentPath !== ""
           ? query(tabsCollectionRef, where("spaceId", "==", currentPath))
           : query(tabsCollectionRef);
-      const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
-        if (doc.exists()) {
-          const order: number[] = doc.data()?.tabOrder;
-          if (order) setTabOrder(order);
-        }
-      });
       const unsubscribeTab = onSnapshot(tabQ, (querySnapshot) => {
         const currentTabs: Tab[] = [];
         if (currentPath !== "") {
@@ -146,10 +132,8 @@ const NewTab = () => {
       return () => {
         unsubscribeTab();
         unsubscribeSpace();
-        unsubscribeTabOrder();
       };
     }
-
     // chrome.runtime.sendMessage(
     //   { action: "getTabs", currentPath, userId: currentUserId },
     //   function (response: Tab[]) {
@@ -177,6 +161,28 @@ const NewTab = () => {
     //   },
     // );
   }, [location.pathname, currentUserId]);
+  useEffect(() => {
+    const currentPath = location.pathname.split("/")[1];
+    const spaceId = currentPath !== "" ? currentPath : "global";
+    if (currentUserId) {
+      const tabOrderDocRef = doc(
+        db,
+        "users",
+        currentUserId,
+        "tabOrders",
+        spaceId,
+      );
+      const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
+        if (doc.exists()) {
+          const order: number[] = doc.data()?.tabOrder;
+          if (order) setTabOrder(order);
+        }
+      });
+      return () => {
+        unsubscribeTabOrder();
+      };
+    }
+  }, [currentUserId, location.pathname]);
   useEffect(() => {
     const handleMessagePassing = (
       request: {

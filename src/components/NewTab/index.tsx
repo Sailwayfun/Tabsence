@@ -7,6 +7,7 @@ import Header from "./Header";
 import Tabs from "./Tabs";
 import CopyToClipboard from "./CopyToClipboard";
 import {
+  doc,
   collection,
   query,
   where,
@@ -43,6 +44,8 @@ const NewTab = () => {
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
+  const [tabOrder, setTabOrder] = useState<number[]>([]);
+  console.log("current order", tabOrder)
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
   );
@@ -90,10 +93,24 @@ const NewTab = () => {
         currentUserId,
         "spaces",
       );
+      const spaceId = currentPath !== "" ? currentPath : "global";
+      const tabOrderDocRef = doc(
+        db,
+        "users",
+        currentUserId,
+        "tabOrders",
+        spaceId,
+      );
       const tabQ =
         currentPath !== ""
           ? query(tabsCollectionRef, where("spaceId", "==", currentPath))
           : query(tabsCollectionRef);
+      const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
+        if (doc.exists()) {
+          const order: number[] = doc.data()?.tabOrder;
+          if (order) setTabOrder(order);
+        }
+      });
       const unsubscribeTab = onSnapshot(tabQ, (querySnapshot) => {
         const currentTabs: Tab[] = [];
         if (currentPath !== "") {
@@ -129,6 +146,7 @@ const NewTab = () => {
       return () => {
         unsubscribeTab();
         unsubscribeSpace();
+        unsubscribeTabOrder();
       };
     }
 

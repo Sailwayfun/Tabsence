@@ -17,6 +17,7 @@ const Chart = ({ durationData }: ChartProps) => {
   const options = {
     chart: {
       type: "pie",
+      backgroundColor: "transparent",
     },
     title: {
       text: "Time Spent on Websites",

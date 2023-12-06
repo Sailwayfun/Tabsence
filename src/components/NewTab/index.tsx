@@ -4,8 +4,16 @@ import { FieldValue } from "firebase/firestore";
 import { useLocation, Outlet } from "react-router-dom";
 import Spaces from "./Spaces";
 import Header from "./Header";
-import TabCard from "./TabCard";
+import Tabs from "./Tabs";
 import CopyToClipboard from "./CopyToClipboard";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  orderBy,
+} from "firebase/firestore";
+import { db } from "../../../firebase-config";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -13,10 +21,13 @@ export interface Tab extends chrome.tabs.Tab {
   tabId: number | undefined;
   isPinned: boolean;
 }
-export interface Space {
-  id: string;
+interface SpaceDoc {
   title: string;
   isArchived?: boolean;
+}
+
+export interface Space extends SpaceDoc {
+  id: string;
 }
 interface Response {
   success: boolean;
@@ -37,6 +48,10 @@ const NewTab = () => {
   );
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
+  console.log(
+    "spaces",
+    spaces.map((space) => space.id),
+  );
   useEffect(() => {
     function hideArchivedSpacesTabs(
       currentTabs: Tab[],
@@ -66,32 +81,83 @@ const NewTab = () => {
   }, []);
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
-    chrome.runtime.sendMessage(
-      { action: "getTabs", currentPath, userId: currentUserId },
-      function (response: Tab[]) {
-        if (response) {
-          setTabs(() => {
-            return response;
+    if (currentPath === "webtime") return;
+    if (currentUserId) {
+      const tabsCollectionRef = collection(db, "users", currentUserId, "tabs");
+      const spacesCollectionRef = collection(
+        db,
+        "users",
+        currentUserId,
+        "spaces",
+      );
+      const tabQ =
+        currentPath !== ""
+          ? query(tabsCollectionRef, where("spaceId", "==", currentPath))
+          : query(tabsCollectionRef);
+      const unsubscribeTab = onSnapshot(tabQ, (querySnapshot) => {
+        const currentTabs: Tab[] = [];
+        if (currentPath !== "") {
+          querySnapshot.forEach((doc) => {
+            const tab = doc.data() as Tab;
+            currentTabs.push(tab);
           });
+          setTabs(currentTabs);
           return;
         }
-      },
-    );
-    chrome.runtime.sendMessage(
-      { action: "getSpaces", userId: currentUserId },
-      function (response: Space[]) {
-        // console.log(1, response, spaces);
-        if (response) {
-          setSpaces(() => response);
-          const currentActiveId = response.find(
-            (space) => space.id === currentPath,
-          )?.id;
-          if (currentPath === "") setActiveSpaceId("");
-          if (currentActiveId) setActiveSpaceId(currentActiveId);
-          return;
-        }
-      },
-    );
+        querySnapshot.forEach((doc) => {
+          const tab = doc.data() as Tab;
+          if (tab.spaceId) return;
+          currentTabs.push(tab);
+        });
+        setTabs(currentTabs);
+        return;
+      });
+      const spaceQ = query(spacesCollectionRef, orderBy("createdAt", "asc"));
+      const unsubscribeSpace = onSnapshot(spaceQ, (querySnapshot) => {
+        const currentSpaces: Space[] = [];
+        querySnapshot.forEach((doc) => {
+          const space = doc.data() as SpaceDoc;
+          currentSpaces.push({ id: doc.id, ...space });
+        });
+        setSpaces(currentSpaces);
+        const currentActiveId = currentSpaces.find(
+          (space) => space.id === currentPath,
+        )?.id;
+        if (currentPath === "") setActiveSpaceId("");
+        if (currentActiveId) setActiveSpaceId(currentActiveId);
+      });
+      return () => {
+        unsubscribeTab();
+        unsubscribeSpace();
+      };
+    }
+
+    // chrome.runtime.sendMessage(
+    //   { action: "getTabs", currentPath, userId: currentUserId },
+    //   function (response: Tab[]) {
+    //     if (response) {
+    //       setTabs(() => {
+    //         return response;
+    //       });
+    //       return;
+    //     }
+    //   },
+    // );
+    // chrome.runtime.sendMessage(
+    //   { action: "getSpaces", userId: currentUserId },
+    //   function (response: Space[]) {
+    //     // console.log(1, response, spaces);
+    //     if (response) {
+    //       setSpaces(() => response);
+    //       const currentActiveId = response.find(
+    //         (space) => space.id === currentPath,
+    //       )?.id;
+    //       if (currentPath === "") setActiveSpaceId("");
+    //       if (currentActiveId) setActiveSpaceId(currentActiveId);
+    //       return;
+    //     }
+    //   },
+    // );
   }, [location.pathname, currentUserId]);
   useEffect(() => {
     const handleMessagePassing = (
@@ -343,7 +409,7 @@ const NewTab = () => {
   return (
     <>
       <Header />
-      <div className="flex w-full gap-5 overflow-x-hidden py-8 pl-80">
+      <div className="flex w-full max-w-6xl gap-5 overflow-x-hidden py-8 pl-80 xl:ml-2">
         {isLoggedin && (
           <Spaces
             spaces={spaces}
@@ -358,7 +424,7 @@ const NewTab = () => {
           <div className="flex items-center gap-8 pb-4">
             {location.pathname !== "/webtime" && (
               <>
-                <h1 className="text-3xl">Your Tabs</h1>
+                <h1 className="text-3xl font-bold">Your Tabs</h1>
                 <CopyToClipboard onCopySpaceLink={copySpaceLink} />
               </>
             )}
@@ -391,30 +457,19 @@ const NewTab = () => {
             {/* TODO: 新增一個按鈕讓使用者分享當下觀看的space的連結 */}
           </div>
           <Outlet />
-          <ul className="flex flex-col gap-3">
-            {isLoggedin &&
-              tabs.length > 0 &&
-              location.pathname.split("/")[1] !== "webtime" &&
-              tabs.map((tab, index) => {
-                return (
-                  <TabCard
-                    key={tab.tabId}
-                    tab={tab}
-                    spaces={spaces}
-                    popupId={activePopupId}
-                    onOpenLink={openLink}
-                    onOpenSpacesPopup={openSpacesPopup}
-                    onSelectSpace={selectSpace}
-                    onCloseTab={closeTab}
-                    selectedSpace={selectedSpace}
-                    isFirstTab={index === 0}
-                    isLastTab={tabs.length - 1 === index}
-                    onTabOrderChange={handleTabOrderChange}
-                    onToggleTabPin={toggleTabPin}
-                  ></TabCard>
-                );
-              })}
-          </ul>
+          <Tabs
+            tabs={tabs}
+            spaces={spaces}
+            activePopupId={activePopupId}
+            selectedSpace={selectedSpace}
+            isLoggedin={isLoggedin}
+            openLink={openLink}
+            openSpacesPopup={openSpacesPopup}
+            selectSpace={selectSpace}
+            closeTab={closeTab}
+            handleTabOrderChange={handleTabOrderChange}
+            toggleTabPin={toggleTabPin}
+          />
         </div>
       </div>
     </>

@@ -6,7 +6,13 @@ import Spaces from "./Spaces";
 import Header from "./Header";
 import Tabs from "./Tabs";
 import CopyToClipboard from "./CopyToClipboard";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  orderBy,
+} from "firebase/firestore";
 import { db } from "../../../firebase-config";
 
 export interface Tab extends chrome.tabs.Tab {
@@ -106,7 +112,7 @@ const NewTab = () => {
         setTabs(currentTabs);
         return;
       });
-      const spaceQ = query(spacesCollectionRef);
+      const spaceQ = query(spacesCollectionRef, orderBy("createdAt", "asc"));
       const unsubscribeSpace = onSnapshot(spaceQ, (querySnapshot) => {
         const currentSpaces: Space[] = [];
         querySnapshot.forEach((doc) => {

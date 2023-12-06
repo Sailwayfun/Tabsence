@@ -15,10 +15,13 @@ export interface Tab extends chrome.tabs.Tab {
   tabId: number | undefined;
   isPinned: boolean;
 }
-export interface Space {
-  id: string;
+interface SpaceDoc {
   title: string;
   isArchived?: boolean;
+}
+
+export interface Space extends SpaceDoc {
+  id: string;
 }
 interface Response {
   success: boolean;
@@ -41,7 +44,7 @@ const NewTab = () => {
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   console.log(
     "spaces",
-    spaces.map((space) => (space.id, space.title)),
+    spaces.map((space) => space.id),
   );
   useEffect(() => {
     function hideArchivedSpacesTabs(
@@ -106,8 +109,8 @@ const NewTab = () => {
       const unsubscribeSpace = onSnapshot(spaceQ, (querySnapshot) => {
         const currentSpaces: Space[] = [];
         querySnapshot.forEach((doc) => {
-          const space = doc.data() as Space;
-          currentSpaces.push(space);
+          const space = doc.data() as SpaceDoc;
+          currentSpaces.push({ id: doc.id, ...space });
         });
         setSpaces(currentSpaces);
         const currentActiveId = currentSpaces.find(

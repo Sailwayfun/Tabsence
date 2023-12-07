@@ -48,7 +48,7 @@ const TabCard = memo(function TabCard({
       />
       <a
         onClick={(e) => onOpenLink(e, tab)}
-        className="mt-4 line-clamp-2 max-w-full cursor-pointer flex-wrap hover:text-gray-500 hover:underline xl:mb-0 xl:line-clamp-none xl:flex"
+        className="mt-4 line-clamp-2 max-w-full cursor-pointer flex-wrap hover:text-gray-500 hover:underline xl:mb-0 xl:mt-0 xl:line-clamp-none xl:flex"
       >
         {tab.title}
       </a>

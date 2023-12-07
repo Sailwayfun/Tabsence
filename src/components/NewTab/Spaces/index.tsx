@@ -79,6 +79,7 @@ const Spaces = forwardRef(
           </div>
           <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
           <AddSpace ref={ref} onAddNewSpace={handleAddNewSpace} />
+          <span className="mx-auto h-[1px] w-full bg-white opacity-70" />
           <ul className="flex flex-col">
             {spaces.map(({ id, title }) => {
               const linkClasses: string = `${

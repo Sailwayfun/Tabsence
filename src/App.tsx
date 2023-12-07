@@ -1,3 +1,4 @@
+import tabs from "./assets/tabs.png";
 const App = () => {
   function newTab() {
     return new Promise((resolve, reject) => {
@@ -10,47 +11,21 @@ const App = () => {
         return;
       });
     });
-
-    // function init() {
-    //   chrome.identity.getAuthToken({ interactive: true }, (token) => {
-    //     chrome.runtime.sendMessage(
-    //       { action: "signIn", payload: token },
-    //       (response) => {
-    //         if (response.success) {
-    //           newTab();
-    //           return;
-    //         }
-    //         alert("Please sign in to continue");
-    //         return;
-    //       },
-    //     );
-    //   });
-    // chrome.runtime.sendMessage({ action: "signIn" }, (response) => {
-    //   if (response.success && response.payload) {
-    //     newTab();
-    //     return;
-    //   }
-    //   alert("Please sign in to continue");
-    //   return;
-    // });
   }
   return (
     <div className="flex h-60 w-80 flex-col gap-10 p-4">
-      <h1 className="text-3xl font-bold underline">Tabsence</h1>
+      <div className="flex items-center">
+        <h1 className="text-3xl font-bold">Tabsence</h1>
+        <img src={tabs} alt="Tabsence" className="ml-4 h-12 w-12" />
+      </div>
       <p className="text-2xl leading-8">Organize your tabs, and your life!</p>
-      <div className="flex w-64 gap-3">
+      <div className="py-3">
         <button
-          className="mb-4 w-24 rounded-md border bg-white px-4 py-2 text-black hover:bg-gray-500 hover:text-white"
+          className="mb-4 w-full rounded-md border bg-orange-700 px-6 py-2 text-lg text-white opacity-80 hover:bg-orange-900"
           onClick={newTab}
         >
           View tabs
         </button>
-        {/* <button
-          onClick={init}
-          className="mb-4 w-24 rounded-md border bg-black px-4 py-2 text-white hover:bg-gray-500 hover:text-white"
-        >
-          Sign In
-        </button> */}
       </div>
     </div>
   );

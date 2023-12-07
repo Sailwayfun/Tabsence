@@ -493,11 +493,12 @@ const NewTab = () => {
           <Outlet />
           <button
             onClick={toggleTabsLayout}
-            className="mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-lg shadow hover:bg-base-200"
+            className={`mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-lg shadow hover:bg-base-200 ${
+              location.pathname === "/webtime" ? "hidden" : ""
+            }`}
           >
             List/Grid View
           </button>
-          {/* <LayoutGroup> */}
           <Tabs
             tabs={tabs}
             spaces={spaces}
@@ -512,7 +513,6 @@ const NewTab = () => {
             toggleTabPin={toggleTabPin}
             isGrid={isTabsGrid}
           />
-          {/* </LayoutGroup> */}
         </div>
       </div>
     </LazyMotion>

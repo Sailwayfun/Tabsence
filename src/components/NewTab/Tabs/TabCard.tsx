@@ -6,7 +6,7 @@ import ArrowDownBtn from "./ArrowDownBtn";
 import ArrowUpBtn from "./ArrowUpBtn";
 import StarBtn from "./StarBtn";
 import Dropdown from "../../UI/Dropdown";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 interface TabProps {
   tab: Tab;
   spaces: Space[];
@@ -42,7 +42,7 @@ const TabCard = memo(function TabCard({
   isLastTab,
 }: TabProps) {
   return (
-    <motion.li
+    <m.li
       className="group/tab-card grid grid-rows-2 justify-items-center gap-3 rounded-lg border bg-slate-100 px-4 py-2 text-lg shadow-md xl:flex xl:items-center xl:text-2xl"
       whileHover={{ scale: 1.05, backgroundColor: "#cbd5e1" }}
     >
@@ -112,7 +112,7 @@ const TabCard = memo(function TabCard({
           id={tab.tabId}
         />
       </div>
-    </motion.li>
+    </m.li>
   );
 });
 

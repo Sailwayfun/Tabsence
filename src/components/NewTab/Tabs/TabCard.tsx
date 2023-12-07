@@ -4,7 +4,7 @@ import MoveToSpace from "./MoveToSpace";
 import CloseBtn from "./CloseBtn";
 import ArrowDownBtn from "./ArrowDownBtn";
 import ArrowUpBtn from "./ArrowUpBtn";
-import StarBtn from "./StarBtn";
+import PinBtn from "./PinBtn";
 import Dropdown from "../../UI/Dropdown";
 import { m } from "framer-motion";
 interface TabProps {
@@ -120,7 +120,7 @@ const TabCard = memo(function TabCard({
             isGrid={isGrid}
           />
         )}
-        <StarBtn
+        <PinBtn
           onToggleTabPin={onToggleTabPin}
           isPinned={tab.isPinned}
           id={tab.tabId}

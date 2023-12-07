@@ -452,7 +452,7 @@ const NewTab = () => {
             onRemoveSpace={handleRemoveSpace}
           />
         )}
-        <div className="flex flex-col">
+        <div className="flex w-4/5 flex-col">
           <div className="flex items-center gap-8 pb-4">
             {location.pathname !== "/webtime" && (
               <>

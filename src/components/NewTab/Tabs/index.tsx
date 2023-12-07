@@ -38,7 +38,7 @@ const Tabs = ({
   isGrid,
 }: TabsProps) => {
   const location = useLocation();
-  const listStyles = "flex flex-col gap-5";
+  const listStyles = "flex flex-col gap-5 w-full";
   const gridStyles = "grid grid-cols-3 gap-3 xl:gap-5 h-full";
   return (
     <ul className={isGrid ? gridStyles : listStyles}>

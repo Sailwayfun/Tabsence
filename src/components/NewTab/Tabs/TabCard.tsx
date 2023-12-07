@@ -41,14 +41,14 @@ const TabCard = memo(function TabCard({
   isLastTab,
 }: TabProps) {
   return (
-    <li className="group/tab-card grid grid-rows-2 gap-3 rounded-lg border px-4 py-2 text-lg shadow-md hover:scale-105 hover:bg-slate-300 xl:flex xl:items-center xl:text-2xl">
+    <li className="group/tab-card grid grid-rows-2 justify-items-center gap-3 rounded-lg border px-4 py-2 text-lg shadow-md hover:scale-105 hover:bg-slate-300 xl:flex xl:items-center xl:text-2xl">
       <img
         src={tab.favIconUrl}
         className="h-16 w-16 border bg-white shadow xl:h-4 xl:w-4"
       />
       <a
         onClick={(e) => onOpenLink(e, tab)}
-        className="mb-6 line-clamp-2 cursor-pointer flex-wrap hover:text-gray-500 hover:underline xl:mb-0 xl:line-clamp-none xl:flex"
+        className="mt-4 line-clamp-2 max-w-full cursor-pointer flex-wrap hover:text-gray-500 hover:underline xl:mb-0 xl:line-clamp-none xl:flex"
       >
         {tab.title}
       </a>

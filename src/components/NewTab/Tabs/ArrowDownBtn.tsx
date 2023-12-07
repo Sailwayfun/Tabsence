@@ -5,7 +5,10 @@ interface ArrowDownBtnProps {
 }
 const ArrowDownBtn = ({ onMoveDown, tabId, direction }: ArrowDownBtnProps) => {
   return (
-    <button className="ml-4" onClick={() => onMoveDown(tabId, direction)}>
+    <button
+      className="ml-4 -rotate-90 xl:rotate-0"
+      onClick={() => onMoveDown(tabId, direction)}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"

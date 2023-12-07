@@ -5,7 +5,10 @@ interface ArrowUpBtnProps {
 }
 const ArrowUpBtn = ({ onMoveUp, tabId, direction }: ArrowUpBtnProps) => {
   return (
-    <button className="ml-4" onClick={() => onMoveUp(tabId, direction)}>
+    <button
+      className="ml-4 -rotate-90 xl:rotate-0"
+      onClick={() => onMoveUp(tabId, direction)}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"

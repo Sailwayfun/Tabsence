@@ -47,7 +47,7 @@ const TabCard = memo(function TabCard({
     <m.li
       className={`group/tab-card grid grid-rows-2 justify-items-center gap-3 rounded-lg border bg-slate-100 px-4 py-2 text-lg shadow-md ${
         isGrid
-          ? "xl:flex xl:flex-col xl:items-center"
+          ? "xl:flex xl:flex-col xl:items-center xl:justify-center xl:gap-5"
           : "xl:flex xl:items-center"
       } xl:text-2xl`}
       whileHover={{ scale: 1.05, backgroundColor: "#cbd5e1" }}

@@ -39,7 +39,7 @@ const Tabs = ({
 }: TabsProps) => {
   const location = useLocation();
   const listStyles = "flex flex-col gap-5 w-full";
-  const gridStyles = "grid grid-cols-3 gap-3 xl:gap-5 h-full";
+  const gridStyles = "grid grid-cols-3 gap-3 xl:gap-5 max-h-full";
   return (
     <ul className={isGrid ? gridStyles : listStyles}>
       {isLoggedin &&

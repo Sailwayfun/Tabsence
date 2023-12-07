@@ -16,7 +16,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import { sortTabs } from "../../utils/firestore";
-import { LazyMotion, domAnimation, LayoutGroup } from "framer-motion";
+import { LazyMotion, domAnimation } from "framer-motion";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -497,22 +497,22 @@ const NewTab = () => {
           >
             List/Grid View
           </button>
-          <LayoutGroup>
-            <Tabs
-              tabs={tabs}
-              spaces={spaces}
-              activePopupId={activePopupId}
-              selectedSpace={selectedSpace}
-              isLoggedin={isLoggedin}
-              openLink={openLink}
-              openSpacesPopup={openSpacesPopup}
-              selectSpace={selectSpace}
-              closeTab={closeTab}
-              handleTabOrderChange={handleTabOrderChange}
-              toggleTabPin={toggleTabPin}
-              isGrid={isTabsGrid}
-            />
-          </LayoutGroup>
+          {/* <LayoutGroup> */}
+          <Tabs
+            tabs={tabs}
+            spaces={spaces}
+            activePopupId={activePopupId}
+            selectedSpace={selectedSpace}
+            isLoggedin={isLoggedin}
+            openLink={openLink}
+            openSpacesPopup={openSpacesPopup}
+            selectSpace={selectSpace}
+            closeTab={closeTab}
+            handleTabOrderChange={handleTabOrderChange}
+            toggleTabPin={toggleTabPin}
+            isGrid={isTabsGrid}
+          />
+          {/* </LayoutGroup> */}
         </div>
       </div>
     </LazyMotion>

@@ -1,7 +1,6 @@
 import TabCard from "./TabCard";
 import { Tab, Space } from "../index";
 import { useLocation } from "react-router-dom";
-import { m } from "framer-motion";
 
 interface TabsProps {
   tabs: Tab[];
@@ -42,15 +41,7 @@ const Tabs = ({
   const listStyles = "flex flex-col gap-5";
   const gridStyles = "grid grid-cols-3 gap-3 xl:gap-5 h-full";
   return (
-    <m.ul
-      className={isGrid ? gridStyles : listStyles}
-      layout
-      transition={{
-        duration: 0.5,
-        delay: 0.5,
-        ease: "easeInOut",
-      }}
-    >
+    <ul className={isGrid ? gridStyles : listStyles}>
       {isLoggedin &&
         tabs.length > 0 &&
         location.pathname.split("/")[1] !== "webtime" &&
@@ -74,7 +65,7 @@ const Tabs = ({
             ></TabCard>
           );
         })}
-    </m.ul>
+    </ul>
   );
 };
 

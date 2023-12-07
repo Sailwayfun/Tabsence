@@ -58,7 +58,7 @@ const Spaces = forwardRef(
       modalRef.current?.close();
     }
     return (
-      <div className="fixed left-0 top-0 z-10 flex h-full w-72 flex-col bg-blue-600">
+      <div className="fixed left-0 top-0 z-10 flex h-full w-72 flex-col bg-orange-700 opacity-80">
         <div className="h-16">
           <Link
             className="btn btn-ghost h-full justify-start rounded-sm pl-0 text-xl"
@@ -84,7 +84,7 @@ const Spaces = forwardRef(
               const linkClasses: string = `${
                 currentSpaceId === id
                   ? "text-yellow-400"
-                  : "bg-blue-600 text-white"
+                  : "bg-orange-700 opacity-80 text-white"
               }`;
               return (
                 <SpaceTab

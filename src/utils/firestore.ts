@@ -2,9 +2,9 @@ import {
   collection,
   getDocs,
   query,
-  where,
+  // where,
   serverTimestamp,
-  getDoc,
+  // getDoc,
   setDoc,
   updateDoc,
   doc,
@@ -14,9 +14,9 @@ import {
 } from "firebase/firestore";
 import { Tab } from "../components/NewTab";
 import { db } from "../../firebase-config";
-interface FirebaseTabDoc extends DocumentData {
-  id: string;
-}
+// interface FirebaseTabDoc extends DocumentData {
+//   id: string;
+// }
 async function getDocFromFirestore(
   collectionName: string,
   queryString?: string,
@@ -36,58 +36,60 @@ async function getDocFromFirestore(
       });
       return spaces;
     }
-    case "tabs": {
-      const tabOrdersCollectionRef = collection(
-        db,
-        "users",
-        userId,
-        "tabOrders",
-      );
-      const tabQuery =
-        queryString === ""
-          ? collectionRef
-          : query(collectionRef, where("spaceId", "==", queryString));
-      const tabsSnapshot = await getDocs(tabQuery);
-      if (queryString === "") {
-        let tabOrder;
-        const tabOrderDocRef = doc(tabOrdersCollectionRef, "global");
-        const tabsWithoutSpace = tabsSnapshot.docs.reduce(
-          (accumulator: FirebaseTabDoc[], doc) => {
-            if (!doc.data().spaceId) {
-              accumulator.push({ id: doc.id, ...doc.data() });
-            }
-            return accumulator;
-          },
-          [],
-        );
-        if (tabOrderDocRef) {
-          const tabOrderSnapshot = await getDoc(tabOrderDocRef);
-          if (tabOrderSnapshot.exists())
-            tabOrder = tabOrderSnapshot.data()?.tabOrder;
-        }
-        return sortTabs(tabsWithoutSpace, tabOrder);
-      }
-      const tabOrderDocRef = doc(tabOrdersCollectionRef, queryString);
-      const tabOrderSnapshot = await getDoc(tabOrderDocRef);
-      const tabOrder: number[] | undefined =
-        tabOrderSnapshot.exists() && tabOrderSnapshot.data()?.tabOrder;
-      if (tabsSnapshot.empty || queryString === "webtime") {
-        return [];
-      }
-      const tabs = tabsSnapshot.docs.map((doc) => {
-        return { id: doc.id, ...doc.data() };
-      });
-      return sortTabs(tabs, tabOrder);
-    }
+    // case "tabs": {
+    //   const tabOrdersCollectionRef = collection(
+    //     db,
+    //     "users",
+    //     userId,
+    //     "tabOrders",
+    //   );
+    //   const tabQuery =
+    //     queryString === ""
+    //       ? collectionRef
+    //       : query(collectionRef, where("spaceId", "==", queryString));
+    //   const tabsSnapshot = await getDocs(tabQuery);
+    //   if (queryString === "") {
+    //     let tabOrder;
+    //     const tabOrderDocRef = doc(tabOrdersCollectionRef, "global");
+    //     const tabsWithoutSpace = tabsSnapshot.docs.reduce(
+    //       (accumulator: FirebaseTabDoc[], doc) => {
+    //         if (!doc.data().spaceId) {
+    //           accumulator.push({ id: doc.id, ...doc.data() });
+    //         }
+    //         return accumulator;
+    //       },
+    //       [],
+    //     );
+    //     if (tabOrderDocRef) {
+    //       const tabOrderSnapshot = await getDoc(tabOrderDocRef);
+    //       if (tabOrderSnapshot.exists())
+    //         tabOrder = tabOrderSnapshot.data()?.tabOrder;
+    //     }
+    //     return sortTabs(tabsWithoutSpace, tabOrder);
+    //   }
+    //   const tabOrderDocRef = doc(tabOrdersCollectionRef, queryString);
+    //   const tabOrderSnapshot = await getDoc(tabOrderDocRef);
+    //   const tabOrder: number[] | undefined =
+    //     tabOrderSnapshot.exists() && tabOrderSnapshot.data()?.tabOrder;
+    //   if (tabsSnapshot.empty || queryString === "webtime") {
+    //     return [];
+    //   }
+    //   const tabs = tabsSnapshot.docs.map((doc) => {
+    //     return { id: doc.id, ...doc.data() };
+    //   });
+    //   return sortTabs(tabs, tabOrder);
+    // }
   }
 }
 
-function sortTabs(tabs: FirebaseTabDoc[], tabOrder?: number[]) {
-  if (!tabOrder) return tabs;
+export function sortTabs(tabs: Tab[], tabOrder?: number[]) {
+  if (!tabOrder || tabOrder.length === 0) return tabs;
   const tabMap = new Map(tabs.map((tab) => [tab.tabId, tab]));
   const sortByOrder = (index: number) => tabMap.get(tabOrder[index]);
   console.log({ tabOrder });
-  return tabOrder.map((_, index) => sortByOrder(index)).filter(Boolean);
+  return tabOrder
+    .map((_, index) => sortByOrder(index))
+    .filter((tab): tab is Tab => tab !== undefined);
 }
 
 export function getFaviconUrl(url: string) {

@@ -7,6 +7,7 @@ import Header from "./Header";
 import Tabs from "./Tabs";
 import CopyToClipboard from "./CopyToClipboard";
 import {
+  doc,
   collection,
   query,
   where,
@@ -14,6 +15,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
+import { sortTabs } from "../../utils/firestore";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -43,6 +45,8 @@ const NewTab = () => {
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
+  const [tabOrder, setTabOrder] = useState<number[]>([]);
+  console.log("current order", tabOrder);
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
   );
@@ -101,7 +105,8 @@ const NewTab = () => {
             const tab = doc.data() as Tab;
             currentTabs.push(tab);
           });
-          setTabs(currentTabs);
+          const sortedTabs = sortTabs(currentTabs, tabOrder);
+          setTabs(sortedTabs);
           return;
         }
         querySnapshot.forEach((doc) => {
@@ -109,7 +114,8 @@ const NewTab = () => {
           if (tab.spaceId) return;
           currentTabs.push(tab);
         });
-        setTabs(currentTabs);
+        const sortedTabs = sortTabs(currentTabs, tabOrder);
+        setTabs(sortedTabs);
         return;
       });
       const spaceQ = query(spacesCollectionRef, orderBy("createdAt", "asc"));
@@ -131,7 +137,6 @@ const NewTab = () => {
         unsubscribeSpace();
       };
     }
-
     // chrome.runtime.sendMessage(
     //   { action: "getTabs", currentPath, userId: currentUserId },
     //   function (response: Tab[]) {
@@ -158,7 +163,29 @@ const NewTab = () => {
     //     }
     //   },
     // );
-  }, [location.pathname, currentUserId]);
+  }, [location.pathname, currentUserId, tabOrder]);
+  useEffect(() => {
+    const currentPath = location.pathname.split("/")[1];
+    const spaceId = currentPath !== "" ? currentPath : "global";
+    if (currentUserId) {
+      const tabOrderDocRef = doc(
+        db,
+        "users",
+        currentUserId,
+        "tabOrders",
+        spaceId,
+      );
+      const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
+        if (doc.exists()) {
+          const order: number[] = doc.data()?.tabOrder;
+          if (order) setTabOrder(order);
+        }
+      });
+      return () => {
+        unsubscribeTabOrder();
+      };
+    }
+  }, [currentUserId, location.pathname]);
   useEffect(() => {
     const handleMessagePassing = (
       request: {
@@ -409,7 +436,7 @@ const NewTab = () => {
   return (
     <>
       <Header />
-      <div className="flex w-full max-w-6xl gap-5 overflow-x-hidden py-8 pl-80 xl:ml-2">
+      <div className="flex w-full max-w-7xl gap-5 overflow-x-hidden py-8 pl-80 xl:ml-2">
         {isLoggedin && (
           <Spaces
             spaces={spaces}

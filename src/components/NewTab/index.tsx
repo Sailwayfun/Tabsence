@@ -16,7 +16,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import { sortTabs } from "../../utils/firestore";
-import { LazyMotion, domAnimation } from "framer-motion";
+import { LazyMotion, domAnimation, LayoutGroup } from "framer-motion";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -47,6 +47,7 @@ const NewTab = () => {
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [tabOrder, setTabOrder] = useState<number[]>([]);
+  const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
   console.log("current order", tabOrder);
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
@@ -434,10 +435,13 @@ const NewTab = () => {
       );
     });
   }
+  function toggleTabsLayout() {
+    setIsTabsGrid((prev) => !prev);
+  }
   return (
     <LazyMotion features={domAnimation}>
       <Header />
-      <div className="flex w-full gap-5 overflow-x-hidden py-8 pl-[400px] pr-10 xl:ml-2">
+      <div className="flex min-h-screen w-full gap-5 overflow-x-hidden py-8 pl-[400px] pr-10 xl:ml-2">
         {isLoggedin && (
           <Spaces
             spaces={spaces}
@@ -487,19 +491,28 @@ const NewTab = () => {
             {/* TODO: 新增一個按鈕讓使用者分享當下觀看的space的連結 */}
           </div>
           <Outlet />
-          <Tabs
-            tabs={tabs}
-            spaces={spaces}
-            activePopupId={activePopupId}
-            selectedSpace={selectedSpace}
-            isLoggedin={isLoggedin}
-            openLink={openLink}
-            openSpacesPopup={openSpacesPopup}
-            selectSpace={selectSpace}
-            closeTab={closeTab}
-            handleTabOrderChange={handleTabOrderChange}
-            toggleTabPin={toggleTabPin}
-          />
+          <button
+            onClick={toggleTabsLayout}
+            className="mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-lg shadow hover:bg-base-200"
+          >
+            List/Grid View
+          </button>
+          <LayoutGroup>
+            <Tabs
+              tabs={tabs}
+              spaces={spaces}
+              activePopupId={activePopupId}
+              selectedSpace={selectedSpace}
+              isLoggedin={isLoggedin}
+              openLink={openLink}
+              openSpacesPopup={openSpacesPopup}
+              selectSpace={selectSpace}
+              closeTab={closeTab}
+              handleTabOrderChange={handleTabOrderChange}
+              toggleTabPin={toggleTabPin}
+              isGrid={isTabsGrid}
+            />
+          </LayoutGroup>
         </div>
       </div>
     </LazyMotion>

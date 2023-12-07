@@ -2,11 +2,17 @@ interface ArrowDownBtnProps {
   onMoveDown: (tabId: number, direction: "down") => void;
   tabId: number;
   direction: "down";
+  isGrid: boolean;
 }
-const ArrowDownBtn = ({ onMoveDown, tabId, direction }: ArrowDownBtnProps) => {
+const ArrowDownBtn = ({
+  onMoveDown,
+  tabId,
+  direction,
+  isGrid,
+}: ArrowDownBtnProps) => {
   return (
     <button
-      className="ml-4 -rotate-90 xl:rotate-0"
+      className={`ml-4 ${isGrid ? "-rotate-90" : "rotate-0"}`}
       onClick={() => onMoveDown(tabId, direction)}
     >
       <svg

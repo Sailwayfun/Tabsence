@@ -1,6 +1,7 @@
 import TabCard from "./TabCard";
 import { Tab, Space } from "../index";
 import { useLocation } from "react-router-dom";
+import { m } from "framer-motion";
 
 interface TabsProps {
   tabs: Tab[];
@@ -8,6 +9,7 @@ interface TabsProps {
   activePopupId?: string;
   selectedSpace: string;
   isLoggedin: boolean;
+  isGrid: boolean;
   openLink: (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
     tab: Tab,
@@ -34,10 +36,21 @@ const Tabs = ({
   closeTab,
   handleTabOrderChange,
   toggleTabPin,
+  isGrid,
 }: TabsProps) => {
   const location = useLocation();
+  const listStyles = "flex flex-col gap-5";
+  const gridStyles = "grid grid-cols-3 gap-3 xl:gap-5 h-full";
   return (
-    <ul className="grid grid-cols-3 gap-3 xl:flex xl:flex-col xl:gap-5">
+    <m.ul
+      className={isGrid ? gridStyles : listStyles}
+      layout
+      transition={{
+        duration: 0.5,
+        delay: 0.5,
+        ease: "easeInOut",
+      }}
+    >
       {isLoggedin &&
         tabs.length > 0 &&
         location.pathname.split("/")[1] !== "webtime" &&
@@ -57,10 +70,11 @@ const Tabs = ({
               isLastTab={tabs.length - 1 === index}
               onTabOrderChange={handleTabOrderChange}
               onToggleTabPin={toggleTabPin}
+              isGrid={isGrid}
             ></TabCard>
           );
         })}
-    </ul>
+    </m.ul>
   );
 };
 

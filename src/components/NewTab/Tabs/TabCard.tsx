@@ -25,6 +25,7 @@ interface TabProps {
   selectedSpace: string;
   isLastTab: boolean;
   isFirstTab: boolean;
+  isGrid: boolean;
 }
 
 const TabCard = memo(function TabCard({
@@ -40,6 +41,7 @@ const TabCard = memo(function TabCard({
   selectedSpace,
   isFirstTab,
   isLastTab,
+  isGrid,
 }: TabProps) {
   return (
     <m.li
@@ -52,7 +54,7 @@ const TabCard = memo(function TabCard({
       />
       <a
         onClick={(e) => onOpenLink(e, tab)}
-        className="mt-4 line-clamp-2 max-w-full cursor-pointer flex-wrap hover:text-gray-500 hover:underline xl:mb-0 xl:mt-0 xl:line-clamp-none xl:flex"
+        className="mt-4 line-clamp-2 max-w-full cursor-pointer flex-wrap hover:text-gray-500 hover:underline xl:mb-0 xl:mt-0"
       >
         {tab.title}
       </a>
@@ -97,6 +99,7 @@ const TabCard = memo(function TabCard({
             onMoveUp={onTabOrderChange}
             tabId={tab.tabId}
             direction="up"
+            isGrid={isGrid}
           />
         )}
         {!isLastTab && tab.tabId && (
@@ -104,6 +107,7 @@ const TabCard = memo(function TabCard({
             onMoveDown={onTabOrderChange}
             tabId={tab.tabId}
             direction="down"
+            isGrid={isGrid}
           />
         )}
         <StarBtn

@@ -2,11 +2,17 @@ interface ArrowUpBtnProps {
   onMoveUp: (tabId: number, direction: "up") => void;
   tabId: number;
   direction: "up";
+  isGrid: boolean;
 }
-const ArrowUpBtn = ({ onMoveUp, tabId, direction }: ArrowUpBtnProps) => {
+const ArrowUpBtn = ({
+  onMoveUp,
+  tabId,
+  direction,
+  isGrid,
+}: ArrowUpBtnProps) => {
   return (
     <button
-      className="ml-4 -rotate-90 xl:rotate-0"
+      className={`ml-4 ${isGrid ? "-rotate-90" : "rotate-0"}`}
       onClick={() => onMoveUp(tabId, direction)}
     >
       <svg

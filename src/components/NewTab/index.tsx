@@ -16,7 +16,6 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import { sortTabs } from "../../utils/firestore";
-import { LazyMotion, domAnimation } from "framer-motion";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -439,7 +438,7 @@ const NewTab = () => {
     setIsTabsGrid((prev) => !prev);
   }
   return (
-    <LazyMotion features={domAnimation}>
+    <>
       <Header />
       <div className="flex min-h-screen w-full gap-5 overflow-x-hidden py-8 pl-[400px] pr-10 xl:ml-2">
         {isLoggedin && (
@@ -515,7 +514,7 @@ const NewTab = () => {
           />
         </div>
       </div>
-    </LazyMotion>
+    </>
   );
 };
 

@@ -15,6 +15,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
+import { sortTabs } from "../../utils/firestore";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -104,7 +105,8 @@ const NewTab = () => {
             const tab = doc.data() as Tab;
             currentTabs.push(tab);
           });
-          setTabs(currentTabs);
+          const sortedTabs = sortTabs(currentTabs, tabOrder);
+          setTabs(sortedTabs);
           return;
         }
         querySnapshot.forEach((doc) => {
@@ -112,7 +114,8 @@ const NewTab = () => {
           if (tab.spaceId) return;
           currentTabs.push(tab);
         });
-        setTabs(currentTabs);
+        const sortedTabs = sortTabs(currentTabs, tabOrder);
+        setTabs(sortedTabs);
         return;
       });
       const spaceQ = query(spacesCollectionRef, orderBy("createdAt", "asc"));
@@ -160,7 +163,7 @@ const NewTab = () => {
     //     }
     //   },
     // );
-  }, [location.pathname, currentUserId]);
+  }, [location.pathname, currentUserId, tabOrder]);
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
     const spaceId = currentPath !== "" ? currentPath : "global";

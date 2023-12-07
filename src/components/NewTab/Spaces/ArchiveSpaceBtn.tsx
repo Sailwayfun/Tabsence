@@ -16,7 +16,7 @@ const ArchiveSpaceBtn = ({ id, onOpenModal, action }: ArchiveSpaceBtnProps) => {
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="white"
-        className="h-6 w-6 stroke-slate-300"
+        className="h-6 w-6 stroke-white"
       >
         <path
           strokeLinecap="round"

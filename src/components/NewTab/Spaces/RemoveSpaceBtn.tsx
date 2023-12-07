@@ -17,7 +17,7 @@ const RemoveSpaceBtn = ({ id, onOpenModal, action }: RemoveSpaceBtnProps) => {
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className="h-6 w-6 stroke-slate-300"
+        className="h-6 w-6 stroke-white"
       >
         <path
           strokeLinecap="round"

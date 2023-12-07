@@ -37,7 +37,7 @@ const Tabs = ({
 }: TabsProps) => {
   const location = useLocation();
   return (
-    <ul className="grid grid-cols-3 gap-3 xl:flex xl:flex-col">
+    <ul className="grid grid-cols-3 gap-3 xl:flex xl:flex-col xl:gap-5">
       {isLoggedin &&
         tabs.length > 0 &&
         location.pathname.split("/")[1] !== "webtime" &&

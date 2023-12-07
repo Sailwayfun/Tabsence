@@ -45,12 +45,18 @@ const TabCard = memo(function TabCard({
 }: TabProps) {
   return (
     <m.li
-      className="group/tab-card grid grid-rows-2 justify-items-center gap-3 rounded-lg border bg-slate-100 px-4 py-2 text-lg shadow-md xl:flex xl:items-center xl:text-2xl"
+      className={`group/tab-card grid grid-rows-2 justify-items-center gap-3 rounded-lg border bg-slate-100 px-4 py-2 text-lg shadow-md ${
+        isGrid
+          ? "xl:flex xl:flex-col xl:items-center"
+          : "xl:flex xl:items-center"
+      } xl:text-2xl`}
       whileHover={{ scale: 1.05, backgroundColor: "#cbd5e1" }}
     >
       <img
         src={tab.favIconUrl}
-        className="h-16 w-16 border bg-white shadow xl:h-4 xl:w-4"
+        className={`${
+          isGrid ? "h-16 w-16" : "xl:h-4 xl:w-4"
+        } border bg-white shadow`}
       />
       <a
         onClick={(e) => onOpenLink(e, tab)}
@@ -58,7 +64,11 @@ const TabCard = memo(function TabCard({
       >
         {tab.title}
       </a>
-      <div className="mr-3 flex xl:pointer-events-none xl:invisible xl:ml-auto xl:group-hover/tab-card:pointer-events-auto xl:group-hover/tab-card:visible">
+      <div
+        className={`mr-3 flex xl:pointer-events-none xl:invisible ${
+          !isGrid && "xl:ml-auto"
+        } xl:group-hover/tab-card:pointer-events-auto xl:group-hover/tab-card:visible`}
+      >
         <CloseBtn id={tab.tabId?.toString()} onCloseTab={onCloseTab} />
         <Dropdown
           button={

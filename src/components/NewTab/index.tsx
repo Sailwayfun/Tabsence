@@ -488,7 +488,6 @@ const NewTab = () => {
                 Sign In
               </button>
             )} */}
-            {/* TODO: 新增一個按鈕讓使用者分享當下觀看的space的連結 */}
           </div>
           <Outlet />
           <ToggleViewBtn

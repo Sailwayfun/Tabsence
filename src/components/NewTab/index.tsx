@@ -227,19 +227,18 @@ const NewTab = () => {
       sendResponse: <T extends Response>(response: T) => void,
     ) => {
       if (request.action === "tabClosed") {
-        const deletedTabId = request.tabId;
-        setTabs((t) => t.filter((tab) => tab.tabId !== deletedTabId));
+        setTabs((t) => t.filter((tab) => tab.tabId !== request.tabId));
         sendResponse({ success: true });
       }
       if (request.action === "tabUpdated") {
-        const updatedTab = request.updatedTab;
         setTabs((t) => {
-          const tabExists = t.some((tab) => tab.tabId === updatedTab.tabId);
-          if (!tabExists) return [...t, updatedTab];
-          return t.map((tab) => {
-            if (tab.tabId === updatedTab.tabId) return updatedTab;
-            return tab;
-          });
+          const updatedTabs = t.map((tab) =>
+            tab.tabId === request.updatedTab.tabId ? request.updatedTab : tab
+          );
+          if (!updatedTabs.some((tab) => tab.tabId === request.updatedTab.tabId)) {
+            updatedTabs.push(request.updatedTab);
+          }
+          return updatedTabs;
         });
         sendResponse({ success: true });
       }

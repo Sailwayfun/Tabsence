@@ -48,6 +48,7 @@ const NewTab = () => {
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
+  const [currentWindowId, setCurrentWindowId] = useState<number>(0);
   console.log("current order", tabOrder);
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
@@ -58,6 +59,28 @@ const NewTab = () => {
     "spaces",
     spaces.map((space) => space.id),
   );
+  useEffect(() => {
+    let active = true;
+    async function getCurrentWindowId(): Promise<number> {
+      return new Promise((resolve, reject) => {
+        chrome.windows.getCurrent((window) => {
+          if (active && window && window.id) {
+            resolve(window.id);
+            return;
+          }
+          reject();
+        });
+      });
+    }
+    getCurrentWindowId()
+      .then((res) => {
+        setCurrentWindowId(res);
+      })
+      .catch((err) => console.error(err));
+    return () => {
+      active = false;
+    };
+  }, []);
   useEffect(() => {
     function hideArchivedSpacesTabs(
       currentTabs: Tab[],
@@ -88,7 +111,7 @@ const NewTab = () => {
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
     if (currentPath === "webtime") return;
-    if (currentUserId) {
+    if (currentUserId && currentWindowId) {
       const tabsCollectionRef = collection(db, "users", currentUserId, "tabs");
       const spacesCollectionRef = collection(
         db,
@@ -98,8 +121,12 @@ const NewTab = () => {
       );
       const tabQ =
         currentPath !== ""
-          ? query(tabsCollectionRef, where("spaceId", "==", currentPath))
-          : query(tabsCollectionRef);
+          ? query(
+              tabsCollectionRef,
+              where("windowId", "==", currentWindowId),
+              where("spaceId", "==", currentPath),
+            )
+          : query(tabsCollectionRef, where("windowId", "==", currentWindowId));
       const unsubscribeTab = onSnapshot(tabQ, (querySnapshot) => {
         const currentTabs: Tab[] = [];
         if (currentPath !== "") {
@@ -165,7 +192,7 @@ const NewTab = () => {
     //     }
     //   },
     // );
-  }, [location.pathname, currentUserId, tabOrder]);
+  }, [location.pathname, currentUserId, currentWindowId, tabOrder]);
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
     const spaceId = currentPath !== "" ? currentPath : "global";

@@ -54,10 +54,6 @@ chrome.runtime.onMessage.addListener(
 );
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
-  const windowId = await chrome.storage.local
-    .get("windowId")
-    .then((res) => res.windowId);
-  if (windowId !== tab.windowId) return true;
   if (changeInfo.url) {
     const tabDurationUpdated = await updateTabDuration(tab.id);
     console.log(1, "updateTabDuration", tabDurationUpdated);

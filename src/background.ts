@@ -205,18 +205,18 @@ async function closeTab(tabId: number) {
   await chrome.tabs.remove(tabId);
 }
 
-async function removeTabFromFirestore(tabId: number, userId?: string) {
-  if (!userId) return;
-  const tabsCollectionRef = collection(db, "users", userId, "tabs");
-  const q = query(tabsCollectionRef, where("tabId", "==", tabId));
-  const querySnapshot = await getDocs(q);
-  querySnapshot.forEach((doc) => {
-    deleteDoc(doc.ref);
-  });
+async function removeTabFromFirestore(tabId: number, userId: string) {
+  const tabDocRef = doc(db, "users", userId, "tabs", tabId.toString());
+  console.log("removeTabFromFirestore", tabDocRef);
+  await deleteDoc(tabDocRef);
 }
 
 chrome.tabs.onRemoved.addListener(async (tabId: number) => {
-  removeTabFromFirestore(tabId);
+  const userId: string | undefined = await chrome.storage.local
+    .get("userId")
+    .then((res) => res.userId);
+  if (!userId) return;
+  await removeTabFromFirestore(tabId, userId);
   const tabDurationUpdated = await updateTabDuration(tabId);
   console.log(3, "updateTabDuration", tabDurationUpdated);
   chrome.runtime.sendMessage({ action: "tabClosed", tabId });
@@ -320,22 +320,34 @@ chrome.runtime.onMessage.addListener(
   },
 );
 
-
 async function handleRemoveSpace(request: RuntimeMessage) {
   if (!request.userId || !request.spaceId) {
     return { success: false };
   }
 
-  const spaceDocRef = doc(db, "users", request.userId, "spaces", request.spaceId);
+  const spaceDocRef = doc(
+    db,
+    "users",
+    request.userId,
+    "spaces",
+    request.spaceId,
+  );
   const tabCollectionRef = collection(db, "users", request.userId, "tabs");
 
   await deleteDoc(spaceDocRef);
 
-  
-  const tabQuery = query(tabCollectionRef, where("spaceId", "==", request.spaceId));
+  const tabQuery = query(
+    tabCollectionRef,
+    where("spaceId", "==", request.spaceId),
+  );
 
-  
-  const tabOrderDocRef = doc(db, "users", request.userId, "tabOrders", request.spaceId);
+  const tabOrderDocRef = doc(
+    db,
+    "users",
+    request.userId,
+    "tabOrders",
+    request.spaceId,
+  );
   const tabOrderSnapshot = await getDoc(tabOrderDocRef);
   if (!tabOrderSnapshot.exists()) {
     return { success: false };
@@ -351,11 +363,12 @@ async function handleRemoveSpace(request: RuntimeMessage) {
   return { success: true };
 }
 
-
-chrome.runtime.onMessage.addListener(async (request: RuntimeMessage, _, sendResponse) => {
-  if (request.action === "removeSpace") {
-    const result = await handleRemoveSpace(request);
-    sendResponse(result);
-  }
-  return true;
-});
+chrome.runtime.onMessage.addListener(
+  async (request: RuntimeMessage, _, sendResponse) => {
+    if (request.action === "removeSpace") {
+      const result = await handleRemoveSpace(request);
+      sendResponse(result);
+    }
+    return true;
+  },
+);

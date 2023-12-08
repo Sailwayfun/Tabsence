@@ -16,6 +16,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import { sortTabs } from "../../utils/firestore";
+import ToggleViewBtn from "./ToggleViewBtn";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -490,14 +491,12 @@ const NewTab = () => {
             {/* TODO: 新增一個按鈕讓使用者分享當下觀看的space的連結 */}
           </div>
           <Outlet />
-          <button
-            onClick={toggleTabsLayout}
-            className={`mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-lg shadow hover:bg-base-200 ${
+          <ToggleViewBtn
+            onToggleView={toggleTabsLayout}
+            className={`mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-xl shadow hover:bg-orange-700 hover:bg-opacity-70 hover:text-white ${
               location.pathname === "/webtime" ? "hidden" : ""
             }`}
-          >
-            List/Grid View
-          </button>
+          />
           <Tabs
             tabs={tabs}
             spaces={spaces}

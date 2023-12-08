@@ -4,7 +4,7 @@ interface AddSpaceBtnProps {
 const AddSpaceBtn = ({ onAddSpace }: AddSpaceBtnProps) => {
   return (
     <button
-      className="flex cursor-pointer justify-end py-6 pr-3"
+      className="flex cursor-pointer items-center gap-3 py-6 pl-3"
       onClick={onAddSpace}
     >
       <svg
@@ -12,8 +12,7 @@ const AddSpaceBtn = ({ onAddSpace }: AddSpaceBtnProps) => {
         fill="none"
         viewBox="0 0 24 24"
         strokeWidth={1.5}
-        stroke="white"
-        className="h-6 w-6"
+        className="h-6 w-6 fill-slate-300 stroke-slate-300"
       >
         <path
           strokeLinecap="round"
@@ -21,6 +20,9 @@ const AddSpaceBtn = ({ onAddSpace }: AddSpaceBtnProps) => {
           d="M12 4.5v15m7.5-7.5h-15"
         />
       </svg>
+      <span className="text-lg tracking-wider text-slate-300 text-opacity-70">
+        New Space
+      </span>
     </button>
   );
 };

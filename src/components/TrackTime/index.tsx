@@ -8,7 +8,6 @@ import {
 import { db } from "../../../firebase-config";
 import { useEffect, useState } from "react";
 import Chart from "./Chart";
-import { m } from "framer-motion";
 
 export interface UrlDuration {
   id: string;
@@ -89,10 +88,9 @@ const TrackTime = () => {
       <div>
         <ul className="flex flex-col gap-3">
           {urlDurations.map((website) => (
-            <m.li
+            <li
               key={website.id}
-              whileHover={{ scale: 1.05 }}
-              className="grid w-full grid-cols-4 rounded-md border border-gray-300 p-3 shadow"
+              className="grid w-full grid-cols-4 rounded-md border border-gray-300 p-3 shadow transition delay-100 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg xl:text-2xl"
             >
               <div className="flex gap-2 text-xl">
                 <img
@@ -109,7 +107,7 @@ const TrackTime = () => {
               <div className="mx-auto my-0 text-xl">
                 {getDurationPercentge(website.durationBySecond)}
               </div>
-            </m.li>
+            </li>
           ))}
         </ul>
         <div className="mx-auto my-3 border-t-2 border-gray-200 pl-80 pt-3 text-xl">

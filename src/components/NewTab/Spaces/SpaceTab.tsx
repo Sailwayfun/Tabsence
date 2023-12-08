@@ -30,7 +30,7 @@ const SpaceTab = ({
   return (
     !isArchived && (
       <li
-        className={`relative p-4 text-xl  ${linkClasses} group/space-tab flex justify-between hover:bg-orange-900`}
+        className={`relative border border-l-0 border-white p-4 text-xl ${linkClasses} group/space-tab flex justify-between hover:bg-orange-900`}
       >
         <Link to={`/${id}`}>{title.toLowerCase()}</Link>
         <RemoveSpaceModal id={id} onRemoveSpace={onRemoveSpace} />

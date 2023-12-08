@@ -4,9 +4,8 @@ import MoveToSpace from "./MoveToSpace";
 import CloseBtn from "./CloseBtn";
 import ArrowDownBtn from "./ArrowDownBtn";
 import ArrowUpBtn from "./ArrowUpBtn";
-import StarBtn from "./StarBtn";
+import PinBtn from "./PinBtn";
 import Dropdown from "../../UI/Dropdown";
-import { m } from "framer-motion";
 interface TabProps {
   tab: Tab;
   spaces: Space[];
@@ -44,13 +43,12 @@ const TabCard = memo(function TabCard({
   isGrid,
 }: TabProps) {
   return (
-    <m.li
+    <li
       className={`group/tab-card grid grid-rows-2 justify-items-center gap-3 rounded-lg border bg-slate-100 px-4 py-2 text-lg shadow-md ${
         isGrid
-          ? "xl:flex xl:flex-col xl:items-center"
+          ? "xl:flex xl:flex-col xl:items-center xl:justify-center xl:gap-5"
           : "xl:flex xl:items-center"
-      } xl:text-2xl`}
-      whileHover={{ scale: 1.05, backgroundColor: "#cbd5e1" }}
+      } transition delay-100 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg xl:text-2xl`}
     >
       <img
         src={tab.favIconUrl}
@@ -120,13 +118,13 @@ const TabCard = memo(function TabCard({
             isGrid={isGrid}
           />
         )}
-        <StarBtn
+        <PinBtn
           onToggleTabPin={onToggleTabPin}
           isPinned={tab.isPinned}
           id={tab.tabId}
         />
       </div>
-    </m.li>
+    </li>
   );
 });
 

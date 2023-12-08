@@ -77,6 +77,7 @@ const Spaces = forwardRef(
               SPACES
             </h2>
           </div>
+          <span className="mx-auto mt-10 h-[1px] w-full bg-white opacity-60" />
           <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
           <AddSpace ref={ref} onAddNewSpace={handleAddNewSpace} />
           <ul className="flex flex-col">

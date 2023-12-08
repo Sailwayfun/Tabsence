@@ -49,17 +49,18 @@ const NewTab = () => {
   const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
   const [currentWindowId, setCurrentWindowId] = useState<number>(0);
-  console.log("current order", tabOrder);
-  console.log("current windowId", currentWindowId);
+  // console.log("current order", tabOrder);
+  // console.log("current windowId", currentWindowId);
+  console.log("current tabs", tabs);
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
   );
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
-  console.log(
-    "spaces",
-    spaces.map((space) => space.id),
-  );
+  // console.log(
+  //   "spaces",
+  //   spaces.map((space) => space.id),
+  // );
   useEffect(() => {
     let active = true;
     async function getCurrentWindowId(): Promise<number> {
@@ -135,8 +136,12 @@ const NewTab = () => {
             const tab = doc.data() as Tab;
             currentTabs.push(tab);
           });
+          console.log("currentTabs", currentTabs);
+          console.log("tabOrder", tabOrder);
           const sortedTabs = sortTabs(currentTabs, tabOrder);
+          console.log("sortedTabs", sortedTabs);
           setTabs(sortedTabs);
+          console.log("tabs on snapshot updated");
           return;
         }
         querySnapshot.forEach((doc) => {
@@ -145,7 +150,9 @@ const NewTab = () => {
           currentTabs.push(tab);
         });
         const sortedTabs = sortTabs(currentTabs, tabOrder);
+        console.log("sortedTabs", sortedTabs, "tabOrder", tabOrder);
         setTabs(sortedTabs);
+        console.log("tabs on snapshot updated");
         return;
       });
       const spaceQ = query(spacesCollectionRef, orderBy("createdAt", "asc"));
@@ -232,15 +239,19 @@ const NewTab = () => {
       }
       if (request.action === "tabUpdated") {
         setTabs((t) => {
-          const updatedTabs = t.map((tab) =>
-            tab.tabId === request.updatedTab.tabId ? request.updatedTab : tab
+          const updatedTabs: Tab[] = [...t];
+          const existingTab: Tab | undefined = updatedTabs.find(
+            (tab) => tab.tabId === request.updatedTab.tabId,
           );
-          if (!updatedTabs.some((tab) => tab.tabId === request.updatedTab.tabId)) {
+          if (existingTab) {
+            Object.assign(existingTab, request.updatedTab);
+          } else {
             updatedTabs.push(request.updatedTab);
           }
           return updatedTabs;
         });
         sendResponse({ success: true });
+        console.log("tabupdated");
       }
       return true;
     };
@@ -308,7 +319,7 @@ const NewTab = () => {
       "add_space",
     ) as HTMLDialogElement | null;
     if (targetModal) targetModal.showModal();
-    console.log("open modal", targetModal);
+    // console.log("open modal", targetModal);
   }
   //TODO:限制spaces數量上限為10個，因為可以不去考慮這個區塊的往下滾動造成popup和overflow-y的衝突
   function addNewSpace() {

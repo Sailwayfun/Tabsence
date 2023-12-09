@@ -66,6 +66,7 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
       .get("userId")
       .then((res) => res.userId);
     const tabData = await saveTabInfo(tab, userId);
+    console.log("tabinfo saved", tabData);
     chrome.runtime.sendMessage(
       {
         action: "tabUpdated",

@@ -50,7 +50,7 @@ const NewTab = () => {
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
   const [currentWindowId, setCurrentWindowId] = useState<number>(0);
   // console.log("current order", tabOrder);
-  // console.log("current windowId", currentWindowId);
+  console.log("current windowId", currentWindowId);
   console.log("current tabs", tabs);
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
@@ -136,8 +136,8 @@ const NewTab = () => {
             const tab = doc.data() as Tab;
             currentTabs.push(tab);
           });
-          console.log("currentTabs", currentTabs);
-          console.log("tabOrder", tabOrder);
+          // console.log("currentTabs", currentTabs);
+          // console.log("tabOrder", tabOrder);
           const sortedTabs = sortTabs(currentTabs, tabOrder);
           console.log("sortedTabs", sortedTabs);
           setTabs(sortedTabs);

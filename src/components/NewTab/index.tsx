@@ -237,7 +237,10 @@ const NewTab = () => {
         setTabs((t) => t.filter((tab) => tab.tabId !== request.tabId));
         sendResponse({ success: true });
       }
-      if (request.action === "tabUpdated") {
+      if (
+        request.action === "tabUpdated" &&
+        request.updatedTab.windowId === currentWindowId
+      ) {
         setTabs((t) => {
           const updatedTabs: Tab[] = [...t];
           const existingTab: Tab | undefined = updatedTabs.find(
@@ -259,7 +262,7 @@ const NewTab = () => {
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessagePassing);
     };
-  }, []);
+  }, [currentWindowId]);
   // useEffect(() => {
   //   chrome.storage.local.get(["isLoggedin", "currentUser"], function (result) {
   //     if (result.isLoggedin && result.currentUser) {

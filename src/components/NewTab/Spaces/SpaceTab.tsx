@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import RemoveSpaceBtn from "./RemoveSpaceBtn";
 import RemoveSpaceModal from "./RemoveSpaceModal";
-import ArchiveSpaceBtn from "./ArchiveSpaceBtn";
+import ToggleArchiveBtn from "./ToggleArchiveBtn";
 import ToggleArchiveModal from "./ToggleArchiveModal";
 interface SpaceTabProps {
   linkClasses: string;
@@ -11,6 +11,7 @@ interface SpaceTabProps {
   onToggleArchive: (id: string) => void;
   modalText: string;
   modalBtnText: string;
+  isArchived: boolean;
 }
 
 const SpaceTab = ({
@@ -21,6 +22,7 @@ const SpaceTab = ({
   onRemoveSpace,
   modalText,
   modalBtnText,
+  isArchived,
 }: SpaceTabProps) => {
   function openModal(id: string, action: string) {
     const modal = document.getElementById(
@@ -32,7 +34,9 @@ const SpaceTab = ({
     <li
       className={`relative border border-l-0 border-white p-4 text-xl ${linkClasses} group/space-tab flex justify-between hover:bg-orange-900`}
     >
-      <Link to={`/${id}`}>{title.toLowerCase()}</Link>
+      <Link to={`/${id}`} className={isArchived ? "pointer-events-none" : ""}>
+        {title.toLowerCase()}
+      </Link>
       <RemoveSpaceModal id={id} onRemoveSpace={onRemoveSpace} />
       <ToggleArchiveModal
         id={id}
@@ -42,10 +46,11 @@ const SpaceTab = ({
       />
       <div className="absolute right-4 flex gap-4">
         <RemoveSpaceBtn id={id} onOpenModal={openModal} action="remove_space" />
-        <ArchiveSpaceBtn
+        <ToggleArchiveBtn
           id={id}
           onOpenModal={openModal}
           action="archive_space"
+          isArchived={isArchived}
         />
       </div>
     </li>

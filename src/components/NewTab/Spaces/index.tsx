@@ -123,6 +123,7 @@ const Spaces = forwardRef(
                   onRemoveSpace={onRemoveSpace}
                   modalText="Are you going to archive this space?"
                   modalBtnText="Archive"
+                  isArchived={false}
                 ></SpaceTab>
               );
             })}
@@ -151,6 +152,7 @@ const Spaces = forwardRef(
                       onRemoveSpace={onRemoveSpace}
                       modalText="Are you going to restore this space?"
                       modalBtnText="Restore"
+                      isArchived={true}
                     ></SpaceTab>
                   );
                 })}

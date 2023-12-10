@@ -2,14 +2,19 @@ import { create } from "zustand";
 
 interface SpaceStoreState {
   archivedSpaces: string[];
-  setArchivedSpaces: (id: string) => void;
+  addArchived: (id: string) => void;
+  restoreArchived: (id: string) => void;
 }
 
 const useSpaceStore = create<SpaceStoreState>((set) => ({
   archivedSpaces: [],
-  setArchivedSpaces: (id) =>
+  addArchived: (id) =>
     set((state) => ({
       archivedSpaces: [...state.archivedSpaces, id],
+    })),
+  restoreArchived: (id) =>
+    set((state) => ({
+      archivedSpaces: state.archivedSpaces.filter((spaceId) => spaceId !== id),
     })),
 }));
 

@@ -1,4 +1,4 @@
-import { forwardRef, useState } from "react";
+import { forwardRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import { useSpaceStore } from "../../../store";
@@ -28,24 +28,43 @@ const Spaces = forwardRef(
       currentSpaceId,
     }: SpacesProps = props;
     console.log({ currentSpaceId });
-    const [activePopup, setActivePopup] = useState<string>("");
     // const [archivedSpaces, setArchivedSpaces] = useState<string[]>([]);
     const archivedSpaces = useSpaceStore((state) => state.archivedSpaces);
-    const setArchivedSpaces = useSpaceStore((state) => state.setArchivedSpaces);
+    const addArchived = useSpaceStore((state) => state.addArchived);
+    const restoreArchived = useSpaceStore((state) => state.restoreArchived);
     const navigate = useNavigate();
     async function archiveSpace(id: string) {
-      setActivePopup("");
       return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage(
           { action: "archiveSpace", spaceId: id },
           (res) => {
             if (res) {
-              setArchivedSpaces(id);
+              addArchived(id);
               toast.success("Space archived", {
                 className: "w-52 text-lg rounded-md shadow",
                 duration: 2000,
               });
               navigate("/");
+              resolve(res);
+            } else {
+              reject();
+            }
+          },
+        );
+      });
+    }
+    async function restoreSpace(id: string) {
+      return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage(
+          { action: "restoreSpace", spaceId: id },
+          (res) => {
+            if (res) {
+              restoreArchived(id);
+              toast.success("Space restored", {
+                className: "w-52 text-lg rounded-md shadow",
+                duration: 2000,
+              });
+              navigate(`/${id}`);
               resolve(res);
             } else {
               reject();
@@ -92,25 +111,51 @@ const Spaces = forwardRef(
                   ? "text-yellow-400"
                   : "bg-orange-700 opacity-80 text-white"
               }`;
+              const isSpaceArchived = archivedSpaces.includes(id);
+              if (isSpaceArchived) return null;
               return (
                 <SpaceTab
                   key={id}
                   linkClasses={linkClasses}
                   id={id}
                   title={title}
-                  isPopupOpen={activePopup === id}
-                  onArchiveSpace={archiveSpace}
-                  isArchived={archivedSpaces.includes(id)}
+                  onToggleArchive={archiveSpace}
                   onRemoveSpace={onRemoveSpace}
+                  modalText="Are you going to archive this space?"
+                  modalBtnText="Archive"
                 ></SpaceTab>
               );
             })}
           </ul>
-          <div className="flex w-full items-center gap-3 px-4 pt-10">
-            <Box className="h-4 w-4 stroke-white" />
-            <Heading text="Archived" />
+          <div className="flex w-full flex-col gap-3 pt-10">
+            <div className="flex items-center gap-3 pl-4">
+              <Box className="h-4 w-4 stroke-white" />
+              <Heading text="Archived" />
+            </div>
+            {archivedSpaces.length === 0 && (
+              <span className="mt-5 h-[1px] w-full bg-white opacity-60" />
+            )}
+            <ul className="flex flex-col">
+              {archivedSpaces.length > 0 &&
+                archivedSpaces.map((id) => {
+                  const space = spaces.find((space) => space.id === id);
+                  if (!space) return null;
+                  const title = space.title;
+                  return (
+                    <SpaceTab
+                      key={id}
+                      linkClasses="bg-orange-700 opacity-80 text-white"
+                      id={id}
+                      title={title}
+                      onToggleArchive={restoreSpace}
+                      onRemoveSpace={onRemoveSpace}
+                      modalText="Are you going to restore this space?"
+                      modalBtnText="Restore"
+                    ></SpaceTab>
+                  );
+                })}
+            </ul>
           </div>
-          <span className="mt-5 h-[1px] w-full bg-white opacity-60" />
         </div>
       </div>
     );

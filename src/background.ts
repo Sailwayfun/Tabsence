@@ -14,10 +14,7 @@ import {
   arrayUnion,
 } from "firebase/firestore";
 
-import {
-  saveTabInfo,
-  upDateTabBySpace,
-} from "./utils/firestore";
+import { saveTabInfo, upDateTabBySpace } from "./utils/firestore";
 
 import { trackTabTime, updateTabDuration } from "./utils/trackTime";
 
@@ -298,6 +295,17 @@ chrome.runtime.onMessage.addListener(
         request.spaceId,
       );
       await updateDoc(spaceDocRef, { isArchived: true });
+      sendResponse({ success: true });
+    }
+    if (request.action === "restoreSpace" && request.spaceId) {
+      const spaceDocRef = doc(
+        db,
+        "users",
+        result.userId,
+        "spaces",
+        request.spaceId,
+      );
+      await updateDoc(spaceDocRef, { isArchived: false });
       sendResponse({ success: true });
     }
     return true;

@@ -175,32 +175,7 @@ const NewTab = () => {
         unsubscribeSpace();
       };
     }
-    // chrome.runtime.sendMessage(
-    //   { action: "getTabs", currentPath, userId: currentUserId },
-    //   function (response: Tab[]) {
-    //     if (response) {
-    //       setTabs(() => {
-    //         return response;
-    //       });
-    //       return;
-    //     }
-    //   },
-    // );
-    // chrome.runtime.sendMessage(
-    //   { action: "getSpaces", userId: currentUserId },
-    //   function (response: Space[]) {
-    //     // console.log(1, response, spaces);
-    //     if (response) {
-    //       setSpaces(() => response);
-    //       const currentActiveId = response.find(
-    //         (space) => space.id === currentPath,
-    //       )?.id;
-    //       if (currentPath === "") setActiveSpaceId("");
-    //       if (currentActiveId) setActiveSpaceId(currentActiveId);
-    //       return;
-    //     }
-    //   },
-    // );
+   
   }, [location.pathname, currentUserId, currentWindowId, tabOrder]);
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
@@ -335,9 +310,7 @@ const NewTab = () => {
       "add_space",
     ) as HTMLDialogElement | null;
     if (targetModal) targetModal.showModal();
-    // console.log("open modal", targetModal);
   }
-  //TODO:限制spaces數量上限為10個，因為可以不去考慮這個區塊的往下滾動造成popup和overflow-y的衝突
   function addNewSpace() {
     const newSpaceTitle: string | undefined =
       newSpaceInputRef.current?.value.trim();

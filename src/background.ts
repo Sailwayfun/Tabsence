@@ -15,8 +15,6 @@ import {
 } from "firebase/firestore";
 
 import {
-  getTabs,
-  getSpaces,
   saveTabInfo,
   upDateTabBySpace,
 } from "./utils/firestore";
@@ -36,22 +34,6 @@ interface RuntimeMessage {
   userId?: string;
   isPinned: boolean;
 }
-
-chrome.runtime.onMessage.addListener(
-  (request: RuntimeMessage, _, sendResponse) => {
-    if (request.action == "getTabs" && request.userId) {
-      getTabs(request.currentPath, request.userId)
-        .then((tabs) => sendResponse(tabs))
-        .catch((error) => console.error("Error getting tabs: ", error));
-    }
-    if (request.action == "getSpaces" && request.userId) {
-      getSpaces(request.userId)
-        .then((spaces) => sendResponse(spaces))
-        .catch((error) => console.error("Error getting spaces: ", error));
-    }
-    return true;
-  },
-);
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   if (changeInfo.url) {

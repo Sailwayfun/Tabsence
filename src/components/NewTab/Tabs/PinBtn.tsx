@@ -1,4 +1,4 @@
-import Pin from "../../icons/Pin";
+import Pin from "../../Icons/Pin";
 interface PinBtnProps {
   id?: number;
   isPinned: boolean;

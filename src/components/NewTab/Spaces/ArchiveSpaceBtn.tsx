@@ -1,4 +1,3 @@
-// import kebabMenu from "./kebab-menu.png";
 interface ArchiveSpaceBtnProps {
   id: string;
   onOpenModal: (id: string, action: string) => void;

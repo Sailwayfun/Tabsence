@@ -7,9 +7,10 @@ import AddSpaceBtn from "./AddSpaceBtn";
 import SpaceTab from "./SpaceTab";
 import logo from "../../../assets/logo.png";
 import tabs from "../../../assets/tabs.png";
-import Folder from "../../icons/Folder";
+import Folder from "../../Icons/Folder";
 import AddSpace from "./AddSpace";
 import Heading from "../../UI/Heading";
+import Box from "../../Icons/Box";
 interface SpacesProps {
   spaces: Space[];
   onOpenAddSpacePopup: () => void;
@@ -105,10 +106,11 @@ const Spaces = forwardRef(
               );
             })}
           </ul>
-          <div className="flex w-full flex-col p-4">
+          <div className="flex w-full items-center gap-3 px-4 pt-10">
+            <Box className="h-4 w-4 stroke-white" />
             <Heading text="Archived" />
           </div>
-          <span className="mt-10 h-[1px] w-full bg-white opacity-60" />
+          <span className="mt-5 h-[1px] w-full bg-white opacity-60" />
         </div>
       </div>
     );

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import RemoveSpaceBtn from "./RemoveSpaceBtn";
 import RemoveSpaceModal from "./RemoveSpaceModal";
 import ArchiveSpaceBtn from "./ArchiveSpaceBtn";
-import ArchiveSpaceModal from "./ArchiveSpaceModal";
+import ToggleArchiveModal from "./ToggleArchiveModal";
 interface SpaceTabProps {
   linkClasses: string;
   id: string;
@@ -34,7 +34,7 @@ const SpaceTab = ({
     >
       <Link to={`/${id}`}>{title.toLowerCase()}</Link>
       <RemoveSpaceModal id={id} onRemoveSpace={onRemoveSpace} />
-      <ArchiveSpaceModal
+      <ToggleArchiveModal
         id={id}
         onAction={onToggleArchive}
         text={modalText}

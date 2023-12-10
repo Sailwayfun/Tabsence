@@ -48,16 +48,41 @@ const NewTab = () => {
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
-  console.log("current order", tabOrder);
+  const [currentWindowId, setCurrentWindowId] = useState<number>(0);
+  // console.log("current order", tabOrder);
+  console.log("current windowId", currentWindowId);
+  console.log("current tabs", tabs);
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
   );
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
-  console.log(
-    "spaces",
-    spaces.map((space) => space.id),
-  );
+  // console.log(
+  //   "spaces",
+  //   spaces.map((space) => space.id),
+  // );
+  useEffect(() => {
+    let active = true;
+    async function getCurrentWindowId(): Promise<number> {
+      return new Promise((resolve, reject) => {
+        chrome.windows.getCurrent((window) => {
+          if (active && window && window.id) {
+            resolve(window.id);
+            return;
+          }
+          reject();
+        });
+      });
+    }
+    getCurrentWindowId()
+      .then((res) => {
+        setCurrentWindowId(res);
+      })
+      .catch((err) => console.error(err));
+    return () => {
+      active = false;
+    };
+  }, []);
   useEffect(() => {
     function hideArchivedSpacesTabs(
       currentTabs: Tab[],
@@ -88,7 +113,7 @@ const NewTab = () => {
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
     if (currentPath === "webtime") return;
-    if (currentUserId) {
+    if (currentUserId && currentWindowId) {
       const tabsCollectionRef = collection(db, "users", currentUserId, "tabs");
       const spacesCollectionRef = collection(
         db,
@@ -98,8 +123,12 @@ const NewTab = () => {
       );
       const tabQ =
         currentPath !== ""
-          ? query(tabsCollectionRef, where("spaceId", "==", currentPath))
-          : query(tabsCollectionRef);
+          ? query(
+              tabsCollectionRef,
+              where("windowId", "==", currentWindowId),
+              where("spaceId", "==", currentPath),
+            )
+          : query(tabsCollectionRef, where("windowId", "==", currentWindowId));
       const unsubscribeTab = onSnapshot(tabQ, (querySnapshot) => {
         const currentTabs: Tab[] = [];
         if (currentPath !== "") {
@@ -107,8 +136,12 @@ const NewTab = () => {
             const tab = doc.data() as Tab;
             currentTabs.push(tab);
           });
+          // console.log("currentTabs", currentTabs);
+          // console.log("tabOrder", tabOrder);
           const sortedTabs = sortTabs(currentTabs, tabOrder);
+          console.log("sortedTabs", sortedTabs);
           setTabs(sortedTabs);
+          console.log("tabs on snapshot updated");
           return;
         }
         querySnapshot.forEach((doc) => {
@@ -117,7 +150,9 @@ const NewTab = () => {
           currentTabs.push(tab);
         });
         const sortedTabs = sortTabs(currentTabs, tabOrder);
+        console.log("sortedTabs", sortedTabs, "tabOrder", tabOrder);
         setTabs(sortedTabs);
+        console.log("tabs on snapshot updated");
         return;
       });
       const spaceQ = query(spacesCollectionRef, orderBy("createdAt", "asc"));
@@ -165,7 +200,7 @@ const NewTab = () => {
     //     }
     //   },
     // );
-  }, [location.pathname, currentUserId, tabOrder]);
+  }, [location.pathname, currentUserId, currentWindowId, tabOrder]);
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
     const spaceId = currentPath !== "" ? currentPath : "global";
@@ -178,7 +213,7 @@ const NewTab = () => {
         spaceId,
       );
       const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
-        if (doc.exists()) {
+        if (doc.exists() && doc.data()?.windowId === currentWindowId) {
           const order: number[] = doc.data()?.tabOrder;
           if (order) setTabOrder(order);
         }
@@ -187,7 +222,7 @@ const NewTab = () => {
         unsubscribeTabOrder();
       };
     }
-  }, [currentUserId, location.pathname]);
+  }, [currentUserId, location.pathname, currentWindowId]);
   useEffect(() => {
     const handleMessagePassing = (
       request: {
@@ -199,21 +234,39 @@ const NewTab = () => {
       sendResponse: <T extends Response>(response: T) => void,
     ) => {
       if (request.action === "tabClosed") {
-        const deletedTabId = request.tabId;
-        setTabs((t) => t.filter((tab) => tab.tabId !== deletedTabId));
+        setTabs((t) => t.filter((tab) => tab.tabId !== request.tabId));
         sendResponse({ success: true });
       }
-      if (request.action === "tabUpdated") {
-        const updatedTab = request.updatedTab;
+      if (
+        request.action === "tabUpdated" &&
+        request.updatedTab.windowId === currentWindowId
+      ) {
         setTabs((t) => {
-          const tabExists = t.some((tab) => tab.tabId === updatedTab.tabId);
-          if (!tabExists) return [...t, updatedTab];
-          return t.map((tab) => {
-            if (tab.tabId === updatedTab.tabId) return updatedTab;
-            return tab;
-          });
+          const updatedTabs: Tab[] = [...t];
+          const existingTab: Tab | undefined = updatedTabs.find(
+            (tab) => tab.tabId === request.updatedTab.tabId,
+          );
+          if (existingTab) {
+            Object.assign(existingTab, request.updatedTab);
+          } else {
+            updatedTabs.push(request.updatedTab);
+          }
+          return updatedTabs;
+        });
+        setTabOrder((o) => {
+          if (request.updatedTab.tabId === undefined) return o;
+          const updatedOrder = [...o];
+          const existingIndex = updatedOrder.findIndex(
+            (id) => id === request.updatedTab.tabId,
+          );
+          if (existingIndex !== -1) {
+            updatedOrder.splice(existingIndex, 1);
+          }
+          updatedOrder.push(request.updatedTab.tabId);
+          return updatedOrder;
         });
         sendResponse({ success: true });
+        console.log("tabupdated");
       }
       return true;
     };
@@ -221,7 +274,7 @@ const NewTab = () => {
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessagePassing);
     };
-  }, []);
+  }, [currentWindowId]);
   // useEffect(() => {
   //   chrome.storage.local.get(["isLoggedin", "currentUser"], function (result) {
   //     if (result.isLoggedin && result.currentUser) {
@@ -281,7 +334,7 @@ const NewTab = () => {
       "add_space",
     ) as HTMLDialogElement | null;
     if (targetModal) targetModal.showModal();
-    console.log("open modal", targetModal);
+    // console.log("open modal", targetModal);
   }
   //TODO:限制spaces數量上限為10個，因為可以不去考慮這個區塊的往下滾動造成popup和overflow-y的衝突
   function addNewSpace() {
@@ -348,7 +401,12 @@ const NewTab = () => {
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(
-        { action: "updateTabOrder", newTabs, spaceId, userId: currentUserId },
+        {
+          action: "updateTabOrder",
+          newTabs,
+          spaceId,
+          userId: currentUserId,
+        },
         function (response) {
           if (response) {
             resolve(response);
@@ -488,7 +546,6 @@ const NewTab = () => {
                 Sign In
               </button>
             )} */}
-            {/* TODO: 新增一個按鈕讓使用者分享當下觀看的space的連結 */}
           </div>
           <Outlet />
           <ToggleViewBtn

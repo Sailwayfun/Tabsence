@@ -213,7 +213,7 @@ const NewTab = () => {
         spaceId,
       );
       const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
-        if (doc.exists()) {
+        if (doc.exists() && doc.data()?.windowId === currentWindowId) {
           const order: number[] = doc.data()?.tabOrder;
           if (order) setTabOrder(order);
         }
@@ -222,7 +222,7 @@ const NewTab = () => {
         unsubscribeTabOrder();
       };
     }
-  }, [currentUserId, location.pathname]);
+  }, [currentUserId, location.pathname, currentWindowId]);
   useEffect(() => {
     const handleMessagePassing = (
       request: {
@@ -252,6 +252,18 @@ const NewTab = () => {
             updatedTabs.push(request.updatedTab);
           }
           return updatedTabs;
+        });
+        setTabOrder((o) => {
+          if (request.updatedTab.tabId === undefined) return o;
+          const updatedOrder = [...o];
+          const existingIndex = updatedOrder.findIndex(
+            (id) => id === request.updatedTab.tabId,
+          );
+          if (existingIndex !== -1) {
+            updatedOrder.splice(existingIndex, 1);
+          }
+          updatedOrder.push(request.updatedTab.tabId);
+          return updatedOrder;
         });
         sendResponse({ success: true });
         console.log("tabupdated");
@@ -389,7 +401,12 @@ const NewTab = () => {
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(
-        { action: "updateTabOrder", newTabs, spaceId, userId: currentUserId },
+        {
+          action: "updateTabOrder",
+          newTabs,
+          spaceId,
+          userId: currentUserId,
+        },
         function (response) {
           if (response) {
             resolve(response);

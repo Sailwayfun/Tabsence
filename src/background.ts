@@ -161,7 +161,7 @@ chrome.runtime.onMessage.addListener(
 
 chrome.runtime.onMessage.addListener(
   async (request: RuntimeMessage, _, sendResponse) => {
-    if (!request.userId) return;
+    if (!request.userId || !request.newTabs[0].windowId) return;
     switch (request.action) {
       case "updateTabOrder":
         {
@@ -181,6 +181,7 @@ chrome.runtime.onMessage.addListener(
               tabOrderDocRef,
               {
                 tabOrder: newTabOrderData,
+                windowId: request.newTabs[0].windowId,
               },
               { merge: true },
             );

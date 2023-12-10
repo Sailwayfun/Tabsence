@@ -1,5 +1,6 @@
 import { forwardRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { Toaster, toast } from "react-hot-toast";
 import { useSpaceStore } from "../../../store";
 import { Space } from "..";
 import AddSpaceBtn from "./AddSpaceBtn";
@@ -38,7 +39,10 @@ const Spaces = forwardRef(
           (res) => {
             if (res) {
               setArchivedSpaces(id);
-              alert("Space archived");
+              toast.success("Space archived", {
+                className: "w-52 text-lg rounded-md shadow",
+                duration: 2000,
+              });
               navigate("/");
               resolve(res);
             } else {
@@ -80,6 +84,7 @@ const Spaces = forwardRef(
           <span className="mx-auto mt-10 h-[1px] w-full bg-white opacity-60" />
           <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
           <AddSpace ref={ref} onAddNewSpace={handleAddNewSpace} />
+          <Toaster />
           <ul className="flex flex-col">
             {spaces.map(({ id, title }) => {
               const linkClasses: string = `${

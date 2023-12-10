@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSpaceStore } from "../../store";
 import { FieldValue } from "firebase/firestore";
 import { useLocation, Outlet } from "react-router-dom";
+import { Toaster, toast } from "react-hot-toast";
 import Spaces from "./Spaces";
 import Header from "./Header";
 import Tabs from "./Tabs";
@@ -341,17 +342,25 @@ const NewTab = () => {
     const newSpaceTitle: string | undefined =
       newSpaceInputRef.current?.value.trim();
     if (!newSpaceTitle || newSpaceTitle.trim().length === 0)
-      return alert("Please enter a space name");
+      return toast.error("Please enter a space name", {
+        className: "w-60 text-lg rounded-md shadow",
+      });
     if (newSpaceTitle.length > 15)
-      return alert("Space name should be less than 15 characters");
+      return toast.error("Space name should be less than 15 characters", {
+        className: "w-[400px] text-lg rounded-md shadow",
+      });
     if (
       spaces.some(
         (space) => space.title.toLowerCase() === newSpaceTitle.toLowerCase(),
       )
     )
-      return alert("Space name already exists");
+      return toast.error("Space name already exists", {
+        className: "w-60 text-lg rounded-md shadow",
+      });
     if (spaces.length >= 10)
-      return alert("You can only create up to 10 spaces");
+      return toast.error("You can only create up to 10 spaces", {
+        className: "w-72 text-lg rounded-md shadow",
+      });
     chrome.runtime.sendMessage(
       { action: "addSpace", newSpaceTitle, userId: currentUserId },
       function (response) {
@@ -420,10 +429,14 @@ const NewTab = () => {
     try {
       const link = window.location.href;
       await navigator.clipboard.writeText(link);
-      alert("Link copied!");
+      toast.success("Link copied!", {
+        className: "w-52 text-lg rounded-md shadow",
+      });
     } catch (err) {
       console.error(err);
-      alert("Failed to copy link. Please try again.");
+      toast.error("Failed to copy link. Please try again.", {
+        className: "w-72 text-lg rounded-md shadow",
+      });
     }
   }
   // function signOut() {
@@ -548,6 +561,7 @@ const NewTab = () => {
             )} */}
           </div>
           <Outlet />
+          <Toaster />
           <ToggleViewBtn
             onToggleView={toggleTabsLayout}
             className={`mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-xl shadow hover:bg-orange-700 hover:bg-opacity-70 hover:text-white ${

@@ -105,9 +105,10 @@ const Spaces = forwardRef(
               );
             })}
           </ul>
-          <div className="w-full p-4">
+          <div className="flex w-full flex-col p-4">
             <Heading text="Archived" />
           </div>
+          <span className="mt-10 h-[1px] w-full bg-white opacity-60" />
         </div>
       </div>
     );

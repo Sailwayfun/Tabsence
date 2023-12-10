@@ -345,8 +345,8 @@ const NewTab = () => {
       return toast.error("Please enter a space name", {
         className: "w-60 text-lg rounded-md shadow",
       });
-    if (newSpaceTitle.length > 15)
-      return toast.error("Space name should be less than 15 characters", {
+    if (newSpaceTitle.length > 10)
+      return toast.error("Space name should be less than 10 characters", {
         className: "w-[400px] text-lg rounded-md shadow",
       });
     if (
@@ -357,8 +357,8 @@ const NewTab = () => {
       return toast.error("Space name already exists", {
         className: "w-60 text-lg rounded-md shadow",
       });
-    if (spaces.length >= 10)
-      return toast.error("You can only create up to 10 spaces", {
+    if (spaces.length >= 5)
+      return toast.error("You can only create up to 5 spaces", {
         className: "w-72 text-lg rounded-md shadow",
       });
     chrome.runtime.sendMessage(

@@ -17,7 +17,7 @@ const ToggleArchiveModal = ({
   const modalRef = useRef<HTMLDialogElement>(null);
   return (
     <Modal id={`archive_space_${id}`} ref={modalRef}>
-      <h3 className="text-lg font-bold">{text}</h3>
+      <h3 className="text-xl font-bold">{text}</h3>
       <p className="py-4">Press ESC key or click on ✕ button to close</p>
       <div className="flex gap-3">
         <button

@@ -9,6 +9,7 @@ import logo from "../../../assets/logo.png";
 import tabs from "../../../assets/tabs.png";
 import Folder from "../../icons/Folder";
 import AddSpace from "./AddSpace";
+import Heading from "../../UI/Heading";
 interface SpacesProps {
   spaces: Space[];
   onOpenAddSpacePopup: () => void;
@@ -77,9 +78,7 @@ const Spaces = forwardRef(
             <div className="h-4 w-4">
               <Folder />
             </div>
-            <h2 className="text-xl font-bold tracking-widest text-white">
-              SPACES
-            </h2>
+            <Heading text="Spaces" />
           </div>
           <span className="mx-auto mt-10 h-[1px] w-full bg-white opacity-60" />
           <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
@@ -106,6 +105,9 @@ const Spaces = forwardRef(
               );
             })}
           </ul>
+          <div className="w-full p-4">
+            <Heading text="Archived" />
+          </div>
         </div>
       </div>
     );

@@ -22,11 +22,11 @@ const ArchiveSpaceModal = ({ id, onArchiveSpace }: ArchiveSpaceModalProps) => {
             console.log("Archived space", id);
             modalRef.current?.close();
           }}
-          className="rounded-md border bg-blue-600 px-4 py-2 text-white shadow-md hover:bg-blue-800"
+          className="rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900"
         >
           Archive Space
         </button>
-        <button className="rounded-md border bg-blue-600 px-4 py-2 text-white shadow-md hover:bg-blue-800">
+        <button className="rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900">
           Cancel
         </button>
       </div>

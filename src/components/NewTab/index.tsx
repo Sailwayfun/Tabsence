@@ -42,7 +42,9 @@ const NewTab = () => {
   // const [filteredSpaces, setFilteredSpaces] = useState<Space[]>([]);
   // const [showArchived, setShowArchived] = useState<boolean>(false);
   const [spaces, setSpaces] = useState<Space[]>([]);
-  const [activePopupId, setActivePopupId] = useState<string | undefined>();
+  const [activeSpaceSelectId, setActiveSpaceSelectId] = useState<
+    string | undefined
+  >();
   const [selectedSpace, setSelectedSpace] = useState<string>("");
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
@@ -288,20 +290,22 @@ const NewTab = () => {
   function openSpacesPopup(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     setSelectedSpace("");
     const id: string | undefined = e.currentTarget.dataset.id;
-    if (id) setActivePopupId(id);
+    if (id) setActiveSpaceSelectId(id);
   }
   function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
     setSelectedSpace(e.target.value);
     if (e.target.value === "") return;
     const request = {
       action: "moveTabToSpace",
-      updatedTab: tabs.find((tab) => tab.id?.toString() === activePopupId),
+      updatedTab: tabs.find(
+        (tab) => tab.id?.toString() === activeSpaceSelectId,
+      ),
       spaceId: e.target.value,
       userId: currentUserId,
     };
     chrome.runtime.sendMessage(request, function (response) {
       const oldTabs = tabs.filter(
-        (tab) => tab.id?.toString() !== activePopupId,
+        (tab) => tab.id?.toString() !== activeSpaceSelectId,
       );
       if (response) setTabs(oldTabs);
     });
@@ -545,7 +549,7 @@ const NewTab = () => {
           <Tabs
             tabs={tabs}
             spaces={spaces}
-            activePopupId={activePopupId}
+            activeSpaceSelectId={activeSpaceSelectId}
             selectedSpace={selectedSpace}
             isLoggedin={isLoggedin}
             openLink={openLink}

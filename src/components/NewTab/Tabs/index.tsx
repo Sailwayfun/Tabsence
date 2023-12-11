@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 interface TabsProps {
   tabs: Tab[];
   spaces: Space[];
-  activePopupId?: string;
+  activeSpaceSelectId?: string;
   selectedSpace: string;
   isLoggedin: boolean;
   isGrid: boolean;
@@ -26,7 +26,7 @@ interface TabsProps {
 const Tabs = ({
   tabs,
   spaces,
-  activePopupId,
+  activeSpaceSelectId,
   selectedSpace,
   isLoggedin,
   openLink,
@@ -51,7 +51,7 @@ const Tabs = ({
               key={tab.tabId}
               tab={tab}
               spaces={spaces}
-              popupId={activePopupId}
+              selectId={activeSpaceSelectId}
               onOpenLink={openLink}
               onOpenSpacesPopup={openSpacesPopup}
               onSelectSpace={selectSpace}

@@ -41,6 +41,13 @@ const SpaceTab = ({
     ) as HTMLDialogElement;
     modal.showModal();
   }
+  function handleKeyUp(e: React.KeyboardEvent<HTMLInputElement>, id: string) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      e.stopPropagation();
+      if (onSpaceTitleBlur) onSpaceTitleBlur(id);
+    }
+  }
   return (
     <li
       className={`relative border border-l-0 border-white p-4 text-xl ${linkClasses} group/space-tab flex justify-between hover:bg-orange-900`}
@@ -52,6 +59,7 @@ const SpaceTab = ({
           value={title}
           onChange={(e) => onSpaceTitleChange(e, id)}
           onBlur={() => onSpaceTitleBlur(id)}
+          onKeyUp={(e) => handleKeyUp(e, id)}
           autoFocus
         />
       )}

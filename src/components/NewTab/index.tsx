@@ -473,7 +473,9 @@ const NewTab = () => {
             {location.pathname !== "/webtime" && (
               <>
                 <h1 className="text-3xl font-bold">Your Tabs</h1>
-                <CopyToClipboard onCopySpaceLink={copySpaceLink} />
+                {location.pathname !== "/" && (
+                  <CopyToClipboard onCopySpaceLink={copySpaceLink} />
+                )}
               </>
             )}
             {location.pathname === "/webtime" && (

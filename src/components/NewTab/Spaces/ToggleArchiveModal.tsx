@@ -1,32 +1,37 @@
 import Modal from "../../UI/Modal";
-interface ArchiveSpaceModalProps {
+interface ToggleArchiveModalProps {
   id: string;
-  onArchiveSpace: (id: string) => void;
+  onAction: (id: string) => void;
+  text: string;
+  btnText: string;
 }
 
 import { useRef } from "react";
 
-const ArchiveSpaceModal = ({ id, onArchiveSpace }: ArchiveSpaceModalProps) => {
+const ToggleArchiveModal = ({
+  id,
+  onAction,
+  text,
+  btnText,
+}: ToggleArchiveModalProps) => {
   const modalRef = useRef<HTMLDialogElement>(null);
   return (
     <Modal id={`archive_space_${id}`} ref={modalRef}>
-      <h3 className="text-lg font-bold">
-        Are you going to archive this space?
-      </h3>
+      <h3 className="text-xl font-bold">{text}</h3>
       <p className="py-4">Press ESC key or click on ✕ button to close</p>
       <div className="flex gap-3">
         <button
           onClick={(e) => {
             e.preventDefault();
-            onArchiveSpace(id);
+            onAction(id);
             console.log("Archived space", id);
             modalRef.current?.close();
           }}
-          className="rounded-md border bg-blue-600 px-4 py-2 text-white shadow-md hover:bg-blue-800"
+          className="rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900"
         >
-          Archive Space
+          {`${btnText} Space`}
         </button>
-        <button className="rounded-md border bg-blue-600 px-4 py-2 text-white shadow-md hover:bg-blue-800">
+        <button className="rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900">
           Cancel
         </button>
       </div>
@@ -34,4 +39,4 @@ const ArchiveSpaceModal = ({ id, onArchiveSpace }: ArchiveSpaceModalProps) => {
   );
 };
 
-export default ArchiveSpaceModal;
+export default ToggleArchiveModal;

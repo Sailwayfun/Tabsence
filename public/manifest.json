@@ -13,11 +13,8 @@
   },
   "permissions": [
     "tabs",
-    "activeTab",
     "favicon",
-    "identity",
-    "storage",
-    "identity.email"
+    "storage"
   ],
   "background": {
     "service_worker": "background.js",

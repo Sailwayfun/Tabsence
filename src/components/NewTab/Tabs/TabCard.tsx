@@ -9,7 +9,7 @@ import Dropdown from "../../UI/Dropdown";
 interface TabProps {
   tab: Tab;
   spaces: Space[];
-  popupId: string | undefined;
+  selectId: string | undefined;
   onOpenLink: (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
     tab: Tab,
@@ -30,7 +30,7 @@ interface TabProps {
 const TabCard = memo(function TabCard({
   tab,
   spaces,
-  popupId,
+  selectId,
   onOpenLink,
   onOpenSpacesPopup,
   onSelectSpace,
@@ -72,12 +72,12 @@ const TabCard = memo(function TabCard({
           button={
             <MoveToSpace
               spaces={spaces}
-              id={tab.id?.toString()}
+              id={tab.tabId?.toString()}
               onOpenSpacesPopup={onOpenSpacesPopup}
             />
           }
         >
-          {tab.id?.toString() === popupId && (
+          {tab.tabId?.toString() === selectId && (
             <div className="ml-5 h-14 w-52 px-3">
               <label
                 htmlFor={tab.id?.toString() || "spaces"}
@@ -86,7 +86,7 @@ const TabCard = memo(function TabCard({
                 Move to space:
               </label>
               <select
-                id={tab.id?.toString() || "spaces"}
+                id={tab.tabId?.toString() || "spaces"}
                 onChange={onSelectSpace}
                 value={selectedSpace}
               >

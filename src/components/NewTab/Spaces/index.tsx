@@ -1,13 +1,16 @@
-import { forwardRef, useState } from "react";
+import { forwardRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { Toaster, toast } from "react-hot-toast";
 import { useSpaceStore } from "../../../store";
 import { Space } from "..";
 import AddSpaceBtn from "./AddSpaceBtn";
 import SpaceTab from "./SpaceTab";
 import logo from "../../../assets/logo.png";
 import tabs from "../../../assets/tabs.png";
-import Folder from "../../icons/Folder";
+import Folder from "../../Icons/Folder";
 import AddSpace from "./AddSpace";
+import Heading from "../../UI/Heading";
+import Box from "../../Icons/Box";
 interface SpacesProps {
   spaces: Space[];
   onOpenAddSpacePopup: () => void;
@@ -25,21 +28,43 @@ const Spaces = forwardRef(
       currentSpaceId,
     }: SpacesProps = props;
     console.log({ currentSpaceId });
-    const [activePopup, setActivePopup] = useState<string>("");
     // const [archivedSpaces, setArchivedSpaces] = useState<string[]>([]);
     const archivedSpaces = useSpaceStore((state) => state.archivedSpaces);
-    const setArchivedSpaces = useSpaceStore((state) => state.setArchivedSpaces);
+    const addArchived = useSpaceStore((state) => state.addArchived);
+    const restoreArchived = useSpaceStore((state) => state.restoreArchived);
     const navigate = useNavigate();
     async function archiveSpace(id: string) {
-      setActivePopup("");
       return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage(
           { action: "archiveSpace", spaceId: id },
           (res) => {
             if (res) {
-              setArchivedSpaces(id);
-              alert("Space archived");
+              addArchived(id);
+              toast.success("Space archived", {
+                className: "w-52 text-lg rounded-md shadow",
+                duration: 2000,
+              });
               navigate("/");
+              resolve(res);
+            } else {
+              reject();
+            }
+          },
+        );
+      });
+    }
+    async function restoreSpace(id: string) {
+      return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage(
+          { action: "restoreSpace", spaceId: id },
+          (res) => {
+            if (res) {
+              restoreArchived(id);
+              toast.success("Space restored", {
+                className: "w-52 text-lg rounded-md shadow",
+                duration: 2000,
+              });
+              navigate(`/${id}`);
               resolve(res);
             } else {
               reject();
@@ -57,6 +82,12 @@ const Spaces = forwardRef(
       const modalRef = ref as React.RefObject<HTMLDialogElement>;
       modalRef.current?.close();
     }
+    function handleClearModalInput() {
+      const inputRef = ref as React.RefObject<HTMLInputElement>;
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+    }
     return (
       <div className="fixed left-0 top-0 z-10 flex h-full w-72 flex-col bg-orange-700 opacity-80">
         <div className="h-16">
@@ -68,18 +99,21 @@ const Spaces = forwardRef(
             <img src={tabs} className="block h-12 w-12" />
           </Link>
         </div>
-        <div className="flex max-h-full w-full flex-col [&::-webkit-scrollbar]:hidden">
+        <div className="flex max-h-full w-full flex-col">
           <div className="flex items-center gap-3 pl-4 pt-10">
             <div className="h-4 w-4">
               <Folder />
             </div>
-            <h2 className="text-xl font-bold tracking-widest text-white">
-              SPACES
-            </h2>
+            <Heading text="Spaces" />
           </div>
           <span className="mx-auto mt-10 h-[1px] w-full bg-white opacity-60" />
           <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
-          <AddSpace ref={ref} onAddNewSpace={handleAddNewSpace} />
+          <AddSpace
+            ref={ref}
+            onAddNewSpace={handleAddNewSpace}
+            onModalClose={handleClearModalInput}
+          />
+          <Toaster />
           <ul className="flex flex-col">
             {spaces.map(({ id, title }) => {
               const linkClasses: string = `${
@@ -87,20 +121,53 @@ const Spaces = forwardRef(
                   ? "text-yellow-400"
                   : "bg-orange-700 opacity-80 text-white"
               }`;
+              const isSpaceArchived = archivedSpaces.includes(id);
+              if (isSpaceArchived) return null;
               return (
                 <SpaceTab
                   key={id}
                   linkClasses={linkClasses}
                   id={id}
                   title={title}
-                  isPopupOpen={activePopup === id}
-                  onArchiveSpace={archiveSpace}
-                  isArchived={archivedSpaces.includes(id)}
+                  onToggleArchive={archiveSpace}
                   onRemoveSpace={onRemoveSpace}
+                  modalText="Are you going to archive this space?"
+                  modalBtnText="Archive"
+                  isArchived={false}
                 ></SpaceTab>
               );
             })}
           </ul>
+          <div className="flex w-full flex-col gap-3 pt-10">
+            <div className="flex items-center gap-3 pl-4">
+              <Box className="h-4 w-4 stroke-white" />
+              <Heading text="Archived" />
+            </div>
+            {archivedSpaces.length === 0 && (
+              <span className="mt-5 h-[1px] w-full bg-white opacity-60" />
+            )}
+            <ul className="flex flex-col">
+              {archivedSpaces.length > 0 &&
+                archivedSpaces.map((id) => {
+                  const space = spaces.find((space) => space.id === id);
+                  if (!space) return null;
+                  const title = space.title;
+                  return (
+                    <SpaceTab
+                      key={id}
+                      linkClasses="bg-orange-700 opacity-80 text-white"
+                      id={id}
+                      title={title}
+                      onToggleArchive={restoreSpace}
+                      onRemoveSpace={onRemoveSpace}
+                      modalText="Are you going to restore this space?"
+                      modalBtnText="Restore"
+                      isArchived={true}
+                    ></SpaceTab>
+                  );
+                })}
+            </ul>
+          </div>
         </div>
       </div>
     );

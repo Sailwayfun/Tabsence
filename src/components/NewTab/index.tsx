@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSpaceStore } from "../../store";
 import { FieldValue } from "firebase/firestore";
 import { useLocation, Outlet } from "react-router-dom";
+import { Toaster, toast } from "react-hot-toast";
 import Spaces from "./Spaces";
 import Header from "./Header";
 import Tabs from "./Tabs";
@@ -41,7 +42,9 @@ const NewTab = () => {
   // const [filteredSpaces, setFilteredSpaces] = useState<Space[]>([]);
   // const [showArchived, setShowArchived] = useState<boolean>(false);
   const [spaces, setSpaces] = useState<Space[]>([]);
-  const [activePopupId, setActivePopupId] = useState<string | undefined>();
+  const [activeSpaceSelectId, setActiveSpaceSelectId] = useState<
+    string | undefined
+  >();
   const [selectedSpace, setSelectedSpace] = useState<string>("");
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
@@ -61,6 +64,8 @@ const NewTab = () => {
   //   "spaces",
   //   spaces.map((space) => space.id),
   // );
+  const tabOrderRef = useRef<number[]>(tabOrder);
+  tabOrderRef.current = tabOrder;
   useEffect(() => {
     let active = true;
     async function getCurrentWindowId(): Promise<number> {
@@ -138,7 +143,7 @@ const NewTab = () => {
           });
           // console.log("currentTabs", currentTabs);
           // console.log("tabOrder", tabOrder);
-          const sortedTabs = sortTabs(currentTabs, tabOrder);
+          const sortedTabs = sortTabs(currentTabs, tabOrderRef.current);
           console.log("sortedTabs", sortedTabs);
           setTabs(sortedTabs);
           console.log("tabs on snapshot updated");
@@ -174,32 +179,6 @@ const NewTab = () => {
         unsubscribeSpace();
       };
     }
-    // chrome.runtime.sendMessage(
-    //   { action: "getTabs", currentPath, userId: currentUserId },
-    //   function (response: Tab[]) {
-    //     if (response) {
-    //       setTabs(() => {
-    //         return response;
-    //       });
-    //       return;
-    //     }
-    //   },
-    // );
-    // chrome.runtime.sendMessage(
-    //   { action: "getSpaces", userId: currentUserId },
-    //   function (response: Space[]) {
-    //     // console.log(1, response, spaces);
-    //     if (response) {
-    //       setSpaces(() => response);
-    //       const currentActiveId = response.find(
-    //         (space) => space.id === currentPath,
-    //       )?.id;
-    //       if (currentPath === "") setActiveSpaceId("");
-    //       if (currentActiveId) setActiveSpaceId(currentActiveId);
-    //       return;
-    //     }
-    //   },
-    // );
   }, [location.pathname, currentUserId, currentWindowId, tabOrder]);
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
@@ -311,22 +290,24 @@ const NewTab = () => {
   function openSpacesPopup(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     setSelectedSpace("");
     const id: string | undefined = e.currentTarget.dataset.id;
-    if (id) setActivePopupId(id);
+    if (id) setActiveSpaceSelectId(id);
   }
   function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
     setSelectedSpace(e.target.value);
     if (e.target.value === "") return;
     const request = {
       action: "moveTabToSpace",
-      updatedTab: tabs.find((tab) => tab.id?.toString() === activePopupId),
+      updatedTab: tabs.find(
+        (tab) => tab.tabId?.toString() === activeSpaceSelectId,
+      ),
       spaceId: e.target.value,
       userId: currentUserId,
     };
     chrome.runtime.sendMessage(request, function (response) {
-      const oldTabs = tabs.filter(
-        (tab) => tab.id?.toString() !== activePopupId,
+      const newTabs = tabs.filter(
+        (tab) => tab.tabId?.toString() !== activeSpaceSelectId,
       );
-      if (response) setTabs(oldTabs);
+      if (response) setTabs(newTabs);
     });
   }
   function openAddSpacePopup() {
@@ -334,24 +315,30 @@ const NewTab = () => {
       "add_space",
     ) as HTMLDialogElement | null;
     if (targetModal) targetModal.showModal();
-    // console.log("open modal", targetModal);
   }
-  //TODO:限制spaces數量上限為10個，因為可以不去考慮這個區塊的往下滾動造成popup和overflow-y的衝突
   function addNewSpace() {
     const newSpaceTitle: string | undefined =
       newSpaceInputRef.current?.value.trim();
     if (!newSpaceTitle || newSpaceTitle.trim().length === 0)
-      return alert("Please enter a space name");
-    if (newSpaceTitle.length > 15)
-      return alert("Space name should be less than 15 characters");
+      return toast.error("Please enter a space name", {
+        className: "w-60 text-lg rounded-md shadow",
+      });
+    if (newSpaceTitle.length > 10)
+      return toast.error("Space name should be less than 10 characters", {
+        className: "w-[400px] text-lg rounded-md shadow",
+      });
     if (
       spaces.some(
         (space) => space.title.toLowerCase() === newSpaceTitle.toLowerCase(),
       )
     )
-      return alert("Space name already exists");
-    if (spaces.length >= 10)
-      return alert("You can only create up to 10 spaces");
+      return toast.error("Space name already exists", {
+        className: "w-60 text-lg rounded-md shadow",
+      });
+    if (spaces.length >= 5)
+      return toast.error("You can only create up to 5 spaces", {
+        className: "w-72 text-lg rounded-md shadow",
+      });
     chrome.runtime.sendMessage(
       { action: "addSpace", newSpaceTitle, userId: currentUserId },
       function (response) {
@@ -420,45 +407,16 @@ const NewTab = () => {
     try {
       const link = window.location.href;
       await navigator.clipboard.writeText(link);
-      alert("Link copied!");
+      toast.success("Link copied!", {
+        className: "w-52 text-lg rounded-md shadow",
+      });
     } catch (err) {
       console.error(err);
-      alert("Failed to copy link. Please try again.");
+      toast.error("Failed to copy link. Please try again.", {
+        className: "w-72 text-lg rounded-md shadow",
+      });
     }
   }
-  // function signOut() {
-  //   chrome.runtime.sendMessage(
-  //     { action: "signOut" },
-  //     async (response: { success: boolean }) => {
-  //       if (response.success) {
-  //         await chrome.storage.local.set({
-  //           isLoggedin: false,
-  //           currentUser: "",
-  //         });
-  //         setIsLoggedin(false);
-  //         return;
-  //       }
-  //     },
-  //   );
-  // }
-  // function signIn() {
-  //   chrome.runtime.sendMessage(
-  //     { action: "signIn" },
-  //     async (response: { success: boolean; token: string; userId: string }) => {
-  //       console.log("response:", { response });
-  //       if (response.success && response.token && response.userId) {
-  //         await chrome.storage.local.set({
-  //           isLoggedin: true,
-  //           currentUser: response.userId,
-  //         });
-  //         setCurrentUserId(response.userId);
-  //         setIsLoggedin(true);
-  //         return;
-  //       }
-  //       return;
-  //     },
-  //   );
-  // }
 
   function sortTabsByPin(tabs: Tab[], tabId?: number) {
     const newTabs = tabs.map((tab) => {
@@ -515,7 +473,9 @@ const NewTab = () => {
             {location.pathname !== "/webtime" && (
               <>
                 <h1 className="text-3xl font-bold">Your Tabs</h1>
-                <CopyToClipboard onCopySpaceLink={copySpaceLink} />
+                {location.pathname !== "/" && (
+                  <CopyToClipboard onCopySpaceLink={copySpaceLink} />
+                )}
               </>
             )}
             {location.pathname === "/webtime" && (
@@ -523,31 +483,9 @@ const NewTab = () => {
                 Your Time Spent on Websites
               </h1>
             )}
-            {/* <button
-              onClick={() => setShowArchived(!showArchived)}
-              className="h-8 w-36 rounded-md bg-gray-500 text-lg
-               text-white hover:bg-black"
-            >
-              {showArchived ? "Hide Archive" : "Show Archive"}
-            </button> */}
-            {/* {isLoggedin && (
-              <button
-                onClick={signOut}
-                className="h-10 w-40 rounded-md border bg-black text-white"
-              >
-                Sign Out
-              </button>
-            )}
-            {!isLoggedin && (
-              <button
-                onClick={signIn}
-                className="h-10 w-40 rounded-md border bg-black text-white"
-              >
-                Sign In
-              </button>
-            )} */}
           </div>
           <Outlet />
+          <Toaster />
           <ToggleViewBtn
             onToggleView={toggleTabsLayout}
             className={`mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-xl shadow hover:bg-orange-700 hover:bg-opacity-70 hover:text-white ${
@@ -557,7 +495,7 @@ const NewTab = () => {
           <Tabs
             tabs={tabs}
             spaces={spaces}
-            activePopupId={activePopupId}
+            activeSpaceSelectId={activeSpaceSelectId}
             selectedSpace={selectedSpace}
             isLoggedin={isLoggedin}
             openLink={openLink}

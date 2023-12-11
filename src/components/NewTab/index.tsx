@@ -62,6 +62,8 @@ const NewTab = () => {
   //   "spaces",
   //   spaces.map((space) => space.id),
   // );
+  const tabOrderRef = useRef<number[]>(tabOrder);
+  tabOrderRef.current = tabOrder;
   useEffect(() => {
     let active = true;
     async function getCurrentWindowId(): Promise<number> {
@@ -139,7 +141,7 @@ const NewTab = () => {
           });
           // console.log("currentTabs", currentTabs);
           // console.log("tabOrder", tabOrder);
-          const sortedTabs = sortTabs(currentTabs, tabOrder);
+          const sortedTabs = sortTabs(currentTabs, tabOrderRef.current);
           console.log("sortedTabs", sortedTabs);
           setTabs(sortedTabs);
           console.log("tabs on snapshot updated");
@@ -175,7 +177,6 @@ const NewTab = () => {
         unsubscribeSpace();
       };
     }
-   
   }, [location.pathname, currentUserId, currentWindowId, tabOrder]);
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];

@@ -82,6 +82,12 @@ const Spaces = forwardRef(
       const modalRef = ref as React.RefObject<HTMLDialogElement>;
       modalRef.current?.close();
     }
+    function handleClearModalInput() {
+      const inputRef = ref as React.RefObject<HTMLInputElement>;
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+    }
     return (
       <div className="fixed left-0 top-0 z-10 flex h-full w-72 flex-col bg-orange-700 opacity-80">
         <div className="h-16">
@@ -102,7 +108,11 @@ const Spaces = forwardRef(
           </div>
           <span className="mx-auto mt-10 h-[1px] w-full bg-white opacity-60" />
           <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
-          <AddSpace ref={ref} onAddNewSpace={handleAddNewSpace} />
+          <AddSpace
+            ref={ref}
+            onAddNewSpace={handleAddNewSpace}
+            onModalClose={handleClearModalInput}
+          />
           <Toaster />
           <ul className="flex flex-col">
             {spaces.map(({ id, title }) => {

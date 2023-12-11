@@ -5,13 +5,17 @@ interface AddSpaceProps {
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     ref: React.Ref<HTMLDialogElement>,
   ) => void;
+  onModalClose: () => void;
 }
 
 const AddSpace = forwardRef(
-  ({ onAddNewSpace }: AddSpaceProps, ref: React.Ref<HTMLInputElement>) => {
+  (
+    { onAddNewSpace, onModalClose }: AddSpaceProps,
+    ref: React.Ref<HTMLInputElement>,
+  ) => {
     const modalRef = useRef<HTMLDialogElement>(null);
     return (
-      <Modal id="add_space" ref={modalRef}>
+      <Modal id="add_space" ref={modalRef} onClose={onModalClose}>
         <div className="flex w-full flex-col gap-3">
           <label className="text-xl">New Space:</label>
           <input

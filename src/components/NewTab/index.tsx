@@ -417,39 +417,6 @@ const NewTab = () => {
       });
     }
   }
-  // function signOut() {
-  //   chrome.runtime.sendMessage(
-  //     { action: "signOut" },
-  //     async (response: { success: boolean }) => {
-  //       if (response.success) {
-  //         await chrome.storage.local.set({
-  //           isLoggedin: false,
-  //           currentUser: "",
-  //         });
-  //         setIsLoggedin(false);
-  //         return;
-  //       }
-  //     },
-  //   );
-  // }
-  // function signIn() {
-  //   chrome.runtime.sendMessage(
-  //     { action: "signIn" },
-  //     async (response: { success: boolean; token: string; userId: string }) => {
-  //       console.log("response:", { response });
-  //       if (response.success && response.token && response.userId) {
-  //         await chrome.storage.local.set({
-  //           isLoggedin: true,
-  //           currentUser: response.userId,
-  //         });
-  //         setCurrentUserId(response.userId);
-  //         setIsLoggedin(true);
-  //         return;
-  //       }
-  //       return;
-  //     },
-  //   );
-  // }
 
   function sortTabsByPin(tabs: Tab[], tabId?: number) {
     const newTabs = tabs.map((tab) => {
@@ -514,29 +481,6 @@ const NewTab = () => {
                 Your Time Spent on Websites
               </h1>
             )}
-            {/* <button
-              onClick={() => setShowArchived(!showArchived)}
-              className="h-8 w-36 rounded-md bg-gray-500 text-lg
-               text-white hover:bg-black"
-            >
-              {showArchived ? "Hide Archive" : "Show Archive"}
-            </button> */}
-            {/* {isLoggedin && (
-              <button
-                onClick={signOut}
-                className="h-10 w-40 rounded-md border bg-black text-white"
-              >
-                Sign Out
-              </button>
-            )}
-            {!isLoggedin && (
-              <button
-                onClick={signIn}
-                className="h-10 w-40 rounded-md border bg-black text-white"
-              >
-                Sign In
-              </button>
-            )} */}
           </div>
           <Outlet />
           <Toaster />

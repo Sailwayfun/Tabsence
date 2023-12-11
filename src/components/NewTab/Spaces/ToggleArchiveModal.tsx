@@ -19,7 +19,7 @@ const ToggleArchiveModal = ({
     <Modal id={`archive_space_${id}`} ref={modalRef}>
       <h3 className="text-xl font-bold">{text}</h3>
       <p className="py-4">Press ESC key or click on ✕ button to close</p>
-      <div className="flex gap-3">
+      <div className="flex w-full gap-3">
         <button
           onClick={(e) => {
             e.preventDefault();
@@ -27,11 +27,11 @@ const ToggleArchiveModal = ({
             console.log("Archived space", id);
             modalRef.current?.close();
           }}
-          className="rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900"
+          className="grow rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900"
         >
           {`${btnText} Space`}
         </button>
-        <button className="rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900">
+        <button className="grow rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900">
           Cancel
         </button>
       </div>

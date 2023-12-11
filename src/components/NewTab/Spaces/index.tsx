@@ -28,7 +28,6 @@ const Spaces = forwardRef(
       currentSpaceId,
     }: SpacesProps = props;
     console.log({ currentSpaceId });
-    // const [archivedSpaces, setArchivedSpaces] = useState<string[]>([]);
     const archivedSpaces = useSpaceStore((state) => state.archivedSpaces);
     const addArchived = useSpaceStore((state) => state.addArchived);
     const restoreArchived = useSpaceStore((state) => state.restoreArchived);

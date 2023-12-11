@@ -32,6 +32,7 @@ interface SpaceDoc {
 
 export interface Space extends SpaceDoc {
   id: string;
+  isEditing: boolean;
 }
 interface Response {
   success: boolean;
@@ -55,6 +56,7 @@ const NewTab = () => {
   // console.log("current order", tabOrder);
   console.log("current windowId", currentWindowId);
   console.log("current tabs", tabs);
+  console.log("current spaces", spaces);
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
   );
@@ -165,7 +167,7 @@ const NewTab = () => {
         const currentSpaces: Space[] = [];
         querySnapshot.forEach((doc) => {
           const space = doc.data() as SpaceDoc;
-          currentSpaces.push({ id: doc.id, ...space });
+          currentSpaces.push({ id: doc.id, isEditing: false, ...space });
         });
         setSpaces(currentSpaces);
         const currentActiveId = currentSpaces.find(
@@ -343,7 +345,10 @@ const NewTab = () => {
       { action: "addSpace", newSpaceTitle, userId: currentUserId },
       function (response) {
         if (response) {
-          setSpaces((s) => [...s, { title: newSpaceTitle, id: response.id }]);
+          setSpaces((s) => [
+            ...s,
+            { title: newSpaceTitle, isEditing: false, id: response.id },
+          ]);
           return;
         }
       },
@@ -455,6 +460,68 @@ const NewTab = () => {
   function toggleTabsLayout() {
     setIsTabsGrid((prev) => !prev);
   }
+  function handleSpaceTitleChange(
+    e: React.ChangeEvent<HTMLInputElement>,
+    id: string,
+  ) {
+    const newSpaces = spaces.map((space) => {
+      if (space.id === id) {
+        if (e.target.value.length > 10) {
+          toast.error("Space name should be less than 10 characters", {
+            className: "w-[400px] text-lg rounded-md shadow",
+          });
+          return space;
+        }
+        return {
+          ...space,
+          title: e.target.value,
+        };
+      }
+      return space;
+    });
+    setSpaces(newSpaces);
+  }
+  function handleEditSpace(id: string) {
+    const newSpaces = spaces.map((space) => {
+      if (space.id === id) {
+        return {
+          ...space,
+          isEditing: true,
+        };
+      }
+      return space;
+    });
+    setSpaces(newSpaces);
+  }
+  function handleSpaceEditBlur(id: string) {
+    const newSpaces = spaces.map((space) => {
+      if (space.id === id) {
+        return {
+          ...space,
+          isEditing: false,
+        };
+      }
+      return space;
+    });
+    setSpaces(newSpaces);
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(
+        {
+          action: "updateSpaceTitle",
+          spaceId: id,
+          newSpaceTitle: newSpaces.find((space) => space.id === id)?.title,
+          userId: currentUserId,
+        },
+        function (response) {
+          if (response) {
+            resolve(response);
+            return;
+          }
+          reject();
+        },
+      );
+    });
+  }
   return (
     <>
       <Header />
@@ -467,6 +534,9 @@ const NewTab = () => {
             onAddNewSpace={addNewSpace}
             currentSpaceId={activeSpaceId}
             onRemoveSpace={handleRemoveSpace}
+            onSpaceEditBlur={handleSpaceEditBlur}
+            onSpaceTitleChange={handleSpaceTitleChange}
+            onEditSpace={handleEditSpace}
           />
         )}
         <div className="flex w-4/5 flex-col">

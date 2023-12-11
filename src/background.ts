@@ -341,3 +341,21 @@ chrome.runtime.onMessage.addListener(
     return true;
   },
 );
+
+chrome.runtime.onMessage.addListener(
+  async (request: RuntimeMessage, _, sendResponse) => {
+    if (request.action === "updateSpaceTitle") {
+      if (!request.userId || !request.spaceId || !request.newSpaceTitle) return;
+      const spaceDocRef = doc(
+        db,
+        "users",
+        request.userId,
+        "spaces",
+        request.spaceId,
+      );
+      await updateDoc(spaceDocRef, { title: request.newSpaceTitle });
+      sendResponse({ success: true });
+    }
+    return true;
+  },
+);

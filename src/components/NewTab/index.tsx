@@ -393,6 +393,7 @@ const NewTab = () => {
           newTabs,
           spaceId,
           userId: currentUserId,
+          windowId: currentWindowId,
         },
         function (response) {
           if (response) {

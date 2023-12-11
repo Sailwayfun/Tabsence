@@ -509,7 +509,7 @@ const NewTab = () => {
         {
           action: "updateSpaceTitle",
           spaceId: id,
-          newTitle: newSpaces.find((space) => space.id === id)?.title,
+          newSpaceTitle: newSpaces.find((space) => space.id === id)?.title,
           userId: currentUserId,
         },
         function (response) {

@@ -32,6 +32,7 @@ interface SpaceDoc {
 
 export interface Space extends SpaceDoc {
   id: string;
+  isEditing: boolean;
 }
 interface Response {
   success: boolean;
@@ -55,6 +56,7 @@ const NewTab = () => {
   // console.log("current order", tabOrder);
   console.log("current windowId", currentWindowId);
   console.log("current tabs", tabs);
+  console.log("current spaces", spaces);
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
   );
@@ -165,7 +167,7 @@ const NewTab = () => {
         const currentSpaces: Space[] = [];
         querySnapshot.forEach((doc) => {
           const space = doc.data() as SpaceDoc;
-          currentSpaces.push({ id: doc.id, ...space });
+          currentSpaces.push({ id: doc.id, isEditing: false, ...space });
         });
         setSpaces(currentSpaces);
         const currentActiveId = currentSpaces.find(
@@ -343,7 +345,10 @@ const NewTab = () => {
       { action: "addSpace", newSpaceTitle, userId: currentUserId },
       function (response) {
         if (response) {
-          setSpaces((s) => [...s, { title: newSpaceTitle, id: response.id }]);
+          setSpaces((s) => [
+            ...s,
+            { title: newSpaceTitle, isEditing: false, id: response.id },
+          ]);
           return;
         }
       },

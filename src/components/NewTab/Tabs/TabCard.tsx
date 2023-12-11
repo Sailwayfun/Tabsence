@@ -72,12 +72,12 @@ const TabCard = memo(function TabCard({
           button={
             <MoveToSpace
               spaces={spaces}
-              id={tab.id?.toString()}
+              id={tab.tabId?.toString()}
               onOpenSpacesPopup={onOpenSpacesPopup}
             />
           }
         >
-          {tab.id?.toString() === selectId && (
+          {tab.tabId?.toString() === selectId && (
             <div className="ml-5 h-14 w-52 px-3">
               <label
                 htmlFor={tab.id?.toString() || "spaces"}
@@ -86,7 +86,7 @@ const TabCard = memo(function TabCard({
                 Move to space:
               </label>
               <select
-                id={tab.id?.toString() || "spaces"}
+                id={tab.tabId?.toString() || "spaces"}
                 onChange={onSelectSpace}
                 value={selectedSpace}
               >

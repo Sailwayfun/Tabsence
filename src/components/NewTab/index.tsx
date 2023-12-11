@@ -298,16 +298,16 @@ const NewTab = () => {
     const request = {
       action: "moveTabToSpace",
       updatedTab: tabs.find(
-        (tab) => tab.id?.toString() === activeSpaceSelectId,
+        (tab) => tab.tabId?.toString() === activeSpaceSelectId,
       ),
       spaceId: e.target.value,
       userId: currentUserId,
     };
     chrome.runtime.sendMessage(request, function (response) {
-      const oldTabs = tabs.filter(
-        (tab) => tab.id?.toString() !== activeSpaceSelectId,
+      const newTabs = tabs.filter(
+        (tab) => tab.tabId?.toString() !== activeSpaceSelectId,
       );
-      if (response) setTabs(oldTabs);
+      if (response) setTabs(newTabs);
     });
   }
   function openAddSpacePopup() {

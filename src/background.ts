@@ -216,36 +216,12 @@ async function getUserId() {
   return userId;
 }
 
-//TODO:從擴充中將使用者登出
-let authToken = "";
 chrome.runtime.onMessage.addListener(
   async (request: RuntimeMessage, _, sendResponse) => {
     if (request.action === "signIn") {
       const userId = await getUserId();
       await chrome.storage.local.set({ userId });
       sendResponse({ success: true, userId });
-      // chrome.identity.getAuthToken({ interactive: true }, (token) => {
-      //   if (!token) sendResponse({ success: false });
-      //   if (token) authToken = token;
-      //   chrome.identity.getProfileUserInfo(async (userInfo) => {
-      //     if (!userInfo) return;
-      //     const usersCollectionRef = collection(db, "users");
-      //     const userDocRef = doc(usersCollectionRef, userInfo.id);
-      //     await setDoc(userDocRef, { email: userInfo.email }, { merge: true });
-      //     sendResponse({
-      //       success: true,
-      //       token: authToken,
-      //       userId: userInfo.id,
-      //     });
-      //   });
-      // });
-      return true;
-    }
-    if (request.action === "signOut") {
-      chrome.identity.removeCachedAuthToken({ token: authToken }, () => {
-        authToken = "";
-        sendResponse({ success: true });
-      });
       return true;
     }
   },

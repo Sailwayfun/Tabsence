@@ -99,7 +99,7 @@ const Spaces = forwardRef(
             <img src={tabs} className="block h-12 w-12" />
           </Link>
         </div>
-        <div className="flex max-h-full w-full flex-col [&::-webkit-scrollbar]:hidden">
+        <div className="flex max-h-full w-full flex-col">
           <div className="flex items-center gap-3 pl-4 pt-10">
             <div className="h-4 w-4">
               <Folder />

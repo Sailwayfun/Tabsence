@@ -16,6 +16,12 @@ interface SpacesProps {
   onOpenAddSpacePopup: () => void;
   onAddNewSpace: () => void;
   onRemoveSpace: (id: string) => void;
+  onSpaceEditBlur: (id: string) => void;
+  onSpaceTitleChange: (
+    e: React.ChangeEvent<HTMLInputElement>,
+    id: string,
+  ) => void;
+  onEditSpace: (id: string) => void;
   currentSpaceId?: string;
 }
 const Spaces = forwardRef(
@@ -25,6 +31,9 @@ const Spaces = forwardRef(
       onOpenAddSpacePopup,
       onAddNewSpace,
       onRemoveSpace,
+      onSpaceEditBlur,
+      onSpaceTitleChange,
+      onEditSpace,
       currentSpaceId,
     }: SpacesProps = props;
     console.log({ currentSpaceId });
@@ -87,6 +96,24 @@ const Spaces = forwardRef(
         inputRef.current.value = "";
       }
     }
+    function handleSpaceEditBlur(id: string) {
+      const space = spaces.find((space) => space.id === id);
+      if (!space) return;
+      if (space.isEditing) {
+        onSpaceEditBlur(id);
+      }
+    }
+    function handleSpaceTitleChange(
+      e: React.ChangeEvent<HTMLInputElement>,
+      id: string,
+    ) {
+      const space = spaces.find((space) => space.id === id);
+      if (!space) return;
+      onSpaceTitleChange(e, id);
+    }
+    function handleEditSpace(id: string) {
+      onEditSpace(id);
+    }
     return (
       <div className="fixed left-0 top-0 z-10 flex h-full w-72 flex-col bg-orange-700 opacity-80">
         <div className="h-16">
@@ -114,7 +141,7 @@ const Spaces = forwardRef(
           />
           <Toaster />
           <ul className="flex flex-col">
-            {spaces.map(({ id, title }) => {
+            {spaces.map(({ id, title, isEditing }) => {
               const linkClasses: string = `${
                 currentSpaceId === id
                   ? "text-yellow-400"
@@ -133,6 +160,10 @@ const Spaces = forwardRef(
                   modalText="Are you going to archive this space?"
                   modalBtnText="Archive"
                   isArchived={false}
+                  isEditing={isEditing}
+                  onSpaceTitleBlur={handleSpaceEditBlur}
+                  onSpaceTitleChange={handleSpaceTitleChange}
+                  onEditSpace={handleEditSpace}
                 ></SpaceTab>
               );
             })}

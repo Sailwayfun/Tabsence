@@ -460,6 +460,68 @@ const NewTab = () => {
   function toggleTabsLayout() {
     setIsTabsGrid((prev) => !prev);
   }
+  function handleSpaceTitleChange(
+    e: React.ChangeEvent<HTMLInputElement>,
+    id: string,
+  ) {
+    const newSpaces = spaces.map((space) => {
+      if (space.id === id) {
+        if (e.target.value.length > 10) {
+          toast.error("Space name should be less than 10 characters", {
+            className: "w-[400px] text-lg rounded-md shadow",
+          });
+          return space;
+        }
+        return {
+          ...space,
+          title: e.target.value,
+        };
+      }
+      return space;
+    });
+    setSpaces(newSpaces);
+  }
+  function handleEditSpace(id: string) {
+    const newSpaces = spaces.map((space) => {
+      if (space.id === id) {
+        return {
+          ...space,
+          isEditing: true,
+        };
+      }
+      return space;
+    });
+    setSpaces(newSpaces);
+  }
+  function handleSpaceEditBlur(id: string) {
+    const newSpaces = spaces.map((space) => {
+      if (space.id === id) {
+        return {
+          ...space,
+          isEditing: false,
+        };
+      }
+      return space;
+    });
+    setSpaces(newSpaces);
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(
+        {
+          action: "updateSpaceTitle",
+          spaceId: id,
+          newTitle: newSpaces.find((space) => space.id === id)?.title,
+          userId: currentUserId,
+        },
+        function (response) {
+          if (response) {
+            resolve(response);
+            return;
+          }
+          reject();
+        },
+      );
+    });
+  }
   return (
     <>
       <Header />
@@ -472,6 +534,9 @@ const NewTab = () => {
             onAddNewSpace={addNewSpace}
             currentSpaceId={activeSpaceId}
             onRemoveSpace={handleRemoveSpace}
+            onSpaceEditBlur={handleSpaceEditBlur}
+            onSpaceTitleChange={handleSpaceTitleChange}
+            onEditSpace={handleEditSpace}
           />
         )}
         <div className="flex w-4/5 flex-col">

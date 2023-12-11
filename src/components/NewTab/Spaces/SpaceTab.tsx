@@ -12,6 +12,13 @@ interface SpaceTabProps {
   modalText: string;
   modalBtnText: string;
   isArchived: boolean;
+  isEditing?: boolean;
+  onSpaceTitleChange?: (
+    e: React.ChangeEvent<HTMLInputElement>,
+    id: string,
+  ) => void;
+  onSpaceTitleBlur?: (id: string) => void;
+  onEditSpace?: (id: string) => void;
 }
 
 const SpaceTab = ({
@@ -23,6 +30,10 @@ const SpaceTab = ({
   modalText,
   modalBtnText,
   isArchived,
+  isEditing,
+  onSpaceTitleBlur,
+  onSpaceTitleChange,
+  onEditSpace,
 }: SpaceTabProps) => {
   function openModal(id: string, action: string) {
     const modal = document.getElementById(
@@ -34,9 +45,32 @@ const SpaceTab = ({
     <li
       className={`relative border border-l-0 border-white p-4 text-xl ${linkClasses} group/space-tab flex justify-between hover:bg-orange-900`}
     >
-      <Link to={`/${id}`} className="w-full flex">
-        {title.toLowerCase()}
-      </Link>
+      {isEditing && onSpaceTitleChange && onSpaceTitleBlur && (
+        <input
+          type="text"
+          className="w-40 bg-transparent p-1 text-white"
+          value={title}
+          onChange={(e) => onSpaceTitleChange(e, id)}
+          onBlur={() => onSpaceTitleBlur(id)}
+          autoFocus
+        />
+      )}
+
+      {!isEditing && (
+        <Link
+          to={`/${id}`}
+          className="flex w-full"
+          onDoubleClick={(
+            e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+          ) => {
+            e.stopPropagation();
+            if (onEditSpace) onEditSpace(id);
+          }}
+        >
+          {title.toLowerCase()}
+        </Link>
+      )}
+
       <RemoveSpaceModal id={id} onRemoveSpace={onRemoveSpace} />
       <ToggleArchiveModal
         id={id}

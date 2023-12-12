@@ -11,6 +11,8 @@ interface DateStoreState {
   date: string;
   increaseDate: () => void;
   decreaseDate: () => void;
+  prevDate: () => string;
+  nextDate: () => string;
 }
 
 const useSpaceStore = create<SpaceStoreState>()(
@@ -43,16 +45,26 @@ function setViewDate(date: string, days: number): string {
   }-${newDate.getDate()}`;
 }
 
-const useDateStore = create<DateStoreState>((set) => ({
-  date: getCurrentDate(),
-  increaseDate: () =>
-    set((state) => ({
-      date: setViewDate(state.date, 1),
-    })),
-  decreaseDate: () =>
-    set((state) => ({
-      date: setViewDate(state.date, -1),
-    })),
-}));
+const useDateStore = create<DateStoreState>()(
+  persist(
+    (set, get) => ({
+      date: getCurrentDate(),
+      increaseDate: () =>
+        set((state) => ({
+          date: setViewDate(state.date, 1),
+        })),
+      decreaseDate: () =>
+        set((state) => ({
+          date: setViewDate(state.date, -1),
+        })),
+      prevDate: () => setViewDate(get().date, -1),
+      nextDate: () => setViewDate(get().date, 1),
+    }),
+    {
+      name: "date-store",
+      partialize: (state) => ({ date: state.date }),
+    },
+  ),
+);
 
 export { useSpaceStore, useDateStore };

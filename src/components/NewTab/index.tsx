@@ -528,7 +528,7 @@ const NewTab = () => {
         )}
         <div className="flex w-5/6 flex-col">
           <div className="flex items-center gap-8 pb-4">
-            {location.pathname !== "/webtime" && (
+            {!location.pathname.includes("/webtime") && (
               <>
                 <h1 className="text-3xl font-bold">Your Tabs</h1>
                 {location.pathname !== "/" && (
@@ -539,12 +539,12 @@ const NewTab = () => {
           </div>
           <Outlet />
           <Toaster />
-          <ToggleViewBtn
-            onToggleView={toggleTabsLayout}
-            className={`mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-xl shadow hover:bg-orange-700 hover:bg-opacity-70 hover:text-white ${
-              location.pathname === "/webtime" ? "hidden" : ""
-            }`}
-          />
+          {!location.pathname.includes("/webtime") && (
+            <ToggleViewBtn
+              onToggleView={toggleTabsLayout}
+              className="mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-xl shadow hover:bg-orange-700 hover:bg-opacity-70 hover:text-white"
+            />
+          )}
           <Tabs
             tabs={tabs}
             spaces={spaces}

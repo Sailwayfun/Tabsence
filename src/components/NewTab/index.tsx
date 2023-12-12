@@ -18,6 +18,7 @@ import {
 import { db } from "../../../firebase-config";
 import { sortTabs } from "../../utils/firestore";
 import ToggleViewBtn from "./ToggleViewBtn";
+import { getCurrentDate } from "../../utils/trackTime";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -550,9 +551,16 @@ const NewTab = () => {
               </>
             )}
             {location.pathname === "/webtime" && (
-              <h1 className="text-3xl font-bold">
-                Your Time Spent on Websites
-              </h1>
+              <div className="flex w-full items-center">
+                <h1 className="text-3xl font-bold">
+                  Your Time Spent on Websites
+                </h1>
+                <div className="ml-auto flex items-center justify-center gap-2">
+                  <button className="h-8 w-8 text-4xl">{`<`}</button>
+                  <p className="text-3xl">{getCurrentDate()}</p>
+                  <button className="h-8 w-8 text-4xl">{`>`}</button>
+                </div>
+              </div>
             )}
           </div>
           <Outlet />

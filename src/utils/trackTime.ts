@@ -16,9 +16,9 @@ async function getUserId(): Promise<string | undefined> {
   return await chrome.storage.local.get("userId").then((res) => res.userId);
 }
 
-function getCurrentDate(): string {
+export function getCurrentDate(): string {
   const today = new Date();
-  return today.toLocaleDateString();
+  return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
 }
 
 interface TabInfo {

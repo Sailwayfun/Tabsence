@@ -119,7 +119,7 @@ const TrackTime = () => {
               </li>
             ))}
           </ul>
-          <div className="mx-auto my-3 border-t-2 border-gray-200 pl-80 pt-3 text-xl">
+          <div className="mx-auto my-3 border-t-2 border-gray-200 pl-64 pt-3 text-xl">
             <span className="pr-3 tracking-wide">Total Duration:</span>
             <span>{getTotalDuration()} s</span>
           </div>

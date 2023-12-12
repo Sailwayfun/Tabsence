@@ -1,4 +1,6 @@
 import { useDateStore } from "../../store";
+import ArrowLeft from "../Icons/ArrowLeft";
+import ArrowRight from "../Icons/ArrowRight";
 
 const Header = () => {
   const date = useDateStore((state) => state.date);
@@ -9,14 +11,18 @@ const Header = () => {
       <h1 className="text-3xl font-bold">Your Time Spent on Websites</h1>
       <div className="flex items-center justify-center gap-2">
         <button
-          className="h-8 w-8 text-4xl"
+          className="h-8 w-8 cursor-pointer text-4xl"
           onClick={decreaseDate}
-        >{`<`}</button>
+        >
+          <ArrowLeft className="h-6 w-6" />
+        </button>
         <p className="grow text-3xl">{date}</p>
         <button
-          className="h-8 w-8 text-4xl"
+          className="h-8 w-8 cursor-pointer text-4xl"
           onClick={increaseDate}
-        >{`>`}</button>
+        >
+          <ArrowRight className="h-6 w-6" />
+        </button>
       </div>
     </div>
   );

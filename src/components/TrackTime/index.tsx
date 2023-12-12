@@ -8,6 +8,7 @@ import {
 import { db } from "../../../firebase-config";
 import { useEffect, useState } from "react";
 import Chart from "./Chart";
+import { useDateStore } from "../../store";
 
 export interface UrlDuration {
   id: string;
@@ -21,6 +22,7 @@ export interface UrlDuration {
 const TrackTime = () => {
   const [userId, setUserId] = useState<string>("");
   const [urlDurations, setUrlDurations] = useState<UrlDuration[]>([]);
+  const date = useDateStore((state) => state.date);
 
   useEffect(() => {
     async function getUserId() {
@@ -42,6 +44,8 @@ const TrackTime = () => {
         "users",
         userId,
         "urlDurations",
+        date,
+        "domains",
       );
       const q = query(
         urlDurationCollectionRef,
@@ -58,7 +62,7 @@ const TrackTime = () => {
         unsubscribe();
       };
     }
-  }, [userId]);
+  }, [userId, date]);
 
   function getDurationPercentge(duration: number) {
     const totalDuration = getTotalDuration();

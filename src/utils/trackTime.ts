@@ -83,7 +83,15 @@ const debouncedWrites: Record<string, DebouncedFunction> = {};
 function getDebouncedWrite(userId: string, domain: string): DebouncedFunction {
   if (!debouncedWrites[domain]) {
     debouncedWrites[domain] = debounce(async (durationBySecond, url, date) => {
-      const urlRef = doc(db, "users", userId, "urlDurations", domain);
+      const urlRef = doc(
+        db,
+        "users",
+        userId,
+        "urlDurations",
+        date,
+        "domains",
+        domain,
+      );
       const urlSnapShot = await getDoc(urlRef);
 
       if (urlSnapShot.exists() && urlSnapShot.data().date === date) {
@@ -101,7 +109,6 @@ function getDebouncedWrite(userId: string, domain: string): DebouncedFunction {
             durationBySecond,
             visitCounts: 1,
             lastVisit: serverTimestamp(),
-            date,
           },
           { merge: true },
         );

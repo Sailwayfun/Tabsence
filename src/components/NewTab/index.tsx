@@ -18,7 +18,7 @@ import {
 import { db } from "../../../firebase-config";
 import { sortTabs } from "../../utils/firestore";
 import ToggleViewBtn from "./ToggleViewBtn";
-import { getCurrentDate } from "../../utils/trackTime";
+import { useDateStore } from "../../store";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -54,6 +54,9 @@ const NewTab = () => {
   const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
   const [currentWindowId, setCurrentWindowId] = useState<number>(0);
+  const date = useDateStore((state) => state.date);
+  const increaseDate = useDateStore((state) => state.increaseDate);
+  const decreaseDate = useDateStore((state) => state.decreaseDate);
   // console.log("current order", tabOrder);
   console.log("current windowId", currentWindowId);
   console.log("current tabs", tabs);
@@ -257,15 +260,7 @@ const NewTab = () => {
       chrome.runtime.onMessage.removeListener(handleMessagePassing);
     };
   }, [currentWindowId]);
-  // useEffect(() => {
-  //   chrome.storage.local.get(["isLoggedin", "currentUser"], function (result) {
-  //     if (result.isLoggedin && result.currentUser) {
-  //       setIsLoggedin(true);
-  //       setCurrentUserId(result.currentUser);
-  //       return;
-  //     }
-  //   });
-  // }, []);
+ 
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
     tab: Tab,
@@ -556,9 +551,15 @@ const NewTab = () => {
                   Your Time Spent on Websites
                 </h1>
                 <div className="ml-auto flex items-center justify-center gap-2">
-                  <button className="h-8 w-8 text-4xl">{`<`}</button>
-                  <p className="text-3xl">{getCurrentDate()}</p>
-                  <button className="h-8 w-8 text-4xl">{`>`}</button>
+                  <button
+                    className="h-8 w-8 text-4xl"
+                    onClick={decreaseDate}
+                  >{`<`}</button>
+                  <p className="grow text-3xl">{date}</p>
+                  <button
+                    className="h-8 w-8 text-4xl"
+                    onClick={increaseDate}
+                  >{`>`}</button>
                 </div>
               </div>
             )}

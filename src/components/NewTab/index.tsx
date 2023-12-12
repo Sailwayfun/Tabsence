@@ -512,9 +512,13 @@ const NewTab = () => {
   const isWebTime = location.pathname.includes("/webtime");
   return (
     <>
-      <Header />
-      <div className="flex min-h-screen w-full gap-5 overflow-x-hidden py-8 pl-[400px] pr-10 xl:ml-2">
-        {isLoggedin && (
+      <Header isWebtimePage={isWebTime} />
+      <div
+        className={`flex min-h-screen w-full gap-5 overflow-x-hidden py-8 ${
+          isWebTime ? "pl-10" : "pl-[400px]"
+        } pr-10 xl:ml-2`}
+      >
+        {isLoggedin && !isWebTime && (
           <Spaces
             spaces={spaces}
             onOpenAddSpacePopup={openAddSpacePopup}
@@ -525,6 +529,7 @@ const NewTab = () => {
             onSpaceEditBlur={handleSpaceEditBlur}
             onSpaceTitleChange={handleSpaceTitleChange}
             onEditSpace={handleEditSpace}
+            isWebtimePage={isWebTime}
           />
         )}
         <div className={`flex ${isWebTime ? "w-full" : "w-5/6"} flex-col`}>

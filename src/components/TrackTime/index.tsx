@@ -130,15 +130,15 @@ const TrackTime = () => {
         </div>
       )}
       {urlDurations.length === 0 && (
-        <div className="flex min-h-screen max-w-full flex-col items-center gap-4 rounded-lg border bg-slate-100 pb-24 pt-10 shadow-md">
-          <img src={noData} alt="no data" className="mx-auto w-3/4" />
+        <div className="flex min-h-screen max-w-full flex-col items-center gap-4 rounded-lg border bg-slate-100 py-16 shadow-md">
+          <img src={noData} alt="no data" className="mx-auto w-1/2" />
           <span className="mr-3 self-end">
             Image by{" "}
             <a href="https://www.freepik.com/free-vector/flat-design-no-data-illustration_47718912.htm#query=not%20data&position=5&from_view=search&track=ais&uuid=7ee5c7a8-e536-4bdb-9331-39411353fc99">
               Freepik
             </a>
           </span>
-          <div className="text-6xl">Sorry! There's no data.</div>
+          <div className="text-4xl">Sorry! There's no data.</div>
         </div>
       )}
     </>

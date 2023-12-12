@@ -509,6 +509,7 @@ const NewTab = () => {
       );
     });
   }
+  const isWebTime = location.pathname.includes("/webtime");
   return (
     <>
       <Header />
@@ -526,7 +527,7 @@ const NewTab = () => {
             onEditSpace={handleEditSpace}
           />
         )}
-        <div className="flex w-5/6 flex-col">
+        <div className={`flex ${isWebTime ? "w-full" : "w-5/6"} flex-col`}>
           <div className="flex items-center gap-8 pb-4">
             {!location.pathname.includes("/webtime") && (
               <>

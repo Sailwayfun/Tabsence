@@ -87,12 +87,13 @@ const TrackTime = () => {
       <Header />
       {urlDurations.length > 0 && (
         <div className="min-h-screen max-w-full rounded-lg border bg-slate-100 p-8 shadow-md">
-          <div className="mb-3 grid grid-cols-4 text-lg">
+          <div className="mb-3 grid auto-cols-min grid-flow-col grid-cols-4 text-lg">
             {labelFields.map((label, index) => (
               <label key={index} className="mx-auto my-0">
                 {label}
               </label>
             ))}
+            <button className="ml-4 h-6 w-6">{`>`}</button>
           </div>
           <div>
             <ul className="flex flex-col gap-3">

@@ -24,6 +24,7 @@ export interface UrlDuration {
 const TrackTime = () => {
   const [userId, setUserId] = useState<string>("");
   const [urlDurations, setUrlDurations] = useState<UrlDuration[]>([]);
+  const [showTable, setShowTable] = useState<boolean>(true);
   const date = useDateStore((state) => state.date);
 
   useEffect(() => {
@@ -82,21 +83,33 @@ const TrackTime = () => {
     "Spent Time (%)",
   ];
 
+  function toggleTable() {
+    setShowTable(!showTable);
+  }
+
   return (
     <>
       <Header />
       {urlDurations.length > 0 && (
-        <div className="min-h-screen max-w-full rounded-lg border bg-slate-100 p-8 shadow-md">
+        <div className="relative min-h-screen max-w-full rounded-lg border bg-slate-100 p-8 shadow-md">
           <div className="mb-3 grid auto-cols-min grid-flow-col grid-cols-4 text-lg">
             {labelFields.map((label, index) => (
-              <label key={index} className="mx-auto my-0">
+              <label
+                key={index}
+                className={`${showTable ? "mx-auto my-0" : "hidden"}`}
+              >
                 {label}
               </label>
             ))}
-            <button className="ml-4 h-6 w-6">{`>`}</button>
+            <button
+              className="absolute right-2 top-7 ml-4 h-6 w-6 text-2xl"
+              onClick={toggleTable}
+            >
+              {showTable ? "▼" : "▲"}
+            </button>
           </div>
           <div>
-            <ul className="flex flex-col gap-3">
+            <ul className={showTable ? "flex flex-col gap-3" : "hidden"}>
               {urlDurations.map((website) => (
                 <li
                   key={website.id}
@@ -122,7 +135,13 @@ const TrackTime = () => {
                 </li>
               ))}
             </ul>
-            <div className="mx-auto my-3 border-t-2 border-gray-200 pt-3 text-xl">
+            <div
+              className={
+                showTable
+                  ? "mx-auto my-3 border-t-2 border-gray-200 pt-3 text-xl"
+                  : "hidden"
+              }
+            >
               <span className="pl-80 pr-2 tracking-wide">Total Duration:</span>
               <span>{getTotalDuration()} s</span>
             </div>

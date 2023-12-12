@@ -115,7 +115,13 @@ const Spaces = forwardRef(
       onEditSpace(id);
     }
     return (
-      <div className="fixed left-0 top-0 z-10 flex h-full w-72 flex-col bg-orange-700 opacity-80">
+      <div
+        className={`transform transition duration-300 ease-in-out ${
+          isWebtimePage
+            ? "absolute h-0 -translate-x-[500px]"
+            : "fixed left-0 top-0 z-10 h-full translate-x-0"
+        }  flex w-72 flex-col bg-orange-700 opacity-80`}
+      >
         <Logo isWebtimePage={isWebtimePage} />
         <div className="flex max-h-full w-full flex-col">
           <div className="flex items-center gap-3 pl-4 pt-10">

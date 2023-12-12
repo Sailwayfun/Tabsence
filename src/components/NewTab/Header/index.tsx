@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Clock from "../../Icons/Clock";
+import Home from "../../Icons/Home";
 import Logo from "../Logo";
 interface HeaderProps {
   isWebtimePage: boolean;
@@ -13,14 +14,23 @@ const Header = ({ isWebtimePage }: HeaderProps) => {
     >
       {isWebtimePage && <Logo isWebtimePage={isWebtimePage} />}
       <div className="pr-4">
-        <button className="btn btn-ghost">
+        {!isWebtimePage ? (
           <Link to="/webtime">
-            <div className="flex items-center">
-              <Clock />
-              <span className="text-lg">Website Time Tracker</span>
-            </div>
+            <button className="btn btn-ghost">
+              <div className="flex items-center">
+                <Clock />
+                <span className="text-lg">Website Time Tracker</span>
+              </div>
+            </button>
           </Link>
-        </button>
+        ) : (
+          <Link to="/" className="flex gap-4">
+            <button className="btn btn-ghost">
+              <Home className="h-6 w-6 stroke-current" />
+              <span className="text-lg">Home</span>
+            </button>
+          </Link>
+        )}
       </div>
     </div>
   );

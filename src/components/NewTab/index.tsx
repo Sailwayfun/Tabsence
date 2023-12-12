@@ -514,11 +514,11 @@ const NewTab = () => {
     <>
       <Header isWebtimePage={isWebTime} />
       <div
-        className={`flex min-h-screen w-full gap-5 overflow-x-hidden py-8 ${
-          isWebTime ? "pl-10" : "pl-[400px]"
-        } pr-10 xl:ml-2`}
+        className={`flex min-h-screen gap-5 overflow-x-hidden py-8 ${
+          isWebTime ? "px-24" : "pl-[400px]"
+        } xl:ml-2`}
       >
-        {isLoggedin && !isWebTime && (
+        {isLoggedin && (
           <Spaces
             spaces={spaces}
             onOpenAddSpacePopup={openAddSpacePopup}

@@ -80,7 +80,7 @@ const Chart = ({ durationData }: ChartProps) => {
     ],
   };
   return (
-    <div className="w-full pt-24">
+    <div className="w-full pt-10">
       <HighchartsReact highcharts={Highcharts} options={options} />
     </div>
   );

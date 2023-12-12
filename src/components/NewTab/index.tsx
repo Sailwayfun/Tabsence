@@ -526,7 +526,7 @@ const NewTab = () => {
             onEditSpace={handleEditSpace}
           />
         )}
-        <div className="flex w-4/5 flex-col">
+        <div className="flex w-5/6 flex-col">
           <div className="flex items-center gap-8 pb-4">
             {location.pathname !== "/webtime" && (
               <>

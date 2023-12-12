@@ -7,7 +7,7 @@ const Header = () => {
   const increaseDate = useDateStore((state) => state.increaseDate);
   const decreaseDate = useDateStore((state) => state.decreaseDate);
   return (
-    <div className="flex w-full max-w-7xl items-center justify-between pb-4">
+    <div className="flex w-full items-center justify-between pb-4">
       <h1 className="text-3xl font-bold">Your Time Spent on Websites</h1>
       <div className="flex items-center justify-center gap-2">
         <button

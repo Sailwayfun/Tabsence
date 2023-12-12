@@ -84,7 +84,7 @@ const TrackTime = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen max-w-7xl rounded-lg border bg-slate-100 p-8 shadow-md">
+      <div className="min-h-screen max-w-full rounded-lg border bg-slate-100 p-8 shadow-md">
         <div className="mb-3 grid grid-cols-4 text-lg">
           {labelFields.map((label, index) => (
             <label key={index} className="mx-auto my-0">
@@ -120,7 +120,7 @@ const TrackTime = () => {
             ))}
           </ul>
           <div className="mx-auto my-3 border-t-2 border-gray-200 pt-3 text-xl">
-            <span className="pl-80 tracking-wide">Total Duration:</span>
+            <span className="pl-80 pr-2 tracking-wide">Total Duration:</span>
             <span>{getTotalDuration()} s</span>
           </div>
         </div>

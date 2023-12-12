@@ -109,7 +109,13 @@ const TrackTime = () => {
             </button>
           </div>
           <div>
-            <ul className={showTable ? "flex flex-col gap-3" : "hidden"}>
+            <ul
+              className={
+                showTable
+                  ? "flex translate-y-0 transform flex-col gap-3 transition duration-300 ease-in-out"
+                  : "absolute -translate-y-[999px] transition duration-300 ease-in-out"
+              }
+            >
               {urlDurations.map((website) => (
                 <li
                   key={website.id}
@@ -138,8 +144,8 @@ const TrackTime = () => {
             <div
               className={
                 showTable
-                  ? "mx-auto my-3 border-t-2 border-gray-200 pt-3 text-xl"
-                  : "hidden"
+                  ? "mx-auto my-3 translate-y-0 transform border-t-2 border-gray-200 pt-3 text-xl transition duration-300 ease-in-out"
+                  : "absolute -translate-y-[999px] transition duration-300 ease-in-out"
               }
             >
               <span className="pl-80 pr-2 tracking-wide">Total Duration:</span>

@@ -36,7 +36,6 @@ const Spaces = forwardRef(
       onEditSpace,
       currentSpaceId,
     }: SpacesProps = props;
-    console.log({ currentSpaceId });
     const location = useLocation();
     const archivedSpaces = useSpaceStore((state) => state.archivedSpaces);
     const addArchived = useSpaceStore((state) => state.addArchived);
@@ -115,7 +114,6 @@ const Spaces = forwardRef(
     function handleEditSpace(id: string) {
       onEditSpace(id);
     }
-    console.log("pathname", location.pathname);
     return (
       <div className="fixed left-0 top-0 z-10 flex h-full w-72 flex-col bg-orange-700 opacity-80">
         <div className="h-16">

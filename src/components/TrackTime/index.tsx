@@ -96,7 +96,9 @@ const TrackTime = () => {
             {labelFields.map((label, index) => (
               <label
                 key={index}
-                className={`${showTable ? "mx-auto my-0" : "hidden"}`}
+                className={`"transform ease-in-out" + ${
+                  showTable ? "mx-auto my-0" : "absolute -translate-y-[999px]"
+                } transition duration-300`}
               >
                 {label}
               </label>
@@ -110,11 +112,11 @@ const TrackTime = () => {
           </div>
           <div>
             <ul
-              className={
+              className={`transform transition duration-300 ease-in-out ${
                 showTable
-                  ? "flex translate-y-0 transform flex-col gap-3 transition duration-300 ease-in-out"
-                  : "absolute -translate-y-[999px] transition duration-300 ease-in-out"
-              }
+                  ? "flex translate-y-0 flex-col gap-3"
+                  : "absolute -translate-y-[999px]"
+              }`}
             >
               {urlDurations.map((website) => (
                 <li
@@ -142,11 +144,11 @@ const TrackTime = () => {
               ))}
             </ul>
             <div
-              className={
+              className={`transform transition duration-300 ease-in-out ${
                 showTable
-                  ? "mx-auto my-3 translate-y-0 transform border-t-2 border-gray-200 pt-3 text-xl transition duration-300 ease-in-out"
-                  : "absolute -translate-y-[999px] transition duration-300 ease-in-out"
-              }
+                  ? "mx-auto my-3 translate-y-0 border-t-2 border-gray-200 pt-3 text-xl"
+                  : "absolute -translate-y-[999px]"
+              }`}
             >
               <span className="pl-80 pr-2 tracking-wide">Total Duration:</span>
               <span>{getTotalDuration()} s</span>

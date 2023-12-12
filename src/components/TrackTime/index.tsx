@@ -9,6 +9,7 @@ import { db } from "../../../firebase-config";
 import { useEffect, useState } from "react";
 import Chart from "./Chart";
 import { useDateStore } from "../../store";
+import Header from "./Header";
 
 export interface UrlDuration {
   id: string;
@@ -81,46 +82,51 @@ const TrackTime = () => {
   ];
 
   return (
-    <div className="min-h-screen max-w-7xl rounded-lg border bg-slate-100 p-8 shadow-md">
-      <div className="mb-3 grid grid-cols-4 text-lg">
-        {labelFields.map((label, index) => (
-          <label key={index} className="mx-auto my-0">
-            {label}
-          </label>
-        ))}
-      </div>
-      <div>
-        <ul className="flex flex-col gap-3">
-          {urlDurations.map((website) => (
-            <li
-              key={website.id}
-              className="grid w-full grid-cols-4 rounded-md border border-gray-300 p-3 shadow transition delay-100 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg xl:text-2xl"
-            >
-              <div className="flex gap-2 text-xl">
-                <img
-                  className="h-8 w-8"
-                  src={website.faviconUrl}
-                  alt={website.id}
-                />
-                <span>{website.id}</span>
-              </div>
-              <div className="mx-auto my-0 text-lg">
-                {website.durationBySecond}
-              </div>
-              <div className="mx-auto my-0 text-xl">{website.visitCounts}</div>
-              <div className="mx-auto my-0 text-xl">
-                {getDurationPercentge(website.durationBySecond)}
-              </div>
-            </li>
+    <>
+      <Header />
+      <div className="min-h-screen max-w-7xl rounded-lg border bg-slate-100 p-8 shadow-md">
+        <div className="mb-3 grid grid-cols-4 text-lg">
+          {labelFields.map((label, index) => (
+            <label key={index} className="mx-auto my-0">
+              {label}
+            </label>
           ))}
-        </ul>
-        <div className="mx-auto my-3 border-t-2 border-gray-200 pl-80 pt-3 text-xl">
-          <span className="pr-3 tracking-wide">Total Duration:</span>
-          <span>{getTotalDuration()} s</span>
         </div>
+        <div>
+          <ul className="flex flex-col gap-3">
+            {urlDurations.map((website) => (
+              <li
+                key={website.id}
+                className="grid w-full grid-cols-4 rounded-md border border-gray-300 p-3 shadow transition delay-100 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg xl:text-2xl"
+              >
+                <div className="flex gap-2 text-xl">
+                  <img
+                    className="h-8 w-8"
+                    src={website.faviconUrl}
+                    alt={website.id}
+                  />
+                  <span>{website.id}</span>
+                </div>
+                <div className="mx-auto my-0 text-lg">
+                  {website.durationBySecond}
+                </div>
+                <div className="mx-auto my-0 text-xl">
+                  {website.visitCounts}
+                </div>
+                <div className="mx-auto my-0 text-xl">
+                  {getDurationPercentge(website.durationBySecond)}
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div className="mx-auto my-3 border-t-2 border-gray-200 pl-80 pt-3 text-xl">
+            <span className="pr-3 tracking-wide">Total Duration:</span>
+            <span>{getTotalDuration()} s</span>
+          </div>
+        </div>
+        <Chart durationData={urlDurations} />
       </div>
-      <Chart durationData={urlDurations} />
-    </div>
+    </>
   );
 };
 

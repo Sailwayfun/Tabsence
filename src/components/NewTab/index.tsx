@@ -53,7 +53,6 @@ const NewTab = () => {
   const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
   const [currentWindowId, setCurrentWindowId] = useState<number>(0);
-  // console.log("current order", tabOrder);
   console.log("current windowId", currentWindowId);
   console.log("current tabs", tabs);
   console.log("current spaces", spaces);
@@ -62,10 +61,6 @@ const NewTab = () => {
   );
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
-  // console.log(
-  //   "spaces",
-  //   spaces.map((space) => space.id),
-  // );
   const tabOrderRef = useRef<number[]>(tabOrder);
   tabOrderRef.current = tabOrder;
   useEffect(() => {
@@ -256,15 +251,7 @@ const NewTab = () => {
       chrome.runtime.onMessage.removeListener(handleMessagePassing);
     };
   }, [currentWindowId]);
-  // useEffect(() => {
-  //   chrome.storage.local.get(["isLoggedin", "currentUser"], function (result) {
-  //     if (result.isLoggedin && result.currentUser) {
-  //       setIsLoggedin(true);
-  //       setCurrentUserId(result.currentUser);
-  //       return;
-  //     }
-  //   });
-  // }, []);
+
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
     tab: Tab,
@@ -539,9 +526,9 @@ const NewTab = () => {
             onEditSpace={handleEditSpace}
           />
         )}
-        <div className="flex w-4/5 flex-col">
+        <div className="flex w-5/6 flex-col">
           <div className="flex items-center gap-8 pb-4">
-            {location.pathname !== "/webtime" && (
+            {!location.pathname.includes("/webtime") && (
               <>
                 <h1 className="text-3xl font-bold">Your Tabs</h1>
                 {location.pathname !== "/" && (
@@ -549,20 +536,15 @@ const NewTab = () => {
                 )}
               </>
             )}
-            {location.pathname === "/webtime" && (
-              <h1 className="text-3xl font-bold">
-                Your Time Spent on Websites
-              </h1>
-            )}
           </div>
           <Outlet />
           <Toaster />
-          <ToggleViewBtn
-            onToggleView={toggleTabsLayout}
-            className={`mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-xl shadow hover:bg-orange-700 hover:bg-opacity-70 hover:text-white ${
-              location.pathname === "/webtime" ? "hidden" : ""
-            }`}
-          />
+          {!location.pathname.includes("/webtime") && (
+            <ToggleViewBtn
+              onToggleView={toggleTabsLayout}
+              className="mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-xl shadow hover:bg-orange-700 hover:bg-opacity-70 hover:text-white"
+            />
+          )}
           <Tabs
             tabs={tabs}
             spaces={spaces}

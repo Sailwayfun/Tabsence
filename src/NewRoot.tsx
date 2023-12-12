@@ -16,6 +16,11 @@ const router = createHashRouter([
       {
         path: "/webtime",
         element: <TrackTime />,
+        children: [
+          {
+            path: ":date",
+          },
+        ],
       },
     ],
   },

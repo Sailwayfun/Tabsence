@@ -16,32 +16,46 @@ async function getUserId(): Promise<string | undefined> {
   return await chrome.storage.local.get("userId").then((res) => res.userId);
 }
 
+export function getCurrentDate(): string {
+  const today = new Date();
+  return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+}
+
 interface TabInfo {
   startTime: number;
   url: string;
+  date: string;
 }
 
-export const tabTimes: Record<number, TabInfo> = {};
+export const tabTimes: Record<string, Record<number, TabInfo>> = {};
 
 export function trackTabTime(url: string, tabId?: number): void {
   if (!tabId) return;
-  tabTimes[tabId] = {
+  const today = getCurrentDate();
+  if (!tabTimes[today]) tabTimes[today] = {};
+  tabTimes[today][tabId] = {
     startTime: Date.now(),
     url,
+    date: today,
   };
+  // tabTimes[tabId] = {
+  //   startTime: Date.now(),
+  //   url,
+  // };
   console.log("tabTimes", tabTimes);
 }
 
 export async function updateTabDuration(tabId?: number): Promise<void> {
   if (!tabId) return;
   const userId = await getUserId();
-  console.log("userId", userId);
-  const tabInfo = tabTimes[tabId];
+  const today = getCurrentDate();
+  if (!tabTimes[today]) tabTimes[today] = {};
+  const tabInfo = tabTimes[today][tabId];
   console.log("tabInfo", tabInfo);
   if (!tabInfo) {
     return;
   }
-  const { startTime, url } = tabInfo;
+  const { startTime, url, date } = tabInfo;
   const duration = Date.now() - startTime;
   const durationBySecond = Math.floor(duration / 1000);
   console.log("durationBySecond", durationBySecond);
@@ -51,24 +65,36 @@ export async function updateTabDuration(tabId?: number): Promise<void> {
     const myDomain: string = "icdbgchingbnboklhnagfckgjpdfjfeg";
     if (domain === myDomain) return;
     const debouncedWriteToFirestore = getDebouncedWrite(userId, domain);
-    debouncedWriteToFirestore(durationBySecond, url);
-    console.log("writeToFirestore", domain, durationBySecond, url);
+    debouncedWriteToFirestore(durationBySecond, url, date);
+    console.log("writeToFirestore", domain, durationBySecond, url, date);
   } catch (error) {
     console.error("Error updating tab duration: ", error);
   }
 }
 
-type DebouncedFunction = (durationBySecond: number, url: string) => void;
+type DebouncedFunction = (
+  durationBySecond: number,
+  url: string,
+  date: string,
+) => void;
 
 const debouncedWrites: Record<string, DebouncedFunction> = {};
 
 function getDebouncedWrite(userId: string, domain: string): DebouncedFunction {
   if (!debouncedWrites[domain]) {
-    debouncedWrites[domain] = debounce(async (durationBySecond, url) => {
-      const urlRef = doc(db, "users", userId, "urlDurations", domain);
+    debouncedWrites[domain] = debounce(async (durationBySecond, url, date) => {
+      const urlRef = doc(
+        db,
+        "users",
+        userId,
+        "urlDurations",
+        date,
+        "domains",
+        domain,
+      );
       const urlSnapShot = await getDoc(urlRef);
 
-      if (urlSnapShot.exists()) {
+      if (urlSnapShot.exists() && urlSnapShot.data().date === date) {
         await updateDoc(urlRef, {
           durationBySecond: increment(durationBySecond),
           visitCounts: increment(1),

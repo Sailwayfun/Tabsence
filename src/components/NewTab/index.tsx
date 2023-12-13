@@ -225,7 +225,7 @@ const NewTab = () => {
         request.action === "tabUpdated" &&
         request.updatedTab.windowId === currentWindowId
       ) {
-        console.log("開新分頁或是改網址，目前的tabs&tabsOrder", tabs, tabOrder);
+        // console.log("開新分頁或是改網址，目前的tabs&tabsOrder", tabs, tabOrder);
         setTabs((t) => {
           const updatedTabs: Tab[] = [...t];
           console.log("updatedTabs", updatedTabs);
@@ -288,7 +288,13 @@ const NewTab = () => {
       };
       chrome.runtime.sendMessage(request, function (response) {
         const oldTabs = tabs.filter((tab) => tab.tabId !== parseInt(id));
-        if (response.success) setTabs(oldTabs);
+        if (!response.sucess) {
+          toast.success("Tab Deleted", {
+            className: "w-52 text-lg rounded-md shadow",
+            id: "tab_deleted",
+          });
+        }
+        setTabs(oldTabs);
         return true;
       });
     }

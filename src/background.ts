@@ -359,3 +359,21 @@ chrome.runtime.onMessage.addListener(
     return true;
   },
 );
+
+chrome.windows.onCreated.addListener(async (window) => {
+  const userId = await chrome.storage.local
+    .get("userId")
+    .then((res) => res.userId);
+  if (!userId) return;
+  const tabOrdersCollectionRef = collection(db, "users", userId, "tabOrders");
+  const tabOrderDocRef = doc(tabOrdersCollectionRef, "global");
+  await setDoc(
+    tabOrderDocRef,
+    {
+      tabOrder: [],
+      windowId: window.id,
+    },
+    { merge: true },
+  );
+  return true;
+});

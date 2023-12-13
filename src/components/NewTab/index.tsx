@@ -54,16 +54,17 @@ const NewTab = () => {
   const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
   const [currentWindowId, setCurrentWindowId] = useState<number>(0);
-  console.log("current windowId", currentWindowId);
-  console.log("current tabs", tabs);
-  console.log("current spaces", spaces);
+  // console.log("current windowId", currentWindowId);
+  // console.log("current tabs", tabs);
+  // console.log("current spaces", spaces);
+  // console.log("tab order", tabOrder);
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
   );
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
-  const tabOrderRef = useRef<number[]>(tabOrder);
-  tabOrderRef.current = tabOrder;
+  // const tabOrderRef = useRef<number[]>(tabOrder);
+  // tabOrderRef.current = tabOrder;
   useEffect(() => {
     let active = true;
     async function getCurrentWindowId(): Promise<number> {
@@ -141,7 +142,7 @@ const NewTab = () => {
           });
           // console.log("currentTabs", currentTabs);
           // console.log("tabOrder", tabOrder);
-          const sortedTabs = sortTabs(currentTabs, tabOrderRef.current);
+          const sortedTabs = sortTabs(currentTabs, tabOrder);
           console.log("sortedTabs", sortedTabs);
           setTabs(sortedTabs);
           console.log("tabs on snapshot updated");
@@ -190,8 +191,12 @@ const NewTab = () => {
         spaceId,
       );
       const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
+        console.log("看看snapshot有沒有更新", doc.data());
+        console.log("看看doc.data()?.windowId", doc.data()?.windowId);
+        console.log("看看currentWindowId", currentWindowId);
         if (doc.exists() && doc.data()?.windowId === currentWindowId) {
           const order: number[] = doc.data()?.tabOrder;
+          console.log("order拿回來是", order);
           if (order) setTabOrder(order);
         }
       });
@@ -201,6 +206,8 @@ const NewTab = () => {
     }
   }, [currentUserId, location.pathname, currentWindowId]);
   useEffect(() => {
+    console.log("這就是我要的useEffect");
+
     const handleMessagePassing = (
       request: {
         action: string;
@@ -218,8 +225,11 @@ const NewTab = () => {
         request.action === "tabUpdated" &&
         request.updatedTab.windowId === currentWindowId
       ) {
+        console.log("開新分頁或是改網址，目前的tabs&tabsOrder", tabs, tabOrder);
         setTabs((t) => {
           const updatedTabs: Tab[] = [...t];
+          console.log("updatedTabs", updatedTabs);
+
           const existingTab: Tab | undefined = updatedTabs.find(
             (tab) => tab.tabId === request.updatedTab.tabId,
           );
@@ -228,18 +238,24 @@ const NewTab = () => {
           } else {
             updatedTabs.push(request.updatedTab);
           }
+          console.log("updatedTabsupdatedTabs", updatedTabs);
           return updatedTabs;
         });
         setTabOrder((o) => {
+          console.log("原有的tabOrder", o);
           if (request.updatedTab.tabId === undefined) return o;
           const updatedOrder = [...o];
           const existingIndex = updatedOrder.findIndex(
             (id) => id === request.updatedTab.tabId,
           );
+          console.log("exist!!!", existingIndex);
           if (existingIndex !== -1) {
-            updatedOrder.splice(existingIndex, 1);
+            // updatedOrder.splice(existingIndex, 1);
+            return updatedOrder;
           }
           updatedOrder.push(request.updatedTab.tabId);
+
+          console.log("更新後的tabOrder", updatedOrder);
           return updatedOrder;
         });
         sendResponse({ success: true });

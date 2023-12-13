@@ -19,6 +19,7 @@ import { db } from "../../../firebase-config";
 import { sortTabs } from "../../utils/firestore";
 import { validateSpaceTitle } from "../../utils/validate";
 import ToggleViewBtn from "./ToggleViewBtn";
+import useWindowId from "../../hooks/useWindowId";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -50,35 +51,12 @@ const NewTab = () => {
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
-  const [currentWindowId, setCurrentWindowId] = useState<number>(0);
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
   );
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
-  
-  useEffect(() => {
-    let active = true;
-    async function getCurrentWindowId(): Promise<number> {
-      return new Promise((resolve, reject) => {
-        chrome.windows.getCurrent((window) => {
-          if (active && window && window.id) {
-            resolve(window.id);
-            return;
-          }
-          reject();
-        });
-      });
-    }
-    getCurrentWindowId()
-      .then((res) => {
-        setCurrentWindowId(res);
-      })
-      .catch((err) => console.error(err));
-    return () => {
-      active = false;
-    };
-  }, []);
+  const currentWindowId = useWindowId();
 
   useEffect(() => {
     function hideArchivedSpacesTabs(
@@ -172,7 +150,7 @@ const NewTab = () => {
       };
     }
   }, [location.pathname, currentUserId, currentWindowId, tabOrder]);
-  
+
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
     const spaceId = currentPath !== "" ? currentPath : "global";
@@ -541,7 +519,7 @@ const NewTab = () => {
   }
 
   const isWebTime = location.pathname.includes("/webtime");
-  
+
   return (
     <>
       <Header isWebtimePage={isWebTime} />

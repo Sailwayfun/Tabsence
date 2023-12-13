@@ -17,7 +17,10 @@ interface SpaceTabProps {
     e: React.ChangeEvent<HTMLInputElement>,
     id: string,
   ) => void;
-  onSpaceTitleBlur?: (id: string) => void;
+  onSpaceTitleBlur?: (
+    e: React.FocusEvent<HTMLInputElement, Element>,
+    id: string,
+  ) => void;
   onEditSpace?: (id: string) => void;
 }
 
@@ -41,11 +44,11 @@ const SpaceTab = ({
     ) as HTMLDialogElement;
     modal.showModal();
   }
-  function handleKeyUp(e: React.KeyboardEvent<HTMLInputElement>, id: string) {
+  function handleKeyup(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
       e.preventDefault();
       e.stopPropagation();
-      if (onSpaceTitleBlur) onSpaceTitleBlur(id);
+      e.currentTarget.blur();
     }
   }
   return (
@@ -58,8 +61,8 @@ const SpaceTab = ({
           className="w-40 bg-transparent p-1 text-white"
           value={title}
           onChange={(e) => onSpaceTitleChange(e, id)}
-          onBlur={() => onSpaceTitleBlur(id)}
-          onKeyUp={(e) => handleKeyUp(e, id)}
+          onBlur={(e) => onSpaceTitleBlur(e, id)}
+          onKeyUp={handleKeyup}
           autoFocus
         />
       )}
@@ -98,5 +101,4 @@ const SpaceTab = ({
     </li>
   );
 };
-
 export default SpaceTab;

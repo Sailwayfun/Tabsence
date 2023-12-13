@@ -17,6 +17,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import { sortTabs } from "../../utils/firestore";
+import { validateSpaceTitle } from "../../utils/validate";
 import ToggleViewBtn from "./ToggleViewBtn";
 
 export interface Tab extends chrome.tabs.Tab {
@@ -308,30 +309,19 @@ const NewTab = () => {
   function addNewSpace() {
     const newSpaceTitle: string | undefined =
       newSpaceInputRef.current?.value.trim();
-    if (!newSpaceTitle || newSpaceTitle.trim().length === 0)
-      return toast.error("Please enter a space name", {
-        className: "w-60 text-lg rounded-md shadow",
-      });
-    if (newSpaceTitle.length > 10)
-      return toast.error("Space name should be less than 10 characters", {
-        className: "w-[400px] text-lg rounded-md shadow",
-      });
-    if (
-      spaces.some(
-        (space) => space.title.toLowerCase() === newSpaceTitle.toLowerCase(),
-      )
-    )
-      return toast.error("Space name already exists", {
-        className: "w-60 text-lg rounded-md shadow",
-      });
-    if (spaces.length >= 5)
-      return toast.error("You can only create up to 5 spaces", {
-        className: "w-72 text-lg rounded-md shadow",
-      });
+    const errorToastId: string | null = validateSpaceTitle(
+      spaces,
+      "create",
+      newSpaceTitle,
+    );
+    if (errorToastId) {
+      if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
+      return;
+    }
     chrome.runtime.sendMessage(
       { action: "addSpace", newSpaceTitle, userId: currentUserId },
       function (response) {
-        if (response) {
+        if (response && newSpaceTitle) {
           setSpaces((s) => [
             ...s,
             { title: newSpaceTitle, isEditing: false, id: response.id },
@@ -454,7 +444,7 @@ const NewTab = () => {
     const newSpaces = spaces.map((space) => {
       if (space.id === id) {
         if (e.target.value.length > 10) {
-          toast.error("Space name should be less than 10 characters", {
+          toast.error("test", {
             className: "w-[400px] text-lg rounded-md shadow",
           });
           return space;
@@ -480,7 +470,19 @@ const NewTab = () => {
     });
     setSpaces(newSpaces);
   }
-  function handleSpaceEditBlur(id: string) {
+  function handleSpaceEditBlur(
+    e: React.FocusEvent<HTMLInputElement, Element>,
+    id: string,
+  ) {
+    if (!e.target.value) return;
+    const errorToastId: string | null = validateSpaceTitle(
+      spaces,
+      "edit",
+      e.target.value,
+    );
+    if (errorToastId) {
+      return;
+    }
     const newSpaces = spaces.map((space) => {
       if (space.id === id) {
         return {

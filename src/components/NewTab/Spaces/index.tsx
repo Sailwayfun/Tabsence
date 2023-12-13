@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { useSpaceStore } from "../../../store";
 import { Space } from "..";
 import AddSpaceBtn from "./AddSpaceBtn";
@@ -15,7 +15,10 @@ interface SpacesProps {
   onOpenAddSpacePopup: () => void;
   onAddNewSpace: () => void;
   onRemoveSpace: (id: string) => void;
-  onSpaceEditBlur: (id: string) => void;
+  onSpaceEditBlur: (
+    e: React.FocusEvent<HTMLInputElement, Element>,
+    id: string,
+  ) => void;
   onSpaceTitleChange: (
     e: React.ChangeEvent<HTMLInputElement>,
     id: string,
@@ -96,11 +99,14 @@ const Spaces = forwardRef(
         inputRef.current.value = "";
       }
     }
-    function handleSpaceEditBlur(id: string) {
+    function handleSpaceEditBlur(
+      e: React.FocusEvent<HTMLInputElement>,
+      id: string,
+    ) {
       const space = spaces.find((space) => space.id === id);
       if (!space) return;
       if (space.isEditing) {
-        onSpaceEditBlur(id);
+        onSpaceEditBlur(e, id);
       }
     }
     function handleSpaceTitleChange(
@@ -137,7 +143,6 @@ const Spaces = forwardRef(
             onAddNewSpace={handleAddNewSpace}
             onModalClose={handleClearModalInput}
           />
-          <Toaster />
           <ul className="flex flex-col">
             {spaces.map(({ id, title, isEditing }) => {
               const linkClasses: string = `${

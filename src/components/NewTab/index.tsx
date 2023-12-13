@@ -20,6 +20,7 @@ import { sortTabs } from "../../utils/firestore";
 import { validateSpaceTitle } from "../../utils/validate";
 import ToggleViewBtn from "./ToggleViewBtn";
 import useWindowId from "../../hooks/useWindowId";
+import useLogin from "../../hooks/useLogin";
 
 export interface Tab extends chrome.tabs.Tab {
   lastAccessed: FieldValue;
@@ -47,8 +48,7 @@ const NewTab = () => {
   >();
   const [selectedSpace, setSelectedSpace] = useState<string>("");
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
-  const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
-  const [currentUserId, setCurrentUserId] = useState<string>("");
+  const { isLoggedin, currentUserId } = useLogin();
   const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
   const archivedSpaces: string[] = useSpaceStore(
@@ -69,24 +69,6 @@ const NewTab = () => {
     }
     setTabs((t) => hideArchivedSpacesTabs(t, archivedSpaces));
   }, [archivedSpaces]);
-
-  useEffect(() => {
-    function getUserId(): Promise<void> {
-      return new Promise((resolve, reject) => {
-        chrome.storage.local.get(["userId"], function (result) {
-          if (result.userId) {
-            setCurrentUserId(result.userId);
-            setIsLoggedin(true);
-            resolve();
-            return;
-          }
-          reject();
-        });
-      });
-    }
-    getUserId().catch((err) => console.error(err));
-  }, []);
-
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
     if (currentPath === "webtime") return;

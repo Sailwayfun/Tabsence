@@ -40,9 +40,6 @@ interface Response {
 }
 const NewTab = () => {
   const [tabs, setTabs] = useState<Tab[]>([]);
-  // const [filteredTabs, setFilteredTabs] = useState<Tab[]>([]);
-  // const [filteredSpaces, setFilteredSpaces] = useState<Space[]>([]);
-  // const [showArchived, setShowArchived] = useState<boolean>(false);
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [activeSpaceSelectId, setActiveSpaceSelectId] = useState<
     string | undefined
@@ -54,17 +51,12 @@ const NewTab = () => {
   const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
   const [currentWindowId, setCurrentWindowId] = useState<number>(0);
-  // console.log("current windowId", currentWindowId);
-  // console.log("current tabs", tabs);
-  // console.log("current spaces", spaces);
-  // console.log("tab order", tabOrder);
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
   );
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
-  // const tabOrderRef = useRef<number[]>(tabOrder);
-  // tabOrderRef.current = tabOrder;
+  
   useEffect(() => {
     let active = true;
     async function getCurrentWindowId(): Promise<number> {
@@ -87,6 +79,7 @@ const NewTab = () => {
       active = false;
     };
   }, []);
+
   useEffect(() => {
     function hideArchivedSpacesTabs(
       currentTabs: Tab[],
@@ -98,6 +91,7 @@ const NewTab = () => {
     }
     setTabs((t) => hideArchivedSpacesTabs(t, archivedSpaces));
   }, [archivedSpaces]);
+
   useEffect(() => {
     function getUserId(): Promise<void> {
       return new Promise((resolve, reject) => {
@@ -114,6 +108,7 @@ const NewTab = () => {
     }
     getUserId().catch((err) => console.error(err));
   }, []);
+
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
     if (currentPath === "webtime") return;
@@ -140,8 +135,6 @@ const NewTab = () => {
             const tab = doc.data() as Tab;
             currentTabs.push(tab);
           });
-          // console.log("currentTabs", currentTabs);
-          // console.log("tabOrder", tabOrder);
           const sortedTabs = sortTabs(currentTabs, tabOrder);
           console.log("sortedTabs", sortedTabs);
           setTabs(sortedTabs);
@@ -179,6 +172,7 @@ const NewTab = () => {
       };
     }
   }, [location.pathname, currentUserId, currentWindowId, tabOrder]);
+  
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
     const spaceId = currentPath !== "" ? currentPath : "global";
@@ -191,12 +185,12 @@ const NewTab = () => {
         spaceId,
       );
       const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
-        console.log("看看snapshot有沒有更新", doc.data());
-        console.log("看看doc.data()?.windowId", doc.data()?.windowId);
-        console.log("看看currentWindowId", currentWindowId);
+        // console.log("看看snapshot有沒有更新", doc.data());
+        // console.log("看看doc.data()?.windowId", doc.data()?.windowId);
+        // console.log("看看currentWindowId", currentWindowId);
         if (doc.exists() && doc.data()?.windowId === currentWindowId) {
           const order: number[] = doc.data()?.tabOrder;
-          console.log("order拿回來是", order);
+          // console.log("order拿回來是", order);
           if (order) setTabOrder(order);
         }
       });
@@ -205,9 +199,8 @@ const NewTab = () => {
       };
     }
   }, [currentUserId, location.pathname, currentWindowId]);
-  useEffect(() => {
-    console.log("這就是我要的useEffect");
 
+  useEffect(() => {
     const handleMessagePassing = (
       request: {
         action: string;
@@ -278,6 +271,7 @@ const NewTab = () => {
     const newTabUrl = tab.url;
     chrome.tabs.create({ url: newTabUrl });
   }
+
   function closeTab(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     const id = e.currentTarget.dataset.id;
     if (id) {
@@ -299,11 +293,13 @@ const NewTab = () => {
       });
     }
   }
+
   function openSpacesPopup(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     setSelectedSpace("");
     const id: string | undefined = e.currentTarget.dataset.id;
     if (id) setActiveSpaceSelectId(id);
   }
+
   function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
     setSelectedSpace(e.target.value);
     if (e.target.value === "") return;
@@ -322,12 +318,14 @@ const NewTab = () => {
       if (response) setTabs(newTabs);
     });
   }
+
   function openAddSpacePopup() {
     const targetModal = document.getElementById(
       "add_space",
     ) as HTMLDialogElement | null;
     if (targetModal) targetModal.showModal();
   }
+
   function addNewSpace() {
     const newSpaceTitle: string | undefined =
       newSpaceInputRef.current?.value.trim();
@@ -354,6 +352,7 @@ const NewTab = () => {
     );
     if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
   }
+
   function handleRemoveSpace(id: string) {
     const removedSpace = spaces.find((space) => space.id === id);
     if (!removedSpace) return;
@@ -372,6 +371,7 @@ const NewTab = () => {
       );
     });
   }
+
   async function handleTabOrderChange(
     tabId: number,
     direction: "up" | "down",
@@ -408,6 +408,7 @@ const NewTab = () => {
       );
     });
   }
+
   async function copySpaceLink() {
     try {
       const link = window.location.href;
@@ -435,6 +436,7 @@ const NewTab = () => {
     });
     return newTabs.sort((a, b) => Number(b.isPinned) - Number(a.isPinned));
   }
+
   function toggleTabPin(tabId?: number, isPinned?: boolean) {
     setTabs((t) => sortTabsByPin(t, tabId));
     return new Promise((resolve, reject) => {
@@ -456,9 +458,11 @@ const NewTab = () => {
       );
     });
   }
+
   function toggleTabsLayout() {
     setIsTabsGrid((prev) => !prev);
   }
+
   function handleSpaceTitleChange(
     e: React.ChangeEvent<HTMLInputElement>,
     id: string,
@@ -480,6 +484,7 @@ const NewTab = () => {
     });
     setSpaces(newSpaces);
   }
+
   function handleEditSpace(id: string) {
     const newSpaces = spaces.map((space) => {
       if (space.id === id) {
@@ -492,6 +497,7 @@ const NewTab = () => {
     });
     setSpaces(newSpaces);
   }
+
   function handleSpaceEditBlur(
     e: React.FocusEvent<HTMLInputElement, Element>,
     id: string,
@@ -533,7 +539,9 @@ const NewTab = () => {
       );
     });
   }
+
   const isWebTime = location.pathname.includes("/webtime");
+  
   return (
     <>
       <Header isWebtimePage={isWebTime} />

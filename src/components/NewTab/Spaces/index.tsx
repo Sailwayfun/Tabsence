@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { useSpaceStore } from "../../../store";
+import { useArchivedSpaceStore } from "../../../store";
 import { Space } from "../../../types/space";
 import AddSpaceBtn from "./AddSpaceBtn";
 import SpaceTab from "./SpaceTab";
@@ -40,9 +40,9 @@ const Spaces = forwardRef(
       currentSpaceId,
       isWebtimePage,
     }: SpacesProps = props;
-    const archivedSpaces = useSpaceStore((state) => state.archivedSpaces);
-    const addArchived = useSpaceStore((state) => state.addArchived);
-    const restoreArchived = useSpaceStore((state) => state.restoreArchived);
+    const archivedSpaces = useArchivedSpaceStore((state) => state.archivedSpaces);
+    const addArchived = useArchivedSpaceStore((state) => state.addArchived);
+    const restoreArchived = useArchivedSpaceStore((state) => state.restoreArchived);
     const navigate = useNavigate();
     async function archiveSpace(id: string) {
       return new Promise((resolve, reject) => {

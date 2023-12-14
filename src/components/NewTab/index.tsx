@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useSpaceStore } from "../../store";
+import { useArchivedSpaceStore } from "../../store";
 import { useLocation, Outlet } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import Spaces from "./Spaces";
@@ -36,7 +36,7 @@ const NewTab = () => {
   const { isLoggedin, currentUserId } = useLogin();
   const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
-  const archivedSpaces: string[] = useSpaceStore(
+  const archivedSpaces: string[] = useArchivedSpaceStore(
     (state) => state.archivedSpaces,
   );
   const location = useLocation();

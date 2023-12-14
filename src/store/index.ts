@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { getCurrentDate } from "../utils/trackTime";
 
-interface SpaceStoreState {
+interface ArchivedSpaceStoreState {
   archivedSpaces: string[];
   addArchived: (id: string) => void;
   restoreArchived: (id: string) => void;
@@ -15,7 +15,7 @@ interface DateStoreState {
   getNextDate: () => string;
 }
 
-const useSpaceStore = create<SpaceStoreState>()(
+const useArchivedSpaceStore = create<ArchivedSpaceStoreState>()(
   persist(
     (set) => ({
       archivedSpaces: [],
@@ -67,4 +67,4 @@ const useDateStore = create<DateStoreState>()(
   ),
 );
 
-export { useSpaceStore, useDateStore };
+export { useArchivedSpaceStore, useDateStore };

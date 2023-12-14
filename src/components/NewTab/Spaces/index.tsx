@@ -2,7 +2,7 @@ import { forwardRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useSpaceStore } from "../../../store";
-import { Space } from "..";
+import { Space } from "../../../types/space";
 import AddSpaceBtn from "./AddSpaceBtn";
 import SpaceTab from "./SpaceTab";
 import Logo from "../Logo";

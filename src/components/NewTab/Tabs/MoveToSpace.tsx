@@ -1,4 +1,4 @@
-import { Space } from "..";
+import { Space } from "../../../types/space";
 interface MoveToSpaceProps {
   spaces: Space[];
   id: string | undefined;

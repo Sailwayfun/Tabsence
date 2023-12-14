@@ -1,4 +1,4 @@
-import { Space } from "..";
+import { Space } from "../../../types/space";
 import { memo } from "react";
 import { Tab } from "../../../types/tab";
 import MoveToSpace from "./MoveToSpace";

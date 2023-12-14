@@ -1,4 +1,4 @@
-import { Space } from "../components/NewTab";
+import { Space } from "../types/space";
 import { toast } from "react-hot-toast";
 
 type ErrorToastId = string;

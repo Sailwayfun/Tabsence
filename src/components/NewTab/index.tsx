@@ -21,16 +21,7 @@ import ToggleViewBtn from "./ToggleViewBtn";
 import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";
 import { Tab } from "../../types/tab";
-
-interface SpaceDoc {
-  title: string;
-  isArchived?: boolean;
-}
-
-export interface Space extends SpaceDoc {
-  id: string;
-  isEditing: boolean;
-}
+import { Space, SpaceDoc } from "../../types/space";
 interface Response {
   success: boolean;
 }
@@ -162,7 +153,7 @@ const NewTab = () => {
         updatedTab: Tab;
       },
       _: chrome.runtime.MessageSender | undefined,
-      sendResponse: <T extends Response>(response: T) => void,
+      sendResponse: (response: Response) => void,
     ) => {
       if (request.action === "tabClosed") {
         setTabs((t) => t.filter((tab) => tab.tabId !== request.tabId));
@@ -172,7 +163,6 @@ const NewTab = () => {
         request.action === "tabUpdated" &&
         request.updatedTab.windowId === currentWindowId
       ) {
-        // console.log("開新分頁或是改網址，目前的tabs&tabsOrder", tabs, tabOrder);
         setTabs((t) => {
           const updatedTabs: Tab[] = [...t];
           console.log("updatedTabs", updatedTabs);

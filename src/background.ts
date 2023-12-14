@@ -1,5 +1,5 @@
 import { db } from "../firebase-config";
-import { Tab } from "./components/NewTab";
+import { Tab } from "./types/tab";
 import {
   collection,
   doc,

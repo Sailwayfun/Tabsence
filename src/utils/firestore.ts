@@ -7,7 +7,7 @@ import {
   DocumentData,
   arrayUnion,
 } from "firebase/firestore";
-import { Tab } from "../components/NewTab";
+import { Tab } from "../types/tab";
 import { db } from "../../firebase-config";
 
 export function sortTabs(tabs: Tab[], tabOrder?: number[]) {

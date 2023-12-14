@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { useSpaceStore } from "../../store";
-import { FieldValue } from "firebase/firestore";
 import { useLocation, Outlet } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import Spaces from "./Spaces";
@@ -21,13 +20,8 @@ import { validateSpaceTitle } from "../../utils/validate";
 import ToggleViewBtn from "./ToggleViewBtn";
 import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";
+import { Tab } from "../../types/tab";
 
-export interface Tab extends chrome.tabs.Tab {
-  lastAccessed: FieldValue;
-  spaceId?: string;
-  tabId: number | undefined;
-  isPinned: boolean;
-}
 interface SpaceDoc {
   title: string;
   isArchived?: boolean;

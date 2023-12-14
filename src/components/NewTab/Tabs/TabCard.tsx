@@ -1,5 +1,6 @@
-import { Tab, Space } from "..";
+import { Space } from "..";
 import { memo } from "react";
+import { Tab } from "../../../types/tab";
 import MoveToSpace from "./MoveToSpace";
 import CloseBtn from "./CloseBtn";
 import ArrowDownBtn from "./ArrowDownBtn";

@@ -49,7 +49,7 @@ const TabCard = memo(function TabCard({
         isGrid
           ? "xl:flex xl:flex-col xl:items-center xl:justify-center xl:gap-5"
           : "xl:flex xl:items-center"
-      } transition delay-100 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg xl:text-2xl`}
+      } transition duration-200 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg xl:text-2xl`}
     >
       <img
         src={tab.favIconUrl}

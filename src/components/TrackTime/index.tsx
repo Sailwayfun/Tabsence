@@ -121,7 +121,7 @@ const TrackTime = () => {
               {urlDurations.map((website) => (
                 <li
                   key={website.id}
-                  className="grid w-full grid-cols-4 rounded-md border border-gray-300 p-3 shadow transition delay-100 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg xl:text-2xl"
+                  className="grid w-full grid-cols-4 rounded-md border border-gray-300 p-3 shadow transition duration-200 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg xl:text-2xl"
                 >
                   <div className="flex gap-2 text-xl">
                     <img

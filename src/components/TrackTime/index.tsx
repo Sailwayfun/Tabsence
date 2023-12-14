@@ -24,6 +24,7 @@ export interface UrlDuration {
 const TrackTime = () => {
   const [userId, setUserId] = useState<string>("");
   const [urlDurations, setUrlDurations] = useState<UrlDuration[]>([]);
+  const [showTable, setShowTable] = useState<boolean>(true);
   const date = useDateStore((state) => state.date);
 
   useEffect(() => {
@@ -82,20 +83,41 @@ const TrackTime = () => {
     "Spent Time (%)",
   ];
 
+  function toggleTable() {
+    setShowTable(!showTable);
+  }
+
   return (
     <>
       <Header />
       {urlDurations.length > 0 && (
-        <div className="min-h-screen max-w-full rounded-lg border bg-slate-100 p-8 shadow-md">
-          <div className="mb-3 grid grid-cols-4 text-lg">
+        <div className="relative min-h-screen max-w-full rounded-lg border bg-slate-100 p-8 shadow-md">
+          <div className="mb-3 grid auto-cols-min grid-flow-col grid-cols-4 text-lg">
             {labelFields.map((label, index) => (
-              <label key={index} className="mx-auto my-0">
+              <label
+                key={index}
+                className={`"transform ease-in-out" + ${
+                  showTable ? "mx-auto my-0" : "absolute -translate-y-[999px]"
+                } transition duration-300`}
+              >
                 {label}
               </label>
             ))}
+            <button
+              className="absolute right-2 top-7 ml-4 h-6 w-6 text-2xl"
+              onClick={toggleTable}
+            >
+              {showTable ? "▼" : "▲"}
+            </button>
           </div>
           <div>
-            <ul className="flex flex-col gap-3">
+            <ul
+              className={`transform transition duration-300 ease-in-out ${
+                showTable
+                  ? "flex translate-y-0 flex-col gap-3"
+                  : "absolute -translate-y-[999px]"
+              }`}
+            >
               {urlDurations.map((website) => (
                 <li
                   key={website.id}
@@ -121,7 +143,13 @@ const TrackTime = () => {
                 </li>
               ))}
             </ul>
-            <div className="mx-auto my-3 border-t-2 border-gray-200 pt-3 text-xl">
+            <div
+              className={`transform transition duration-300 ease-in-out ${
+                showTable
+                  ? "mx-auto my-3 translate-y-0 border-t-2 border-gray-200 pt-3 text-xl"
+                  : "absolute -translate-y-[999px]"
+              }`}
+            >
               <span className="pl-80 pr-2 tracking-wide">Total Duration:</span>
               <span>{getTotalDuration()} s</span>
             </div>
@@ -130,15 +158,15 @@ const TrackTime = () => {
         </div>
       )}
       {urlDurations.length === 0 && (
-        <div className="flex min-h-screen max-w-full flex-col items-center gap-4 rounded-lg border bg-slate-100 pb-24 pt-10 shadow-md">
-          <img src={noData} alt="no data" className="mx-auto w-3/4" />
+        <div className="flex min-h-screen max-w-full flex-col items-center gap-4 rounded-lg border bg-slate-100 py-16 shadow-md">
+          <img src={noData} alt="no data" className="mx-auto w-1/2" />
           <span className="mr-3 self-end">
             Image by{" "}
             <a href="https://www.freepik.com/free-vector/flat-design-no-data-illustration_47718912.htm#query=not%20data&position=5&from_view=search&track=ais&uuid=7ee5c7a8-e536-4bdb-9331-39411353fc99">
               Freepik
             </a>
           </span>
-          <div className="text-6xl">Sorry! There's no data.</div>
+          <div className="text-4xl">Sorry! There's no data.</div>
         </div>
       )}
     </>

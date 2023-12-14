@@ -1,17 +1,36 @@
 import { Link } from "react-router-dom";
 import Clock from "../../Icons/Clock";
-const Header = () => {
+import Home from "../../Icons/Home";
+import Logo from "../Logo";
+interface HeaderProps {
+  isWebtimePage: boolean;
+}
+const Header = ({ isWebtimePage }: HeaderProps) => {
   return (
-    <div className="navbar sticky top-0 flex justify-end bg-base-200">
+    <div
+      className={`navbar top-0 flex ${
+        isWebtimePage ? "justify-between pl-0 pt-0" : "sticky justify-end"
+      } bg-base-200`}
+    >
+      {isWebtimePage && <Logo isWebtimePage={isWebtimePage} />}
       <div className="pr-4">
-        <button className="btn btn-ghost">
+        {!isWebtimePage ? (
           <Link to="/webtime">
-            <div className="flex items-center">
-              <Clock />
-              <span className="text-lg">Website Time Tracker</span>
-            </div>
+            <button className="btn btn-ghost">
+              <div className="flex items-center">
+                <Clock />
+                <span className="text-lg">Website Time Tracker</span>
+              </div>
+            </button>
           </Link>
-        </button>
+        ) : (
+          <Link to="/" className="flex gap-4">
+            <button className="btn btn-ghost">
+              <Home className="h-6 w-6 stroke-current" />
+              <span className="text-lg">Home</span>
+            </button>
+          </Link>
+        )}
       </div>
     </div>
   );

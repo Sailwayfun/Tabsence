@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { useSpaceStore } from "../../store";
-import { FieldValue } from "firebase/firestore";
 import { useLocation, Outlet } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import Spaces from "./Spaces";
@@ -17,74 +16,33 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import { sortTabs } from "../../utils/firestore";
+import { validateSpaceTitle } from "../../utils/validate";
 import ToggleViewBtn from "./ToggleViewBtn";
-
-export interface Tab extends chrome.tabs.Tab {
-  lastAccessed: FieldValue;
-  spaceId?: string;
-  tabId: number | undefined;
-  isPinned: boolean;
-}
-interface SpaceDoc {
-  title: string;
-  isArchived?: boolean;
-}
-
-export interface Space extends SpaceDoc {
-  id: string;
-  isEditing: boolean;
-}
+import useWindowId from "../../hooks/useWindowId";
+import useLogin from "../../hooks/useLogin";
+import { Tab } from "../../types/tab";
+import { Space, SpaceDoc } from "../../types/space";
 interface Response {
   success: boolean;
 }
 const NewTab = () => {
   const [tabs, setTabs] = useState<Tab[]>([]);
-  // const [filteredTabs, setFilteredTabs] = useState<Tab[]>([]);
-  // const [filteredSpaces, setFilteredSpaces] = useState<Space[]>([]);
-  // const [showArchived, setShowArchived] = useState<boolean>(false);
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [activeSpaceSelectId, setActiveSpaceSelectId] = useState<
     string | undefined
   >();
   const [selectedSpace, setSelectedSpace] = useState<string>("");
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
-  const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
-  const [currentUserId, setCurrentUserId] = useState<string>("");
+  const { isLoggedin, currentUserId } = useLogin();
   const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
-  const [currentWindowId, setCurrentWindowId] = useState<number>(0);
-  console.log("current windowId", currentWindowId);
-  console.log("current tabs", tabs);
-  console.log("current spaces", spaces);
   const archivedSpaces: string[] = useSpaceStore(
     (state) => state.archivedSpaces,
   );
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
-  const tabOrderRef = useRef<number[]>(tabOrder);
-  tabOrderRef.current = tabOrder;
-  useEffect(() => {
-    let active = true;
-    async function getCurrentWindowId(): Promise<number> {
-      return new Promise((resolve, reject) => {
-        chrome.windows.getCurrent((window) => {
-          if (active && window && window.id) {
-            resolve(window.id);
-            return;
-          }
-          reject();
-        });
-      });
-    }
-    getCurrentWindowId()
-      .then((res) => {
-        setCurrentWindowId(res);
-      })
-      .catch((err) => console.error(err));
-    return () => {
-      active = false;
-    };
-  }, []);
+  const currentWindowId = useWindowId();
+
   useEffect(() => {
     function hideArchivedSpacesTabs(
       currentTabs: Tab[],
@@ -96,22 +54,6 @@ const NewTab = () => {
     }
     setTabs((t) => hideArchivedSpacesTabs(t, archivedSpaces));
   }, [archivedSpaces]);
-  useEffect(() => {
-    function getUserId(): Promise<void> {
-      return new Promise((resolve, reject) => {
-        chrome.storage.local.get(["userId"], function (result) {
-          if (result.userId) {
-            setCurrentUserId(result.userId);
-            setIsLoggedin(true);
-            resolve();
-            return;
-          }
-          reject();
-        });
-      });
-    }
-    getUserId().catch((err) => console.error(err));
-  }, []);
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
     if (currentPath === "webtime") return;
@@ -138,9 +80,7 @@ const NewTab = () => {
             const tab = doc.data() as Tab;
             currentTabs.push(tab);
           });
-          // console.log("currentTabs", currentTabs);
-          // console.log("tabOrder", tabOrder);
-          const sortedTabs = sortTabs(currentTabs, tabOrderRef.current);
+          const sortedTabs = sortTabs(currentTabs, tabOrder);
           console.log("sortedTabs", sortedTabs);
           setTabs(sortedTabs);
           console.log("tabs on snapshot updated");
@@ -177,6 +117,7 @@ const NewTab = () => {
       };
     }
   }, [location.pathname, currentUserId, currentWindowId, tabOrder]);
+
   useEffect(() => {
     const currentPath = location.pathname.split("/")[1];
     const spaceId = currentPath !== "" ? currentPath : "global";
@@ -189,8 +130,12 @@ const NewTab = () => {
         spaceId,
       );
       const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
+        // console.log("看看snapshot有沒有更新", doc.data());
+        // console.log("看看doc.data()?.windowId", doc.data()?.windowId);
+        // console.log("看看currentWindowId", currentWindowId);
         if (doc.exists() && doc.data()?.windowId === currentWindowId) {
           const order: number[] = doc.data()?.tabOrder;
+          // console.log("order拿回來是", order);
           if (order) setTabOrder(order);
         }
       });
@@ -199,46 +144,55 @@ const NewTab = () => {
       };
     }
   }, [currentUserId, location.pathname, currentWindowId]);
+
   useEffect(() => {
     const handleMessagePassing = (
-      request: {
+      message: {
         action: string;
         tabId: number | undefined;
         updatedTab: Tab;
       },
       _: chrome.runtime.MessageSender | undefined,
-      sendResponse: <T extends Response>(response: T) => void,
+      sendResponse: (response: Response) => void,
     ) => {
-      if (request.action === "tabClosed") {
-        setTabs((t) => t.filter((tab) => tab.tabId !== request.tabId));
+      if (message.action === "tabClosed") {
+        setTabs((t) => t.filter((tab) => tab.tabId !== message.tabId));
         sendResponse({ success: true });
       }
       if (
-        request.action === "tabUpdated" &&
-        request.updatedTab.windowId === currentWindowId
+        message.action === "tabUpdated" &&
+        message.updatedTab.windowId === currentWindowId
       ) {
         setTabs((t) => {
           const updatedTabs: Tab[] = [...t];
+          console.log("updatedTabs", updatedTabs);
+
           const existingTab: Tab | undefined = updatedTabs.find(
-            (tab) => tab.tabId === request.updatedTab.tabId,
+            (tab) => tab.tabId === message.updatedTab.tabId,
           );
           if (existingTab) {
-            Object.assign(existingTab, request.updatedTab);
+            Object.assign(existingTab, message.updatedTab);
           } else {
-            updatedTabs.push(request.updatedTab);
+            updatedTabs.push(message.updatedTab);
           }
+          console.log("updatedTabsupdatedTabs", updatedTabs);
           return updatedTabs;
         });
         setTabOrder((o) => {
-          if (request.updatedTab.tabId === undefined) return o;
+          console.log("原有的tabOrder", o);
+          if (message.updatedTab.tabId === undefined) return o;
           const updatedOrder = [...o];
           const existingIndex = updatedOrder.findIndex(
-            (id) => id === request.updatedTab.tabId,
+            (id) => id === message.updatedTab.tabId,
           );
+          console.log("exist!!!", existingIndex);
           if (existingIndex !== -1) {
-            updatedOrder.splice(existingIndex, 1);
+            // updatedOrder.splice(existingIndex, 1);
+            return updatedOrder;
           }
-          updatedOrder.push(request.updatedTab.tabId);
+          updatedOrder.push(message.updatedTab.tabId);
+
+          console.log("更新後的tabOrder", updatedOrder);
           return updatedOrder;
         });
         sendResponse({ success: true });
@@ -261,30 +215,39 @@ const NewTab = () => {
     const newTabUrl = tab.url;
     chrome.tabs.create({ url: newTabUrl });
   }
+
   function closeTab(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     const id = e.currentTarget.dataset.id;
     if (id) {
-      const request = {
+      const message = {
         action: "closeTab",
         tabId: parseInt(id),
         userId: currentUserId,
       };
-      chrome.runtime.sendMessage(request, function (response) {
+      chrome.runtime.sendMessage(message, function (response) {
         const oldTabs = tabs.filter((tab) => tab.tabId !== parseInt(id));
-        if (response.success) setTabs(oldTabs);
+        if (!response.sucess) {
+          toast.success("Tab Deleted", {
+            className: "w-52 text-lg rounded-md shadow",
+            id: "tab_deleted",
+          });
+        }
+        setTabs(oldTabs);
         return true;
       });
     }
   }
+
   function openSpacesPopup(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     setSelectedSpace("");
     const id: string | undefined = e.currentTarget.dataset.id;
     if (id) setActiveSpaceSelectId(id);
   }
+
   function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
     setSelectedSpace(e.target.value);
     if (e.target.value === "") return;
-    const request = {
+    const message = {
       action: "moveTabToSpace",
       updatedTab: tabs.find(
         (tab) => tab.tabId?.toString() === activeSpaceSelectId,
@@ -292,46 +255,37 @@ const NewTab = () => {
       spaceId: e.target.value,
       userId: currentUserId,
     };
-    chrome.runtime.sendMessage(request, function (response) {
+    chrome.runtime.sendMessage(message, function (response) {
       const newTabs = tabs.filter(
         (tab) => tab.tabId?.toString() !== activeSpaceSelectId,
       );
       if (response) setTabs(newTabs);
     });
   }
+
   function openAddSpacePopup() {
     const targetModal = document.getElementById(
       "add_space",
     ) as HTMLDialogElement | null;
     if (targetModal) targetModal.showModal();
   }
+
   function addNewSpace() {
     const newSpaceTitle: string | undefined =
       newSpaceInputRef.current?.value.trim();
-    if (!newSpaceTitle || newSpaceTitle.trim().length === 0)
-      return toast.error("Please enter a space name", {
-        className: "w-60 text-lg rounded-md shadow",
-      });
-    if (newSpaceTitle.length > 10)
-      return toast.error("Space name should be less than 10 characters", {
-        className: "w-[400px] text-lg rounded-md shadow",
-      });
-    if (
-      spaces.some(
-        (space) => space.title.toLowerCase() === newSpaceTitle.toLowerCase(),
-      )
-    )
-      return toast.error("Space name already exists", {
-        className: "w-60 text-lg rounded-md shadow",
-      });
-    if (spaces.length >= 5)
-      return toast.error("You can only create up to 5 spaces", {
-        className: "w-72 text-lg rounded-md shadow",
-      });
+    const errorToastId: string | null = validateSpaceTitle(
+      spaces,
+      "create",
+      newSpaceTitle,
+    );
+    if (errorToastId) {
+      if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
+      return;
+    }
     chrome.runtime.sendMessage(
       { action: "addSpace", newSpaceTitle, userId: currentUserId },
       function (response) {
-        if (response) {
+        if (response && newSpaceTitle) {
           setSpaces((s) => [
             ...s,
             { title: newSpaceTitle, isEditing: false, id: response.id },
@@ -342,6 +296,7 @@ const NewTab = () => {
     );
     if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
   }
+
   function handleRemoveSpace(id: string) {
     const removedSpace = spaces.find((space) => space.id === id);
     if (!removedSpace) return;
@@ -360,6 +315,7 @@ const NewTab = () => {
       );
     });
   }
+
   async function handleTabOrderChange(
     tabId: number,
     direction: "up" | "down",
@@ -396,6 +352,7 @@ const NewTab = () => {
       );
     });
   }
+
   async function copySpaceLink() {
     try {
       const link = window.location.href;
@@ -423,6 +380,7 @@ const NewTab = () => {
     });
     return newTabs.sort((a, b) => Number(b.isPinned) - Number(a.isPinned));
   }
+
   function toggleTabPin(tabId?: number, isPinned?: boolean) {
     setTabs((t) => sortTabsByPin(t, tabId));
     return new Promise((resolve, reject) => {
@@ -444,9 +402,11 @@ const NewTab = () => {
       );
     });
   }
+
   function toggleTabsLayout() {
     setIsTabsGrid((prev) => !prev);
   }
+
   function handleSpaceTitleChange(
     e: React.ChangeEvent<HTMLInputElement>,
     id: string,
@@ -454,7 +414,7 @@ const NewTab = () => {
     const newSpaces = spaces.map((space) => {
       if (space.id === id) {
         if (e.target.value.length > 10) {
-          toast.error("Space name should be less than 10 characters", {
+          toast.error("test", {
             className: "w-[400px] text-lg rounded-md shadow",
           });
           return space;
@@ -468,6 +428,7 @@ const NewTab = () => {
     });
     setSpaces(newSpaces);
   }
+
   function handleEditSpace(id: string) {
     const newSpaces = spaces.map((space) => {
       if (space.id === id) {
@@ -480,7 +441,20 @@ const NewTab = () => {
     });
     setSpaces(newSpaces);
   }
-  function handleSpaceEditBlur(id: string) {
+
+  function handleSpaceEditBlur(
+    e: React.FocusEvent<HTMLInputElement, Element>,
+    id: string,
+  ) {
+    if (!e.target.value) return;
+    const errorToastId: string | null = validateSpaceTitle(
+      spaces,
+      "edit",
+      e.target.value,
+    );
+    if (errorToastId) {
+      return;
+    }
     const newSpaces = spaces.map((space) => {
       if (space.id === id) {
         return {
@@ -509,10 +483,17 @@ const NewTab = () => {
       );
     });
   }
+
+  const isWebTime = location.pathname.includes("/webtime");
+
   return (
     <>
-      <Header />
-      <div className="flex min-h-screen w-full gap-5 overflow-x-hidden py-8 pl-[400px] pr-10 xl:ml-2">
+      <Header isWebtimePage={isWebTime} />
+      <div
+        className={`flex min-h-screen gap-5 overflow-x-hidden py-8 ${
+          isWebTime ? "px-24" : "pl-[400px]"
+        } xl:ml-2`}
+      >
         {isLoggedin && (
           <Spaces
             spaces={spaces}
@@ -524,9 +505,10 @@ const NewTab = () => {
             onSpaceEditBlur={handleSpaceEditBlur}
             onSpaceTitleChange={handleSpaceTitleChange}
             onEditSpace={handleEditSpace}
+            isWebtimePage={isWebTime}
           />
         )}
-        <div className="flex w-5/6 flex-col">
+        <div className={`flex ${isWebTime ? "w-full" : "w-5/6"} flex-col`}>
           <div className="flex items-center gap-8 pb-4">
             {!location.pathname.includes("/webtime") && (
               <>

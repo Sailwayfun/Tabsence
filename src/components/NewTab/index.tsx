@@ -147,7 +147,7 @@ const NewTab = () => {
 
   useEffect(() => {
     const handleMessagePassing = (
-      request: {
+      message: {
         action: string;
         tabId: number | undefined;
         updatedTab: Tab;
@@ -155,42 +155,42 @@ const NewTab = () => {
       _: chrome.runtime.MessageSender | undefined,
       sendResponse: (response: Response) => void,
     ) => {
-      if (request.action === "tabClosed") {
-        setTabs((t) => t.filter((tab) => tab.tabId !== request.tabId));
+      if (message.action === "tabClosed") {
+        setTabs((t) => t.filter((tab) => tab.tabId !== message.tabId));
         sendResponse({ success: true });
       }
       if (
-        request.action === "tabUpdated" &&
-        request.updatedTab.windowId === currentWindowId
+        message.action === "tabUpdated" &&
+        message.updatedTab.windowId === currentWindowId
       ) {
         setTabs((t) => {
           const updatedTabs: Tab[] = [...t];
           console.log("updatedTabs", updatedTabs);
 
           const existingTab: Tab | undefined = updatedTabs.find(
-            (tab) => tab.tabId === request.updatedTab.tabId,
+            (tab) => tab.tabId === message.updatedTab.tabId,
           );
           if (existingTab) {
-            Object.assign(existingTab, request.updatedTab);
+            Object.assign(existingTab, message.updatedTab);
           } else {
-            updatedTabs.push(request.updatedTab);
+            updatedTabs.push(message.updatedTab);
           }
           console.log("updatedTabsupdatedTabs", updatedTabs);
           return updatedTabs;
         });
         setTabOrder((o) => {
           console.log("原有的tabOrder", o);
-          if (request.updatedTab.tabId === undefined) return o;
+          if (message.updatedTab.tabId === undefined) return o;
           const updatedOrder = [...o];
           const existingIndex = updatedOrder.findIndex(
-            (id) => id === request.updatedTab.tabId,
+            (id) => id === message.updatedTab.tabId,
           );
           console.log("exist!!!", existingIndex);
           if (existingIndex !== -1) {
             // updatedOrder.splice(existingIndex, 1);
             return updatedOrder;
           }
-          updatedOrder.push(request.updatedTab.tabId);
+          updatedOrder.push(message.updatedTab.tabId);
 
           console.log("更新後的tabOrder", updatedOrder);
           return updatedOrder;
@@ -219,12 +219,12 @@ const NewTab = () => {
   function closeTab(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     const id = e.currentTarget.dataset.id;
     if (id) {
-      const request = {
+      const message = {
         action: "closeTab",
         tabId: parseInt(id),
         userId: currentUserId,
       };
-      chrome.runtime.sendMessage(request, function (response) {
+      chrome.runtime.sendMessage(message, function (response) {
         const oldTabs = tabs.filter((tab) => tab.tabId !== parseInt(id));
         if (!response.sucess) {
           toast.success("Tab Deleted", {
@@ -247,7 +247,7 @@ const NewTab = () => {
   function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
     setSelectedSpace(e.target.value);
     if (e.target.value === "") return;
-    const request = {
+    const message = {
       action: "moveTabToSpace",
       updatedTab: tabs.find(
         (tab) => tab.tabId?.toString() === activeSpaceSelectId,
@@ -255,7 +255,7 @@ const NewTab = () => {
       spaceId: e.target.value,
       userId: currentUserId,
     };
-    chrome.runtime.sendMessage(request, function (response) {
+    chrome.runtime.sendMessage(message, function (response) {
       const newTabs = tabs.filter(
         (tab) => tab.tabId?.toString() !== activeSpaceSelectId,
       );

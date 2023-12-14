@@ -52,7 +52,7 @@ async function saveTabInfo(tab: chrome.tabs.Tab, userId?: string) {
 }
 
 async function upDateTabBySpace(
-  request: {
+  message: {
     action: string;
     updatedTab: Tab;
     spaceId: string;
@@ -61,8 +61,8 @@ async function upDateTabBySpace(
   tabDocRef: DocumentReference<DocumentData, DocumentData>,
 ) {
   try {
-    await updateDoc(tabDocRef, { spaceId: request.spaceId });
-    const updatedTab = { ...request.updatedTab, spaceId: request.spaceId };
+    await updateDoc(tabDocRef, { spaceId: message.spaceId });
+    const updatedTab = { ...message.updatedTab, spaceId: message.spaceId };
     return updatedTab;
   } catch (error) {
     console.error("Error updating tabs: ", error);

@@ -9,7 +9,7 @@ import {
 import { db } from "../../../firebase-config";
 import { useEffect, useState } from "react";
 import Chart from "./Chart";
-import { useDateStore } from "../../store";
+import { useParams } from "react-router-dom";
 import Header from "./Header";
 
 export interface UrlDuration {
@@ -25,7 +25,7 @@ const TrackTime = () => {
   const [userId, setUserId] = useState<string>("");
   const [urlDurations, setUrlDurations] = useState<UrlDuration[]>([]);
   const [showTable, setShowTable] = useState<boolean>(true);
-  const date = useDateStore((state) => state.date);
+  const { date } = useParams<{ date: string }>();
 
   useEffect(() => {
     async function getUserId() {
@@ -41,7 +41,7 @@ const TrackTime = () => {
   }, []);
 
   useEffect(() => {
-    if (userId) {
+    if (userId && date) {
       const urlDurationCollectionRef = collection(
         db,
         "users",

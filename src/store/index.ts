@@ -45,8 +45,10 @@ function setViewDate(date: string, days: number): string {
   }-${newDate.getDate()}`;
 }
 
-const useDateStore = create<DateStoreState>()(
-  persist(
+const useDateStore = create<DateStoreState>
+// ()
+(
+  // persist(
     (set, get) => ({
       date: getCurrentDate(),
       increaseDate: () =>
@@ -60,11 +62,11 @@ const useDateStore = create<DateStoreState>()(
       getPrevDate: () => setViewDate(get().date, -1),
       getNextDate: () => setViewDate(get().date, 1),
     }),
-    {
-      name: "date-store",
-      partialize: (state) => ({ date: state.date }),
-    },
-  ),
+  //   {
+  //     name: "date-store",
+  //     partialize: (state) => ({ date: state.date }),
+  //   },
+  // ),
 );
 
 export { useArchivedSpaceStore, useDateStore };

@@ -2,9 +2,10 @@ import { useDateStore } from "../../store";
 import { Link } from "react-router-dom";
 import ArrowLeft from "../Icons/ArrowLeft";
 import ArrowRight from "../Icons/ArrowRight";
+import { useParams } from "react-router-dom";
 
 const Header = () => {
-  const date = useDateStore((state) => state.date);
+  const { date } = useParams<{ date: string }>();
   const increaseDate = useDateStore((state) => state.increaseDate);
   const decreaseDate = useDateStore((state) => state.decreaseDate);
   const getPrevDate = useDateStore((state) => state.getPrevDate);

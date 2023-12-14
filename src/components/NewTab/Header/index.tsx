@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Clock from "../../Icons/Clock";
 import Home from "../../Icons/Home";
 import Logo from "../Logo";
+import { getCurrentDate } from "../../../utils/trackTime";
 interface HeaderProps {
   isWebtimePage: boolean;
 }
@@ -15,7 +16,7 @@ const Header = ({ isWebtimePage }: HeaderProps) => {
       {isWebtimePage && <Logo isWebtimePage={isWebtimePage} />}
       <div className="pr-4">
         {!isWebtimePage ? (
-          <Link to="/webtime">
+          <Link to={`/webtime/${getCurrentDate()}`}>
             <button className="btn btn-ghost">
               <div className="flex items-center">
                 <Clock />

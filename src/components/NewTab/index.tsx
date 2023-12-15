@@ -130,12 +130,8 @@ const NewTab = () => {
         spaceId,
       );
       const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
-        // console.log("看看snapshot有沒有更新", doc.data());
-        // console.log("看看doc.data()?.windowId", doc.data()?.windowId);
-        // console.log("看看currentWindowId", currentWindowId);
         if (doc.exists() && doc.data()?.windowId === currentWindowId) {
           const order: number[] = doc.data()?.tabOrder;
-          // console.log("order拿回來是", order);
           if (order) setTabOrder(order);
         }
       });

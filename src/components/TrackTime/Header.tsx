@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import ArrowLeft from "../Icons/ArrowLeft";
 import ArrowRight from "../Icons/ArrowRight";
 import { useParams } from "react-router-dom";
+import { getCurrentDate } from "../../utils/trackTime";
 
 const Header = () => {
   const { date } = useParams<{ date: string }>();
@@ -10,6 +11,8 @@ const Header = () => {
   const decreaseDate = useDateStore((state) => state.decreaseDate);
   const getPrevDate = useDateStore((state) => state.getPrevDate);
   const getNextDate = useDateStore((state) => state.getNextDate);
+  const today = getCurrentDate();
+  console.log(today, "today", date, "date");
   return (
     <div className="flex w-full items-center justify-between pb-4">
       <h1 className="text-3xl font-bold">Your Time Spent on Websites</h1>
@@ -23,14 +26,16 @@ const Header = () => {
           </button>
         </Link>
         <p className="grow text-3xl">{date}</p>
-        <Link to={getNextDate()} className="contents w-full">
-          <button
-            className="h-8 w-8 cursor-pointer text-4xl"
-            onClick={increaseDate}
-          >
-            <ArrowRight className="h-6 w-6" />
-          </button>
-        </Link>
+        {!(date && date === today) && (
+          <Link to={getNextDate()} className="contents w-full">
+            <button
+              className="h-8 w-8 cursor-pointer text-4xl"
+              onClick={increaseDate}
+            >
+              <ArrowRight className="h-6 w-6" />
+            </button>
+          </Link>
+        )}
       </div>
     </div>
   );

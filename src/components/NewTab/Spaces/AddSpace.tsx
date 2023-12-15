@@ -19,8 +19,9 @@ const AddSpace = forwardRef(
         <div className="flex w-full flex-col gap-3">
           <label className="text-xl">New Space:</label>
           <input
-            className="h-4 w-full rounded-lg border p-5 text-lg"
+            className="h-4 w-full rounded-lg border p-5 text-lg placeholder:text-base"
             ref={ref}
+            placeholder="Enter a space name with 10 or fewer characters."
           />
           <button
             onClick={(e) => {

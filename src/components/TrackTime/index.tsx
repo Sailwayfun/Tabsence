@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import Chart from "./Chart";
 import { useParams } from "react-router-dom";
 import Header from "./Header";
+import Loader from "../UI/Loader";
 
 export interface UrlDuration {
   id: string;
@@ -25,6 +26,7 @@ const TrackTime = () => {
   const [userId, setUserId] = useState<string>("");
   const [urlDurations, setUrlDurations] = useState<UrlDuration[]>([]);
   const [showTable, setShowTable] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { date } = useParams<{ date: string }>();
 
   useEffect(() => {
@@ -41,6 +43,7 @@ const TrackTime = () => {
   }, []);
 
   useEffect(() => {
+    setIsLoading(true);
     if (userId && date) {
       const urlDurationCollectionRef = collection(
         db,
@@ -59,6 +62,7 @@ const TrackTime = () => {
           id: doc.id,
           ...doc.data(),
         }));
+        setIsLoading(false);
         setUrlDurations(data as UrlDuration[]);
       });
       return () => {
@@ -157,7 +161,10 @@ const TrackTime = () => {
           <Chart durationData={urlDurations} />
         </div>
       )}
-      {urlDurations.length === 0 && (
+      {isLoading && (
+        <Loader text="Loading Data..." animateClass="animate-spin" />
+      )}
+      {!isLoading && urlDurations.length === 0 && (
         <div className="flex min-h-screen max-w-full flex-col items-center gap-4 rounded-lg border bg-slate-100 py-16 shadow-md">
           <img src={noData} alt="no data" className="mx-auto w-1/3" />
           <span className="mr-8 self-end">

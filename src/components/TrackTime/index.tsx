@@ -12,6 +12,7 @@ import Chart from "./Chart";
 import { useParams } from "react-router-dom";
 import Header from "./Header";
 import Loader from "../UI/Loader";
+import useLogin from "../../hooks/useLogin";
 
 export interface UrlDuration {
   id: string;
@@ -23,24 +24,11 @@ export interface UrlDuration {
 }
 
 const TrackTime = () => {
-  const [userId, setUserId] = useState<string>("");
   const [urlDurations, setUrlDurations] = useState<UrlDuration[]>([]);
   const [showTable, setShowTable] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { date } = useParams<{ date: string }>();
-
-  useEffect(() => {
-    async function getUserId() {
-      const userId = await chrome.storage.local
-        .get("userId")
-        .then((res) => res.userId);
-      return userId;
-    }
-
-    getUserId()
-      .then((userId) => setUserId(userId))
-      .catch((err) => console.error(err));
-  }, []);
+  const { currentUserId: userId } = useLogin();
 
   useEffect(() => {
     setIsLoading(true);

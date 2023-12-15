@@ -117,3 +117,19 @@ function getDebouncedWrite(userId: string, domain: string): DebouncedFunction {
   }
   return debouncedWrites[domain];
 }
+
+function setViewDate(date: string, days: number): string {
+  const today = new Date(date);
+  const newDate = new Date(today.setDate(today.getDate() + days));
+  return `${newDate.getFullYear()}-${
+    newDate.getMonth() + 1
+  }-${newDate.getDate()}`;
+}
+
+export function getPrevDate(date: string): string {
+  return setViewDate(date, -1);
+}
+
+export function getNextDate(date: string): string {
+  return setViewDate(date, 1);
+}

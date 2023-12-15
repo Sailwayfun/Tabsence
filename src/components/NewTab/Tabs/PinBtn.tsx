@@ -13,7 +13,7 @@ const PinBtn = ({ onToggleTabPin, id, isPinned }: PinBtnProps) => {
       >
         <Pin
           className={`h-6 w-6 stroke-1 ${
-            isPinned ? "fill-orange-700 opacity-80" : "fill-white"
+            isPinned ? "fill-orange-700 opacity-80" : "fill-transparent"
           } stroke-current`}
         />
       </button>

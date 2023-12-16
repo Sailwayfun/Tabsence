@@ -22,6 +22,7 @@ import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";
 import { Tab } from "../../types/tab";
 import { Space, SpaceDoc } from "../../types/space";
+import Loader from "../UI/Loader";
 interface Response {
   success: boolean;
 }
@@ -35,6 +36,7 @@ const NewTab = () => {
   const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const { isLoggedin, currentUserId } = useLogin();
   const [tabOrder, setTabOrder] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
   const archivedSpaces: string[] = useArchivedSpaceStore(
     (state) => state.archivedSpaces,
@@ -42,6 +44,10 @@ const NewTab = () => {
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   const currentWindowId = useWindowId();
+
+  useEffect(() => {
+    setTabOrder([]);
+  }, [location.pathname]);
 
   useEffect(() => {
     function hideArchivedSpacesTabs(
@@ -55,8 +61,9 @@ const NewTab = () => {
     setTabs((t) => hideArchivedSpacesTabs(t, archivedSpaces));
   }, [archivedSpaces]);
   useEffect(() => {
+    setIsLoading(true);
     const currentPath = location.pathname.split("/")[1];
-    if (currentPath === "webtime") return;
+    if (currentPath.startsWith("webtime")) return;
     if (currentUserId && currentWindowId) {
       const tabsCollectionRef = collection(db, "users", currentUserId, "tabs");
       const spacesCollectionRef = collection(
@@ -83,6 +90,7 @@ const NewTab = () => {
           const sortedTabs = sortTabs(currentTabs, tabOrder);
           console.log("sortedTabs", sortedTabs);
           setTabs(sortedTabs);
+          setIsLoading(false);
           console.log("tabs on snapshot updated");
           return;
         }
@@ -94,6 +102,7 @@ const NewTab = () => {
         const sortedTabs = sortTabs(currentTabs, tabOrder);
         console.log("sortedTabs", sortedTabs, "tabOrder", tabOrder);
         setTabs(sortedTabs);
+        setIsLoading(false);
         console.log("tabs on snapshot updated");
         return;
       });
@@ -105,6 +114,7 @@ const NewTab = () => {
           currentSpaces.push({ id: doc.id, isEditing: false, ...space });
         });
         setSpaces(currentSpaces);
+        setIsLoading(false);
         const currentActiveId = currentSpaces.find(
           (space) => space.id === currentPath,
         )?.id;
@@ -119,6 +129,7 @@ const NewTab = () => {
   }, [location.pathname, currentUserId, currentWindowId, tabOrder]);
 
   useEffect(() => {
+    setIsLoading(true);
     const currentPath = location.pathname.split("/")[1];
     const spaceId = currentPath !== "" ? currentPath : "global";
     if (currentUserId) {
@@ -133,6 +144,7 @@ const NewTab = () => {
         if (doc.exists() && doc.data()?.windowId === currentWindowId) {
           const order: number[] = doc.data()?.tabOrder;
           if (order) setTabOrder(order);
+          setIsLoading(false);
         }
       });
       return () => {
@@ -529,20 +541,25 @@ const NewTab = () => {
               className="mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-xl shadow hover:bg-orange-700 hover:bg-opacity-70 hover:text-white"
             />
           )}
-          <Tabs
-            tabs={tabs}
-            spaces={spaces}
-            activeSpaceSelectId={activeSpaceSelectId}
-            selectedSpace={selectedSpace}
-            isLoggedin={isLoggedin}
-            openLink={openLink}
-            openSpacesPopup={openSpacesPopup}
-            selectSpace={selectSpace}
-            closeTab={closeTab}
-            handleTabOrderChange={handleTabOrderChange}
-            toggleTabPin={toggleTabPin}
-            isGrid={isTabsGrid}
-          />
+          {isLoading && (
+            <Loader text="Loading Data..." animateClass="animate-spin" />
+          )}
+          {!isLoading && (
+            <Tabs
+              tabs={tabs}
+              spaces={spaces}
+              activeSpaceSelectId={activeSpaceSelectId}
+              selectedSpace={selectedSpace}
+              isLoggedin={isLoggedin}
+              openLink={openLink}
+              openSpacesPopup={openSpacesPopup}
+              selectSpace={selectSpace}
+              closeTab={closeTab}
+              handleTabOrderChange={handleTabOrderChange}
+              toggleTabPin={toggleTabPin}
+              isGrid={isTabsGrid}
+            />
+          )}
         </div>
       </div>
     </>

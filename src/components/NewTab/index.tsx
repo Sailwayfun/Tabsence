@@ -255,7 +255,13 @@ const NewTab = () => {
       const newTabs = tabs.filter(
         (tab) => tab.tabId?.toString() !== activeSpaceSelectId,
       );
-      if (response) setTabs(newTabs);
+      if (response) {
+        toast.success("Tab moved to space", {
+          className: "w-60 text-lg rounded-md shadow",
+          duration: 2000,
+        });
+        setTabs(newTabs);
+      }
     });
   }
 

@@ -63,7 +63,7 @@ const NewTab = () => {
   useEffect(() => {
     setIsLoading(true);
     const currentPath = location.pathname.split("/")[1];
-    if (currentPath.startsWith("webtime")) return;
+    if (currentPath.startsWith("webtime")) return setIsLoading(false);
     if (currentUserId && currentWindowId) {
       const tabsCollectionRef = collection(db, "users", currentUserId, "tabs");
       const spacesCollectionRef = collection(

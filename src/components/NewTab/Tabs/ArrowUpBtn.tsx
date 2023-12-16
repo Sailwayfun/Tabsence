@@ -11,9 +11,12 @@ const ArrowUpBtn = ({
   isGrid,
 }: ArrowUpBtnProps) => {
   return (
-    <div className="tooltip" data-tip={`${isGrid ? "Move left" : "Move up"}`}>
+    <div
+      className={`tooltip`}
+      data-tip={`${isGrid ? "Move left" : "Move up"}`}
+    >
       <button
-        className={`ml-4 ${isGrid ? "-rotate-90" : "rotate-0"}`}
+        className={`${isGrid ? "-rotate-90" : "rotate-0"}`}
         onClick={() => onMoveUp(tabId, direction)}
       >
         <svg

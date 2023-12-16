@@ -1,5 +1,5 @@
 import { Space } from "../../../types/space";
-import { memo } from "react";
+import { memo, useState, useEffect, useRef } from "react";
 import { Tab } from "../../../types/tab";
 import MoveToSpace from "./MoveToSpace";
 import CloseBtn from "./CloseBtn";
@@ -27,6 +27,7 @@ interface TabProps {
   isLastTab: boolean;
   isFirstTab: boolean;
   isGrid: boolean;
+  zIndex?: number;
 }
 
 const TabCard = memo(function TabCard({
@@ -44,15 +45,42 @@ const TabCard = memo(function TabCard({
   isLastTab,
   isGrid,
 }: TabProps) {
+  const [showIcons, setShowIcons] = useState(false);
+  console.log("icons should be shown?", showIcons);
+  const iconsRef = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        iconsRef.current &&
+        btnRef.current &&
+        !btnRef.current.contains(event.target as Node) &&
+        !iconsRef.current.contains(event.target as Node)
+      ) {
+        setShowIcons(false);
+      }
+    }
+    window.addEventListener("click", handleClickOutside);
+    return () => {
+      window.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
   return (
     <li
       className={`relative grid grid-rows-2 justify-items-center gap-3 rounded-lg border bg-slate-100  text-lg shadow-md ${
         isGrid
-          ? "pt-2 xl:flex xl:flex-col xl:items-center xl:justify-center xl:gap-3"
+          ? "p-3 xl:flex xl:flex-col xl:items-center xl:justify-center xl:gap-3"
           : "px-4 py-2 xl:flex xl:items-center"
-      } transition duration-200 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg xl:text-2xl`}
+      } transition duration-200 ease-in-out hover:z-50 hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg xl:text-2xl`}
     >
-      <KebabBtn onClick={() => {}} />
+      {isGrid && (
+        <KebabBtn
+          onClick={() => {
+            setShowIcons(true);
+          }}
+          ref={btnRef}
+        />
+      )}
       <img
         src={tab.favIconUrl}
         className={`${
@@ -67,64 +95,88 @@ const TabCard = memo(function TabCard({
       >
         {tab.title}
       </a>
-      <div className={`mr-3 flex ${!isGrid && "xl:ml-auto"} `}>
-        <CloseBtn id={tab.tabId?.toString()} onCloseTab={onCloseTab} />
-        <Dropdown
-          button={
-            <MoveToSpace
-              spaces={spaces}
-              id={tab.tabId?.toString()}
-              onOpenSpacesPopup={onOpenSpacesPopup}
-            />
-          }
+      {((showIcons && isGrid) || !isGrid) && (
+        <div
+          className={`flex gap-4 ${
+            isGrid
+              ? "absolute -right-8 top-0 z-50 flex-col justify-center rounded-lg bg-slate-100 p-2 shadow-md"
+              : "mr-3 xl:ml-auto"
+          } `}
+          ref={iconsRef}
         >
-          {tab.tabId?.toString() === selectId && (
-            <div className="ml-5 h-14 w-52 px-3">
-              <label
-                htmlFor={tab.id?.toString() || "spaces"}
-                className="text-xl"
-              >
-                Move to space:
-              </label>
-              <select
-                id={tab.tabId?.toString() || "spaces"}
-                onChange={onSelectSpace}
-                value={selectedSpace}
-              >
-                <option value="">Select a space</option>
-                {spaces.map(({ id, title }) => {
-                  return (
-                    <option value={id} key={id}>
-                      {title}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
+          {!isGrid && (
+            <PinBtn
+              onToggleTabPin={onToggleTabPin}
+              isPinned={tab.isPinned}
+              id={tab.tabId}
+              isGrid={isGrid}
+            />
           )}
-        </Dropdown>
-        {!isFirstTab && tab.tabId && (
-          <ArrowUpBtn
-            onMoveUp={onTabOrderChange}
-            tabId={tab.tabId}
-            direction="up"
-            isGrid={isGrid}
+          <Dropdown
+            button={
+              <MoveToSpace
+                spaces={spaces}
+                id={tab.tabId?.toString()}
+                onOpenSpacesPopup={onOpenSpacesPopup}
+              />
+            }
+          >
+            {tab.tabId?.toString() === selectId && (
+              <div className="ml-5 h-14 w-52 px-3">
+                <label
+                  htmlFor={tab.id?.toString() || "spaces"}
+                  className="text-xl"
+                >
+                  Move to space:
+                </label>
+                <select
+                  id={tab.tabId?.toString() || "spaces"}
+                  onChange={onSelectSpace}
+                  value={selectedSpace}
+                >
+                  <option value="">Select a space</option>
+                  {spaces.map(({ id, title }) => {
+                    return (
+                      <option value={id} key={id}>
+                        {title}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            )}
+          </Dropdown>
+          {!isFirstTab && tab.tabId && (
+            <ArrowUpBtn
+              onMoveUp={onTabOrderChange}
+              tabId={tab.tabId}
+              direction="up"
+              isGrid={isGrid}
+            />
+          )}
+          {!isLastTab && tab.tabId && (
+            <ArrowDownBtn
+              onMoveDown={onTabOrderChange}
+              tabId={tab.tabId}
+              direction="down"
+              isGrid={isGrid}
+            />
+          )}
+          <CloseBtn
+            id={tab.tabId?.toString()}
+            onCloseTab={onCloseTab}
+            order={isGrid ? "order-first" : ""}
           />
-        )}
-        {!isLastTab && tab.tabId && (
-          <ArrowDownBtn
-            onMoveDown={onTabOrderChange}
-            tabId={tab.tabId}
-            direction="down"
-            isGrid={isGrid}
-          />
-        )}
+        </div>
+      )}
+      {isGrid && (
         <PinBtn
           onToggleTabPin={onToggleTabPin}
           isPinned={tab.isPinned}
           id={tab.tabId}
+          isGrid={isGrid}
         />
-      </div>
+      )}
     </li>
   );
 });

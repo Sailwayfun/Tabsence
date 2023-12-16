@@ -12,11 +12,11 @@ const ArrowDownBtn = ({
 }: ArrowDownBtnProps) => {
   return (
     <div
-      className="tooltip"
+      className={`tooltip`}
       data-tip={`${isGrid ? "Move right" : "Move down"}`}
     >
       <button
-        className={`ml-4 ${isGrid ? "-rotate-90" : "rotate-0"}`}
+        className={`${isGrid ? "-rotate-90" : "rotate-0"}`}
         onClick={() => onMoveDown(tabId, direction)}
       >
         <svg

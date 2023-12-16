@@ -178,7 +178,14 @@ chrome.runtime.onMessage.addListener(
 
 async function closeTabAndRemoveFromFirestore(tabId: number, userId?: string) {
   if (!userId) return;
-  await closeTab(tabId);
+  try {
+    const tab = await chrome.tabs.get(tabId);
+    if (tab) {
+      await closeTab(tabId);
+    }
+  } catch (error) {
+    console.log(`Tab with id ${tabId} does not exist in the current window.`);
+  }
   await removeTabFromFirestore(tabId, userId);
 }
 

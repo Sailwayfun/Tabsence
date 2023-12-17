@@ -38,10 +38,6 @@ export function trackTabTime(url: string, tabId?: number): void {
     url,
     date: today,
   };
-  // tabTimes[tabId] = {
-  //   startTime: Date.now(),
-  //   url,
-  // };
   console.log("tabTimes", tabTimes);
 }
 
@@ -63,7 +59,7 @@ export async function updateTabDuration(tabId?: number): Promise<void> {
   try {
     const domain = new URL(url).hostname;
     const myDomain: string = "icdbgchingbnboklhnagfckgjpdfjfeg";
-    if (domain === myDomain) return;
+    if (domain === myDomain || domain === "newtab") return;
     const debouncedWriteToFirestore = getDebouncedWrite(userId, domain);
     debouncedWriteToFirestore(durationBySecond, url, date);
     console.log("writeToFirestore", domain, durationBySecond, url, date);

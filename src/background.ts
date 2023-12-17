@@ -14,9 +14,11 @@ import {
   arrayUnion,
 } from "firebase/firestore";
 
+import { urlsStore } from "./store/tabUrlMap";
+
 import { saveTabInfo, upDateTabBySpace } from "./utils/firestore";
 
-import { trackTabTime, updateTabDuration } from "./utils/trackTime";
+import { tabTimes, trackTabTime, updateTabDuration } from "./utils/trackTime";
 
 interface RuntimeMessage {
   action: string;
@@ -32,12 +34,11 @@ interface RuntimeMessage {
   windowId: number;
 }
 
-chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.url) {
-    const tabDurationUpdated = await updateTabDuration(tab.id);
-    console.log(1, "updateTabDuration", tabDurationUpdated);
-    const tabTimeTracked = trackTabTime(changeInfo.url, tab.id);
-    console.log(2, "tracktabtime", tabTimeTracked);
+    urlsStore.getState().updateTabUrl(tabId, changeInfo.url);
+    const tabTimeTracked = trackTabTime(changeInfo.url);
+    console.log(1, "tracktabtime", tabTimeTracked);
     return true;
   }
   if (changeInfo.status === "complete" && tab.title !== "Tabsence") {
@@ -200,13 +201,14 @@ async function removeTabFromFirestore(tabId: number, userId: string) {
 }
 
 chrome.tabs.onRemoved.addListener(async (tabId: number) => {
+  const closedTabUrl: string = urlsStore.getState().getTabUrl(tabId);
   const userId: string | undefined = await chrome.storage.local
     .get("userId")
     .then((res) => res.userId);
   if (!userId) return;
   await removeTabFromFirestore(tabId, userId);
-  const tabDurationUpdated = await updateTabDuration(tabId);
-  console.log(3, "updateTabDuration", tabDurationUpdated);
+  await updateTabDuration(closedTabUrl);
+  console.log(3, "updateTabDuration", tabTimes);
   chrome.runtime.sendMessage({ action: "tabClosed", tabId });
   return true;
 });

@@ -23,46 +23,60 @@ export function getCurrentDate(): string {
 
 interface TabInfo {
   startTime: number;
-  url: string;
+  // url: string;
+  durationBySecond: number;
   date: string;
 }
 
-export const tabTimes: Record<string, Record<number, TabInfo>> = {};
+export const tabTimes: Record<string, Record<string, TabInfo>> = {};
 
-export function trackTabTime(url: string, tabId?: number): void {
-  if (!tabId) return;
+export function trackTabTime(url: string): void {
+  if (!url) return;
   const today = getCurrentDate();
   if (!tabTimes[today]) tabTimes[today] = {};
-  tabTimes[today][tabId] = {
+  if (tabTimes[today][url]) {
+    tabTimes[today][url].startTime = Date.now();
+    return;
+  }
+  tabTimes[today][url] = {
     startTime: Date.now(),
-    url,
     date: today,
+    durationBySecond: 0,
   };
-  console.log("tabTimes", tabTimes);
+  console.log(0, "trackTabTime", tabTimes);
 }
 
-export async function updateTabDuration(tabId?: number): Promise<void> {
-  if (!tabId) return;
+export async function updateTabDuration(newUrl?: string): Promise<void> {
+  if (!newUrl) return;
   const userId = await getUserId();
   const today = getCurrentDate();
   if (!tabTimes[today]) tabTimes[today] = {};
-  const tabInfo = tabTimes[today][tabId];
-  console.log("tabInfo", tabInfo);
+  const tabInfo = tabTimes[today][newUrl];
+  console.log("updateTabDuration", tabInfo);
   if (!tabInfo) {
     return;
   }
-  const { startTime, url, date } = tabInfo;
+  const { startTime, date } = tabInfo;
   const duration = Date.now() - startTime;
-  const durationBySecond = Math.floor(duration / 1000);
-  console.log("durationBySecond", durationBySecond);
+  const seconds = Math.floor(duration / 1000);
+  console.log("這次加上了多少秒", seconds);
+  if (seconds < 1) return;
+  tabInfo.durationBySecond += seconds;
+  console.log("durationBySecond", tabInfo.durationBySecond);
   if (!userId) return;
   try {
-    const domain = new URL(url).hostname;
+    const domain = new URL(newUrl).hostname;
     const myDomain: string = "icdbgchingbnboklhnagfckgjpdfjfeg";
     if (domain === myDomain || domain === "newtab") return;
     const debouncedWriteToFirestore = getDebouncedWrite(userId, domain);
-    debouncedWriteToFirestore(durationBySecond, url, date);
-    console.log("writeToFirestore", domain, durationBySecond, url, date);
+    debouncedWriteToFirestore(tabInfo.durationBySecond, newUrl, date);
+    console.log(
+      "writeToFirestore",
+      domain,
+      tabInfo.durationBySecond,
+      newUrl,
+      date,
+    );
   } catch (error) {
     console.error("Error updating tab duration: ", error);
   }

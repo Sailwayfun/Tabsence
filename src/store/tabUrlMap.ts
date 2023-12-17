@@ -1,23 +1,25 @@
 import { createStore } from "zustand/vanilla";
 
 interface TabUrlMapStoreState {
-  urls: string[];
+  urls: Record<number, string>;
   updateTabUrl: (tabId: number, url: string) => void;
   getTabUrl: (tabId: number) => string;
 }
 
 const urlsStore = createStore<TabUrlMapStoreState>((set, get) => ({
-  urls: [],
+  urls: {},
   updateTabUrl: (tabId, url) => {
     set((state) => {
-      const urls = [...state.urls];
-      urls[tabId] = url;
-      return { urls };
+      return {
+        urls: {
+          ...state.urls,
+          [tabId]: url,
+        },
+      };
     });
   },
   getTabUrl: (tabId) => {
-    const urls = get().urls;
-    return urls[tabId];
+    return get().urls[tabId];
   },
 }));
 

@@ -399,14 +399,15 @@ const NewTab = () => {
   }
 
   function toggleTabPin(tabId?: number, isPinned?: boolean) {
-    setTabs((t) => sortTabsByPin(t, tabId));
+    const newTabs = sortTabsByPin(tabs, tabId);
+    setTabs(newTabs);
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(
         {
           action: "toggleTabPin",
           tabId,
           isPinned,
-          newTabs: sortTabsByPin(tabs, tabId),
+          newTabs,
           spaceId: location.pathname.split("/")[1] || "global",
         },
         function (response) {

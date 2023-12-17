@@ -103,8 +103,7 @@ function getDebouncedWrite(userId: string, domain: string): DebouncedFunction {
         domain,
       );
       const urlSnapShot = await getDoc(urlRef);
-
-      if (urlSnapShot.exists() && urlSnapShot.data().date === date) {
+      if (urlSnapShot.exists()) {
         await updateDoc(urlRef, {
           durationBySecond: increment(durationBySecond),
           visitCounts: increment(1),

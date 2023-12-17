@@ -29,7 +29,7 @@ interface RuntimeMessage {
   newTabs: Tab[];
   userId?: string;
   isPinned: boolean;
-  windowId: number;
+  // windowId: number;
 }
 
 chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
@@ -140,7 +140,7 @@ chrome.runtime.onMessage.addListener(
 
 chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
-    if (!message.userId || !message.windowId) return;
+    if (!message.userId) return;
     switch (message.action) {
       case "updateTabOrder":
         {
@@ -160,7 +160,7 @@ chrome.runtime.onMessage.addListener(
               tabOrderDocRef,
               {
                 tabOrder: newTabOrderData,
-                windowId: message.newTabs[0].windowId,
+                // windowId: message.newTabs[0].windowId,
               },
               { merge: true },
             );
@@ -366,20 +366,20 @@ chrome.runtime.onMessage.addListener(
   },
 );
 
-chrome.windows.onCreated.addListener(async (window) => {
-  const userId = await chrome.storage.local
-    .get("userId")
-    .then((res) => res.userId);
-  if (!userId) return;
-  const tabOrdersCollectionRef = collection(db, "users", userId, "tabOrders");
-  const tabOrderDocRef = doc(tabOrdersCollectionRef, "global");
-  await setDoc(
-    tabOrderDocRef,
-    {
-      tabOrder: [],
-      windowId: window.id,
-    },
-    { merge: true },
-  );
-  return true;
-});
+// chrome.windows.onCreated.addListener(async (window) => {
+//   const userId = await chrome.storage.local
+//     .get("userId")
+//     .then((res) => res.userId);
+//   if (!userId) return;
+//   const tabOrdersCollectionRef = collection(db, "users", userId, "tabOrders");
+//   const tabOrderDocRef = doc(tabOrdersCollectionRef, "global");
+//   await setDoc(
+//     tabOrderDocRef,
+//     {
+//       tabOrder: [],
+//       // windowId: window.id,
+//     },
+//     { merge: true },
+//   );
+//   return true;
+// });

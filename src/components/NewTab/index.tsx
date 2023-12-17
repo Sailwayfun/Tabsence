@@ -18,7 +18,7 @@ import { db } from "../../../firebase-config";
 import { sortTabs } from "../../utils/firestore";
 import { validateSpaceTitle } from "../../utils/validate";
 import ToggleViewBtn from "./ToggleViewBtn";
-import useWindowId from "../../hooks/useWindowId";
+// import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";
 import { Tab } from "../../types/tab";
 import { Space, SpaceDoc } from "../../types/space";
@@ -43,7 +43,7 @@ const NewTab = () => {
   );
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
-  const currentWindowId = useWindowId();
+  // const currentWindowId = useWindowId();
 
   useEffect(() => {
     setTabOrder([]);
@@ -64,7 +64,7 @@ const NewTab = () => {
     setIsLoading(true);
     const currentPath = location.pathname.split("/")[1];
     if (currentPath.startsWith("webtime")) return setIsLoading(false);
-    if (currentUserId && currentWindowId) {
+    if (currentUserId) {
       const tabsCollectionRef = collection(db, "users", currentUserId, "tabs");
       const spacesCollectionRef = collection(
         db,
@@ -76,10 +76,10 @@ const NewTab = () => {
         currentPath !== ""
           ? query(
               tabsCollectionRef,
-              where("windowId", "==", currentWindowId),
+              // where("windowId", "==", currentWindowId),
               where("spaceId", "==", currentPath),
             )
-          : query(tabsCollectionRef, where("windowId", "==", currentWindowId));
+          : query(tabsCollectionRef);
       const unsubscribeTab = onSnapshot(tabQ, (querySnapshot) => {
         const currentTabs: Tab[] = [];
         if (currentPath !== "") {
@@ -126,7 +126,7 @@ const NewTab = () => {
         unsubscribeSpace();
       };
     }
-  }, [location.pathname, currentUserId, currentWindowId, tabOrder]);
+  }, [location.pathname, currentUserId, tabOrder]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -141,7 +141,7 @@ const NewTab = () => {
         spaceId,
       );
       const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
-        if (doc.exists() && doc.data()?.windowId === currentWindowId) {
+        if (doc.exists() && doc.data()) {
           const order: number[] = doc.data()?.tabOrder;
           if (order) setTabOrder(order);
           setIsLoading(false);
@@ -151,7 +151,7 @@ const NewTab = () => {
         unsubscribeTabOrder();
       };
     }
-  }, [currentUserId, location.pathname, currentWindowId]);
+  }, [currentUserId, location.pathname]);
 
   useEffect(() => {
     const handleMessagePassing = (
@@ -168,8 +168,8 @@ const NewTab = () => {
         sendResponse({ success: true });
       }
       if (
-        message.action === "tabUpdated" &&
-        message.updatedTab.windowId === currentWindowId
+        message.action === "tabUpdated"
+        // message.updatedTab.windowId === currentWindowId
       ) {
         setTabs((t) => {
           const updatedTabs: Tab[] = [...t];
@@ -212,7 +212,7 @@ const NewTab = () => {
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessagePassing);
     };
-  }, [currentWindowId]);
+  }, []);
 
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
@@ -355,7 +355,7 @@ const NewTab = () => {
           newTabs,
           spaceId,
           userId: currentUserId,
-          windowId: currentWindowId,
+          // windowId: currentWindowId,
         },
         function (response) {
           if (response) {

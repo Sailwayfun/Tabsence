@@ -30,7 +30,7 @@ async function saveTabInfo(tab: chrome.tabs.Tab, userId?: string) {
   if (!userId) return;
   if (tab.url && tab.title && tab.id) {
     const tabData = {
-      windowId: tab.windowId,
+      // windowId: tab.windowId,
       tabId: tab.id,
       title: tab.title,
       url: tab.url,

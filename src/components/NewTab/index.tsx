@@ -391,7 +391,11 @@ const NewTab = () => {
       }
       return tab;
     });
-    return newTabs.sort((a, b) => Number(b.isPinned) - Number(a.isPinned));
+    return newTabs.sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return 0;
+    });
   }
 
   function toggleTabPin(tabId?: number, isPinned?: boolean) {

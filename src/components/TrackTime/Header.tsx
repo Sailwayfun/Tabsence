@@ -18,8 +18,8 @@ const Header = () => {
       <div className="flex items-center justify-center gap-2">
         {date && date !== today && (
           <Link to={today} className="contents w-full">
-            <button className="mr-8 h-8 w-20 rounded-md bg-orange-700 bg-opacity-70 px-3 text-lg text-white shadow hover:bg-orange-900">
-              Today
+            <button className="mr-8 h-8 w-32 rounded-md bg-orange-700 bg-opacity-70 px-3 text-lg text-white shadow hover:bg-orange-900">
+              View Today
             </button>
           </Link>
         )}

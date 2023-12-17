@@ -288,7 +288,7 @@ const NewTab = () => {
       newSpaceInputRef.current?.value.trim();
     const errorToastId: string | null = validateSpaceTitle(
       spaces,
-      "create",
+      undefined,
       newSpaceTitle,
     );
     if (errorToastId) {
@@ -467,7 +467,7 @@ const NewTab = () => {
     if (!e.target.value) return;
     const errorToastId: string | null = validateSpaceTitle(
       spaces,
-      "edit",
+      id,
       e.target.value,
     );
     if (errorToastId) {

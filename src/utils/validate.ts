@@ -5,17 +5,16 @@ type ErrorToastId = string;
 
 function validateSpaceTitle(
   spaces: Space[],
-  action: "create" | "edit",
+  id?: string,
   title?: string,
 ): ErrorToastId | null {
   const nameExists: boolean =
     title !== undefined &&
-    spaces.some(
-      (s) => s.title.trim().toLowerCase() === title.trim().toLowerCase(),
-    );
+    spaces.some((space) => space.id !== id && space.title === title.trim());
   const nameEmpty: boolean = title === undefined || title.trim().length === 0;
   const nameTooLong: boolean = title !== undefined && title.trim().length > 10;
-  const spaceLimitReached: boolean = spaces.length >= 5;
+  const spaceLimitReached: boolean =
+    spaces.length >= 5 && spaces.every((space) => space.id !== id);
   if (nameEmpty) {
     return toast.error("Please enter a space title", {
       className: "w-60 text-lg rounded-md shadow",
@@ -26,9 +25,9 @@ function validateSpaceTitle(
       className: "w-72 text-lg rounded-md shadow",
     });
   }
-  if (nameExists && action === "create") {
+  if (nameExists) {
     return toast.error("Space name already exists", {
-      className: "w-60 text-lg rounded-md shadow",
+      className: "w-72 text-lg rounded-md shadow",
     });
   }
   if (nameTooLong) {

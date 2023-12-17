@@ -1,20 +1,16 @@
-import { Space } from "../../../types/space";
 interface MoveToSpaceProps {
-  spaces: Space[];
   id: string | undefined;
   onOpenSpacesPopup: (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     tabId: string | undefined,
   ) => void;
 }
-const MoveToSpace = ({ spaces, id, onOpenSpacesPopup }: MoveToSpaceProps) => {
+const MoveToSpace = ({ id, onOpenSpacesPopup }: MoveToSpaceProps) => {
   return (
     <div className="tooltip" data-tip="Move to Space">
       <button
         onClick={(e) => {
           onOpenSpacesPopup(e, id);
-          console.log("spaces", spaces);
-          console.log("id", id);
         }}
         data-id={id}
       >

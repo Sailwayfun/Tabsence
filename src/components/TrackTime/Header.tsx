@@ -11,7 +11,6 @@ import {
 const Header = () => {
   const { date } = useParams<{ date: string }>();
   const today = getCurrentDate();
-  console.log(today, "today", date, "date");
   return (
     <div className="flex w-full items-center justify-between pb-4">
       <h1 className="text-3xl font-bold">Your Time Spent on Websites</h1>

@@ -195,7 +195,6 @@ const NewTab = () => {
           );
           console.log("exist!!!", existingIndex);
           if (existingIndex !== -1) {
-            // updatedOrder.splice(existingIndex, 1);
             return updatedOrder;
           }
           updatedOrder.push(message.updatedTab.tabId);

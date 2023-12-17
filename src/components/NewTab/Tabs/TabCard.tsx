@@ -46,7 +46,6 @@ const TabCard = memo(function TabCard({
   isGrid,
 }: TabProps) {
   const [showIcons, setShowIcons] = useState(false);
-  console.log("icons should be shown?", showIcons);
   const iconsRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -115,7 +114,6 @@ const TabCard = memo(function TabCard({
           <Dropdown
             button={
               <MoveToSpace
-                spaces={spaces}
                 id={tab.tabId?.toString()}
                 onOpenSpacesPopup={onOpenSpacesPopup}
               />

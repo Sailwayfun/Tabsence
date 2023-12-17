@@ -17,7 +17,6 @@ const RemoveSpaceModal = ({ id, onRemoveSpace }: RemoveSpaceModalProps) => {
           onClick={(e) => {
             e.preventDefault();
             onRemoveSpace(id);
-            console.log("removed space", id);
             modalRef.current?.close();
           }}
           className="rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900"

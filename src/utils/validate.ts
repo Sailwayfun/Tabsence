@@ -17,7 +17,7 @@ function validateSpaceTitle(
     spaces.length >= 5 && spaces.every((space) => space.id !== id);
   if (nameEmpty) {
     return toast.error("Please enter a space title", {
-      className: "w-60 text-lg rounded-md shadow",
+      className: "w-72 text-lg rounded-md shadow",
     });
   }
   if (spaceLimitReached) {

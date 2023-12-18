@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useArchivedSpaceStore } from "../../store";
-import { useLocation, Outlet } from "react-router-dom";
+import { useLocation, Outlet, useParams } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import Spaces from "./Spaces";
 import Header from "./Header";
@@ -44,6 +44,7 @@ const NewTab = () => {
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   const currentWindowId = useWindowId();
+  const { windowId: sharedWindowId } = useParams<{ windowId: string }>();
 
   useEffect(() => {
     setTabOrder([]);
@@ -76,10 +77,19 @@ const NewTab = () => {
         currentPath !== ""
           ? query(
               tabsCollectionRef,
-              where("windowId", "==", currentWindowId),
+              where("windowId", "in", [
+                currentWindowId,
+                sharedWindowId ? parseInt(sharedWindowId) : "",
+              ]),
               where("spaceId", "==", currentPath),
             )
-          : query(tabsCollectionRef, where("windowId", "==", currentWindowId));
+          : query(
+              tabsCollectionRef,
+              where("windowId", "in", [
+                currentWindowId,
+                sharedWindowId ? parseInt(sharedWindowId) : "",
+              ]),
+            );
       const unsubscribeTab = onSnapshot(tabQ, (querySnapshot) => {
         const currentTabs: Tab[] = [];
         if (currentPath !== "") {
@@ -126,12 +136,20 @@ const NewTab = () => {
         unsubscribeSpace();
       };
     }
-  }, [location.pathname, currentUserId, currentWindowId, tabOrder]);
+  }, [
+    location.pathname,
+    currentUserId,
+    currentWindowId,
+    sharedWindowId,
+    tabOrder,
+  ]);
 
   useEffect(() => {
     setIsLoading(true);
     const currentPath = location.pathname.split("/")[1];
     const spaceId = currentPath !== "" ? currentPath : "global";
+    const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
+    console.log("sharedWindowId", parsedSharedWindowId);
     if (currentUserId) {
       const tabOrderDocRef = doc(
         db,
@@ -141,7 +159,13 @@ const NewTab = () => {
         spaceId,
       );
       const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
-        if (doc.exists() && doc.data()?.windowId === currentWindowId) {
+        console.log("有sharedWindowId", parsedSharedWindowId);
+        console.log("有doc的windowId", doc.data()?.windowId);
+        if (
+          doc.exists() &&
+          (doc.data()?.windowId === currentWindowId ||
+            doc.data()?.windowId === parsedSharedWindowId)
+        ) {
           const order: number[] = doc.data()?.tabOrder;
           if (order) setTabOrder(order);
           setIsLoading(false);
@@ -151,9 +175,10 @@ const NewTab = () => {
         unsubscribeTabOrder();
       };
     }
-  }, [currentUserId, location.pathname, currentWindowId]);
+  }, [currentUserId, location.pathname, currentWindowId, sharedWindowId]);
 
   useEffect(() => {
+    const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
     const handleMessagePassing = (
       message: {
         action: string;
@@ -169,7 +194,8 @@ const NewTab = () => {
       }
       if (
         message.action === "tabUpdated" &&
-        message.updatedTab.windowId === currentWindowId
+        (message.updatedTab.windowId === currentWindowId ||
+          message.updatedTab.windowId === parsedSharedWindowId)
       ) {
         setTabs((t) => {
           const updatedTabs: Tab[] = [...t];
@@ -211,7 +237,7 @@ const NewTab = () => {
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessagePassing);
     };
-  }, [currentWindowId]);
+  }, [currentWindowId, sharedWindowId]);
 
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
@@ -348,13 +374,16 @@ const NewTab = () => {
     spaceId: string | undefined,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
+      const parsedSharedWindowId = sharedWindowId
+        ? parseInt(sharedWindowId)
+        : "";
       chrome.runtime.sendMessage(
         {
           action: "updateTabOrder",
           newTabs,
           spaceId,
           userId: currentUserId,
-          windowId: currentWindowId,
+          windowId: parsedSharedWindowId || currentWindowId,
         },
         function (response) {
           if (response) {
@@ -369,7 +398,8 @@ const NewTab = () => {
   async function copySpaceLink() {
     try {
       const link = window.location.href;
-      await navigator.clipboard.writeText(link);
+      const sharedLink = `${link}/share/${currentWindowId}`;
+      await navigator.clipboard.writeText(sharedLink);
       toast.success("Link copied!", {
         className: "w-52 text-lg rounded-md shadow",
       });

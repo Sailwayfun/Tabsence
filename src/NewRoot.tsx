@@ -12,6 +12,7 @@ const router = createHashRouter([
     children: [
       {
         path: "/:spaceId",
+        children: [{ path: "share/:windowId" }],
       },
       {
         path: "/webtime",

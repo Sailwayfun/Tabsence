@@ -42,6 +42,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     return true;
   }
   if (changeInfo.status === "complete" && tab.title !== "Tabsence") {
+    if (tab.url?.includes("newtab")) return true;
     const userId = await chrome.storage.local
       .get("userId")
       .then((res) => res.userId);

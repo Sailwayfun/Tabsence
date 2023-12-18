@@ -9,12 +9,17 @@ const ToggleOrderBtn = ({
   isAscending,
 }: ToggleOrderBtnProps) => {
   return (
-    <button onClick={onToggleOrder}>
-      <ToggleOrder
-        className="h-6 w-6"
-        direction={isAscending ? "ascend" : "descend"}
-      />
-    </button>
+    <div
+      className="tooltip"
+      data-tip={isAscending ? "descending" : "ascending"}
+    >
+      <button onClick={onToggleOrder}>
+        <ToggleOrder
+          className="h-6 w-6"
+          direction={isAscending ? "ascend" : "descend"}
+        />
+      </button>
+    </div>
   );
 };
 

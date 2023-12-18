@@ -337,7 +337,9 @@ async function handleRemoveSpace(message: RuntimeMessage) {
     return { success: false };
   }
   await Promise.all(deletedTabsSnapshot.docs.map((doc) => deleteDoc(doc.ref)));
-
+  await chrome.tabs.remove(
+    deletedTabsSnapshot.docs.map((doc) => doc.data().tabId),
+  );
   return { success: true };
 }
 

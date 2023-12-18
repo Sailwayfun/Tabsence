@@ -114,7 +114,7 @@ const TrackTime = () => {
                 >
                   {label}
                 </label>
-                {label.includes("Duration") && (
+                {label.includes("Duration") && showTable && (
                   <ToggleOrderBtn
                     onToggleOrder={toggleDurationsOrder}
                     isAscending={isAscending}

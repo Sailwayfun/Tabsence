@@ -149,7 +149,6 @@ const NewTab = () => {
     const currentPath = location.pathname.split("/")[1];
     const spaceId = currentPath !== "" ? currentPath : "global";
     const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
-    console.log("sharedWindowId", parsedSharedWindowId);
     if (currentUserId) {
       const tabOrderDocRef = doc(
         db,
@@ -199,8 +198,6 @@ const NewTab = () => {
       ) {
         setTabs((t) => {
           const updatedTabs: Tab[] = [...t];
-          console.log("updatedTabs", updatedTabs);
-
           const existingTab: Tab | undefined = updatedTabs.find(
             (tab) => tab.tabId === message.updatedTab.tabId,
           );
@@ -209,27 +206,21 @@ const NewTab = () => {
           } else {
             updatedTabs.push(message.updatedTab);
           }
-          console.log("updatedTabsupdatedTabs", updatedTabs);
           return updatedTabs;
         });
         setTabOrder((o) => {
-          console.log("原有的tabOrder", o);
           if (message.updatedTab.tabId === undefined) return o;
           const updatedOrder = [...o];
           const existingIndex = updatedOrder.findIndex(
             (id) => id === message.updatedTab.tabId,
           );
-          console.log("exist!!!", existingIndex);
           if (existingIndex !== -1) {
             return updatedOrder;
           }
           updatedOrder.push(message.updatedTab.tabId);
-
-          console.log("更新後的tabOrder", updatedOrder);
           return updatedOrder;
         });
         sendResponse({ success: true });
-        console.log("tabupdated");
       }
       return true;
     };

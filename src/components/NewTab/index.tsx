@@ -65,7 +65,7 @@ const NewTab = () => {
   useEffect(() => {
     setIsLoading(true);
     const currentPath = location.pathname.split("/")[1];
-    if (currentPath.startsWith("webtime")) return setIsLoading(false);
+    if (currentPath.includes("webtime")) return setIsLoading(false);
     if (currentUserId && currentWindowId) {
       const tabsCollectionRef = collection(db, "users", currentUserId, "tabs");
       const spacesCollectionRef = collection(
@@ -150,6 +150,7 @@ const NewTab = () => {
     const currentPath = location.pathname.split("/")[1];
     const spaceId = currentPath !== "" ? currentPath : "global";
     const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
+    if (currentPath.includes("webtime")) return setIsLoading(false);
     if (currentUserId) {
       const tabOrderDocRef = doc(
         db,

@@ -28,7 +28,7 @@ const TrackTime = () => {
   const [urlDurations, setUrlDurations] = useState<UrlDuration[]>([]);
   const [showTable, setShowTable] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isAcending, setIsAcending] = useState<boolean>(true);
+  const [isAscending, setIsAscending] = useState<boolean>(true);
   const { date } = useParams<{ date: string }>();
   const { currentUserId: userId } = useLogin();
 
@@ -71,10 +71,10 @@ const TrackTime = () => {
   }
 
   function toggleDurationsOrder() {
-    setIsAcending(!isAcending);
+    setIsAscending(!isAscending);
     const sortedDurations = [...urlDurations];
     sortedDurations.sort((a, b) => {
-      if (isAcending) {
+      if (isAscending) {
         return b.durationBySecond - a.durationBySecond;
       }
       return a.durationBySecond - b.durationBySecond;
@@ -94,9 +94,13 @@ const TrackTime = () => {
     setShowTable(!showTable);
   }
 
+  function resetDurationOrder() {
+    setIsAscending(true);
+  }
+
   return (
     <>
-      <Header />
+      <Header onResetOrder={resetDurationOrder} />
       {urlDurations.length > 0 && (
         <div className="relative min-h-screen max-w-full rounded-lg border bg-slate-100 p-8 shadow-md">
           <div className="mb-3 grid auto-cols-min grid-flow-col grid-cols-4 text-lg">
@@ -113,7 +117,7 @@ const TrackTime = () => {
                 {label.includes("Duration") && (
                   <ToggleOrderBtn
                     onToggleOrder={toggleDurationsOrder}
-                    isAscending={isAcending}
+                    isAscending={isAscending}
                   />
                 )}
               </div>

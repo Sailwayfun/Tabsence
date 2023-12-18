@@ -11,7 +11,7 @@ const ToggleOrder = ({ className, direction }: Iconprops) => {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={`${className} ${direction === "ascend" ? "rotate-180" : ""}`}
+      className={`${className} ${direction === "ascend" ? "" : "rotate-180"}`}
     >
       <path
         strokeLinecap="round"

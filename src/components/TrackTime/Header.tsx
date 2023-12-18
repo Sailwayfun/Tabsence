@@ -8,7 +8,11 @@ import {
   getNextDate,
 } from "../../utils/trackTime";
 
-const Header = () => {
+interface HeaderProps {
+  onResetOrder: () => void;
+}
+
+const Header = ({ onResetOrder }: HeaderProps) => {
   const { date } = useParams<{ date: string }>();
   const today = getCurrentDate();
   return (
@@ -16,14 +20,18 @@ const Header = () => {
       <h1 className="text-3xl font-bold">Your Time Spent on Websites</h1>
       <div className="flex items-center justify-center gap-2">
         {date && date !== today && (
-          <Link to={today} className="contents w-full">
+          <Link to={today} className="contents w-full" onClick={onResetOrder}>
             <button className="mr-8 h-8 w-32 rounded-md bg-orange-700 bg-opacity-70 px-3 text-lg text-white shadow hover:bg-orange-900">
               View Today
             </button>
           </Link>
         )}
         {date && (
-          <Link to={getPrevDate(date)} className="contents w-full">
+          <Link
+            to={getPrevDate(date)}
+            className="contents w-full"
+            onClick={onResetOrder}
+          >
             <button
               className="h-8 w-8 cursor-pointer text-4xl"
               onClick={() => getPrevDate(date)}
@@ -34,7 +42,11 @@ const Header = () => {
         )}
         <p className="grow text-3xl">{date}</p>
         {date && date !== today && (
-          <Link to={getNextDate(date)} className="contents w-full">
+          <Link
+            to={getNextDate(date)}
+            className="contents w-full"
+            onClick={onResetOrder}
+          >
             <button
               className="h-8 w-8 cursor-pointer text-4xl"
               onClick={() => getNextDate(date)}

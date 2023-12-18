@@ -13,6 +13,7 @@ import { useParams } from "react-router-dom";
 import Header from "./Header";
 import Loader from "../UI/Loader";
 import useLogin from "../../hooks/useLogin";
+import ToggleOrderBtn from "./ToggleOrderBtn";
 
 export interface UrlDuration {
   id: string;
@@ -27,6 +28,7 @@ const TrackTime = () => {
   const [urlDurations, setUrlDurations] = useState<UrlDuration[]>([]);
   const [showTable, setShowTable] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isAcending, setIsAcending] = useState<boolean>(true);
   const { date } = useParams<{ date: string }>();
   const { currentUserId: userId } = useLogin();
 
@@ -68,6 +70,19 @@ const TrackTime = () => {
     return urlDurations.reduce((acc, cur) => acc + cur.durationBySecond, 0);
   }
 
+  function toggleDurationsOrder() {
+    setIsAcending(!isAcending);
+    const sortedDurations = [...urlDurations];
+    sortedDurations.sort((a, b) => {
+      if (isAcending) {
+        return b.durationBySecond - a.durationBySecond;
+      }
+      return a.durationBySecond - b.durationBySecond;
+    });
+    setUrlDurations(sortedDurations);
+    return setIsLoading(false);
+  }
+
   const labelFields = [
     "Domain Name",
     "Duration (sec)",
@@ -86,14 +101,22 @@ const TrackTime = () => {
         <div className="relative min-h-screen max-w-full rounded-lg border bg-slate-100 p-8 shadow-md">
           <div className="mb-3 grid auto-cols-min grid-flow-col grid-cols-4 text-lg">
             {labelFields.map((label, index) => (
-              <label
-                key={index}
-                className={`"transform ease-in-out" + ${
-                  showTable ? "mx-auto my-0" : "absolute -translate-y-[999px]"
-                } transition duration-300`}
-              >
-                {label}
-              </label>
+              <div className="flex">
+                <label
+                  key={index}
+                  className={`"transform ease-in-out" + ${
+                    showTable ? "mx-auto my-0" : "absolute -translate-y-[999px]"
+                  } transition duration-300`}
+                >
+                  {label}
+                </label>
+                {label.includes("Duration") && (
+                  <ToggleOrderBtn
+                    onToggleOrder={toggleDurationsOrder}
+                    isAscending={isAcending}
+                  />
+                )}
+              </div>
             ))}
             <button
               className="absolute right-2 top-7 ml-4 h-6 w-6 text-2xl"
@@ -149,7 +172,7 @@ const TrackTime = () => {
           <Chart durationData={urlDurations} />
         </div>
       )}
-      {isLoading && (
+      {isLoading && urlDurations.length === 0 && (
         <Loader text="Loading Data..." animateClass="animate-spin" />
       )}
       {!isLoading && urlDurations.length === 0 && (

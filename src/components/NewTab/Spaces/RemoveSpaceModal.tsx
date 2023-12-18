@@ -6,6 +6,12 @@ interface RemoveSpaceModalProps {
 
 import { useRef } from "react";
 
+function closeDialog(dialogRef: HTMLDialogElement | null) {
+  if (dialogRef) {
+    dialogRef.close();
+  }
+}
+
 const RemoveSpaceModal = ({ id, onRemoveSpace }: RemoveSpaceModalProps) => {
   const modalRef = useRef<HTMLDialogElement>(null);
   return (
@@ -17,13 +23,18 @@ const RemoveSpaceModal = ({ id, onRemoveSpace }: RemoveSpaceModalProps) => {
           onClick={(e) => {
             e.preventDefault();
             onRemoveSpace(id);
-            modalRef.current?.close();
+            closeDialog(modalRef.current);
           }}
           className="rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900"
         >
           Remove Space
         </button>
-        <button className="rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900">
+        <button
+          className="rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900"
+          onClick={() => {
+            closeDialog(modalRef.current);
+          }}
+        >
           Cancel
         </button>
       </div>

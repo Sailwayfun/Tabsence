@@ -15,6 +15,11 @@ const ToggleArchiveModal = ({
   btnText,
 }: ToggleArchiveModalProps) => {
   const modalRef = useRef<HTMLDialogElement>(null);
+  function closeDialog(dialog: HTMLDialogElement | null) {
+    if (dialog) {
+      dialog.close();
+    }
+  }
   return (
     <Modal id={`archive_space_${id}`} ref={modalRef}>
       <h3 className="text-xl font-bold">{text}</h3>
@@ -24,13 +29,16 @@ const ToggleArchiveModal = ({
           onClick={(e) => {
             e.preventDefault();
             onAction(id);
-            modalRef.current?.close();
+            closeDialog(modalRef.current);
           }}
           className="grow rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900"
         >
           {`${btnText} Space`}
         </button>
-        <button className="grow rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900">
+        <button
+          onClick={() => closeDialog(modalRef.current)}
+          className="grow rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900"
+        >
           Cancel
         </button>
       </div>

@@ -38,6 +38,7 @@ const NewTab = () => {
   const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
+  const [isAddingSpace, setIsAddingSpace] = useState<boolean>(false);
   const archivedSpaces: string[] = useArchivedSpaceStore(
     (state) => state.archivedSpaces,
   );
@@ -301,6 +302,8 @@ const NewTab = () => {
   }
 
   function addNewSpace() {
+    if (isAddingSpace) return;
+    setIsAddingSpace(true);
     const newSpaceTitle: string | undefined =
       newSpaceInputRef.current?.value.trim();
     const errorToastId: string | null = validateSpaceTitle(
@@ -310,7 +313,7 @@ const NewTab = () => {
     );
     if (errorToastId) {
       if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
-      return;
+      return setIsAddingSpace(false);
     }
     chrome.runtime.sendMessage(
       { action: "addSpace", newSpaceTitle, userId: currentUserId },
@@ -320,7 +323,7 @@ const NewTab = () => {
             ...s,
             { title: newSpaceTitle, isEditing: false, id: response.id },
           ]);
-          return;
+          return setIsAddingSpace(false);
         }
       },
     );

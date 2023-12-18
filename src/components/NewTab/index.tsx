@@ -62,6 +62,7 @@ const NewTab = () => {
     }
     setTabs((t) => hideArchivedSpacesTabs(t, archivedSpaces));
   }, [archivedSpaces]);
+  
   useEffect(() => {
     setIsLoading(true);
     const currentPath = location.pathname.split("/")[1];
@@ -324,8 +325,8 @@ const NewTab = () => {
             ...s,
             { title: newSpaceTitle, isEditing: false, id: response.id },
           ]);
-          return setIsAddingSpace(false);
         }
+        setIsAddingSpace(false);
       },
     );
     if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";

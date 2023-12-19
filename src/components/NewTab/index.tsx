@@ -45,7 +45,7 @@ const NewTab = () => {
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   const currentWindowId = useWindowId();
   const { windowId: sharedWindowId } = useParams<{ windowId: string }>();
-  console.log("spaces", spaces);
+  
   useEffect(() => {
     setTabOrder([]);
   }, [location.pathname]);

@@ -442,8 +442,8 @@ const NewTab = () => {
   ) {
     const newSpaces = spaces.map((space) => {
       if (space.id === id) {
-        if (e.target.value.length > 10) {
-          toast.error("test", {
+        if (e.target.value.length === 11) {
+          toast.error("Space name should be less than 10 characters", {
             className: "w-[400px] text-lg rounded-md shadow",
           });
           return space;

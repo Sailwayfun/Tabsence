@@ -33,7 +33,6 @@ const NewTab = () => {
     string | undefined
   >();
   const [selectedSpace, setSelectedSpace] = useState<string>("");
-  const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const { isLoggedin, currentUserId } = useLogin();
   const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -44,8 +43,11 @@ const NewTab = () => {
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   const currentWindowId = useWindowId();
-  const { windowId: sharedWindowId } = useParams<{ windowId: string }>();
-  
+  const { windowId: sharedWindowId, spaceId: currentSpaceId } = useParams<{
+    windowId: string;
+    spaceId: string;
+  }>();
+
   useEffect(() => {
     setTabOrder([]);
   }, [location.pathname]);
@@ -126,11 +128,6 @@ const NewTab = () => {
         });
         setSpaces(currentSpaces);
         setIsLoading(false);
-        const currentActiveId = currentSpaces.find(
-          (space) => space.id === currentPath,
-        )?.id;
-        if (currentPath === "") setActiveSpaceId("");
-        if (currentActiveId) setActiveSpaceId(currentActiveId);
       });
       return () => {
         unsubscribeTab();
@@ -350,7 +347,7 @@ const NewTab = () => {
     newTabs.splice(movedTabIndex, 1);
     newTabs.splice(movedTabIndex + (direction === "up" ? -1 : 1), 0, movedTab);
     setTabs(newTabs);
-    await onTabOrderChange(newTabs, activeSpaceId);
+    await onTabOrderChange(newTabs, currentSpaceId);
   }
 
   function onTabOrderChange(
@@ -532,7 +529,7 @@ const NewTab = () => {
             onOpenAddSpacePopup={openAddSpacePopup}
             ref={newSpaceInputRef}
             onAddNewSpace={addNewSpace}
-            currentSpaceId={activeSpaceId}
+            currentSpaceId={currentSpaceId}
             onRemoveSpace={handleRemoveSpace}
             onSpaceEditBlur={handleSpaceEditBlur}
             onSpaceTitleChange={handleSpaceTitleChange}

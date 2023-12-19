@@ -10,7 +10,7 @@ const Header = ({ isWebtimePage }: HeaderProps) => {
   return (
     <div
       className={`navbar top-0 flex ${
-        isWebtimePage ? "justify-between pl-0 pt-0" : "sticky justify-end"
+        isWebtimePage ? "justify-between pl-0 pt-0" : "fixed justify-end"
       } bg-base-200`}
     >
       {isWebtimePage && <Logo isWebtimePage={isWebtimePage} />}

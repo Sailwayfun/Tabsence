@@ -515,8 +515,12 @@ const NewTab = () => {
             isWebtimePage={isWebTime}
           />
         )}
-        <div className={`flex ${isWebTime ? "w-full" : "w-5/6"} flex-col`}>
-          <div className="flex items-center gap-8 pb-4">
+        <div
+          className={`flex ${
+            isWebTime ? "w-full" : "w-5/6"
+          } relative z-10 flex-col`}
+        >
+          <div className="flex items-center gap-8 pb-4 pt-[72px]">
             {!location.pathname.includes("/webtime") && (
               <>
                 <h1 className="text-3xl font-bold">Your Tabs</h1>

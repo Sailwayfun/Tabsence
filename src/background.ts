@@ -115,6 +115,7 @@ chrome.runtime.onMessage.addListener(
       })
         .then(() => {
           sendResponse({ id: spaceId });
+          console.log("firestore Space added");
         })
         .catch((error) => {
           console.error("Error adding space: ", error);

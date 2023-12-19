@@ -105,11 +105,10 @@ const TrackTime = () => {
         <div className="relative min-h-screen max-w-full rounded-lg border bg-slate-100 p-8 shadow-md">
           <div className="mb-3 grid auto-cols-min grid-flow-col grid-cols-4 text-lg">
             {labelFields.map((label, index) => (
-              <div className="flex">
+              <div className="flex justify-center gap-4" key={index}>
                 <label
-                  key={index}
                   className={`"transform ease-in-out" + ${
-                    showTable ? "mx-auto my-0" : "absolute -translate-y-[999px]"
+                    showTable ? "my-0" : "absolute -translate-y-[999px]"
                   } transition duration-300`}
                 >
                   {label}

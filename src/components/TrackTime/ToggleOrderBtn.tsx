@@ -10,7 +10,7 @@ const ToggleOrderBtn = ({
 }: ToggleOrderBtnProps) => {
   return (
     <div
-      className="tooltip"
+      className="tooltip flex items-center justify-center"
       data-tip={isAscending ? "descending" : "ascending"}
     >
       <button onClick={onToggleOrder}>

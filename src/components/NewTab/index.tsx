@@ -251,14 +251,12 @@ const NewTab = () => {
         userId: currentUserId,
       };
       chrome.runtime.sendMessage(message, function (response) {
-        const oldTabs = tabs.filter((tab) => tab.tabId !== parseInt(id));
         if (!response.sucess) {
           toast.success("Tab Deleted", {
             className: "w-52 text-lg rounded-md shadow",
             id: "tab_deleted",
           });
         }
-        setTabs(oldTabs);
         return true;
       });
     }
@@ -282,15 +280,11 @@ const NewTab = () => {
       userId: currentUserId,
     };
     chrome.runtime.sendMessage(message, function (response) {
-      const newTabs = tabs.filter(
-        (tab) => tab.tabId?.toString() !== activeSpaceSelectId,
-      );
       if (response) {
         toast.success("Tab moved to space", {
           className: "w-60 text-lg rounded-md shadow",
           duration: 2000,
         });
-        setTabs(newTabs);
       }
     });
   }
@@ -318,7 +312,10 @@ const NewTab = () => {
       { action: "addSpace", newSpaceTitle, userId: currentUserId },
       function (response) {
         if (response && newSpaceTitle) {
-          console.log("frontend space added", response.id);
+          toast.success("Space added", {
+            className: "w-52 text-lg rounded-md shadow",
+            duration: 2000,
+          });
         }
       },
     );

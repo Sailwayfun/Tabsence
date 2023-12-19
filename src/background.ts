@@ -110,17 +110,15 @@ chrome.runtime.onMessage.addListener(
         createdAt: serverTimestamp(),
         isArchived: false,
       };
-      await setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
-        merge: true,
-      })
-        .then(() => {
-          sendResponse({ id: spaceId });
-          console.log("firestore Space added");
-        })
-        .catch((error) => {
-          console.error("Error adding space: ", error);
-          sendResponse(null);
+      try {
+        await setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
+          merge: true,
         });
+        sendResponse({ id: spaceId });
+      } catch (error) {
+        console.error("Error adding space: ", error);
+        sendResponse(null);
+      }
       return true;
     }
     return true;

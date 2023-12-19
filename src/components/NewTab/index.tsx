@@ -250,13 +250,11 @@ const NewTab = () => {
         tabId: parseInt(id),
         userId: currentUserId,
       };
-      chrome.runtime.sendMessage(message, function (response) {
-        if (!response.sucess) {
-          toast.success("Tab Deleted", {
-            className: "w-52 text-lg rounded-md shadow",
-            id: "tab_deleted",
-          });
-        }
+      chrome.runtime.sendMessage(message, function () {
+        toast.success("Tab Deleted", {
+          className: "w-52 text-lg rounded-md shadow",
+          id: "tab_deleted",
+        });
         return true;
       });
     }

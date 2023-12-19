@@ -162,14 +162,15 @@ const TrackTime = () => {
               ))}
             </ul>
             <div
-              className={`transform transition duration-300 ease-in-out ${
+              className={`grid transform grid-cols-4 transition duration-300 ease-in-out ${
                 showTable
                   ? "mx-auto my-3 translate-y-0 border-t-2 border-gray-200 pt-3 text-xl"
                   : "absolute -translate-y-[999px]"
               }`}
             >
-              <span className="pl-80 pr-2 tracking-wide">Total Duration:</span>
-              <span>{getTotalDuration()} s</span>
+              <span className="col-start-2 flex justify-center pr-2 tracking-wide">
+                {`Total Duration: ${getTotalDuration()} s`}
+              </span>
             </div>
           </div>
           <Chart durationData={urlDurations} />

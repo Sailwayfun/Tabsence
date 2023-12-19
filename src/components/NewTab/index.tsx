@@ -207,18 +207,6 @@ const NewTab = () => {
           }
           return updatedTabs;
         });
-        setTabOrder((o) => {
-          if (message.updatedTab.tabId === undefined) return o;
-          const updatedOrder = [...o];
-          const existingIndex = updatedOrder.findIndex(
-            (id) => id === message.updatedTab.tabId,
-          );
-          if (existingIndex !== -1) {
-            return updatedOrder;
-          }
-          updatedOrder.push(message.updatedTab.tabId);
-          return updatedOrder;
-        });
         sendResponse({ success: true });
       }
       return true;

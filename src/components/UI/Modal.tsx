@@ -1,4 +1,5 @@
 import { forwardRef } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalProps {
   id: string;
@@ -15,7 +16,7 @@ const Modal = forwardRef<ModalRef, ModalProps>(
         onClose();
       }
     }
-    return (
+    return createPortal(
       <dialog id={id} className="modal text-black" ref={ref}>
         <div className="modal-box relative rounded-md">
           <form method="dialog" className="modal-backdrop">
@@ -31,7 +32,8 @@ const Modal = forwardRef<ModalRef, ModalProps>(
         <form method="dialog" className="modal-backdrop">
           <button></button>
         </form>
-      </dialog>
+      </dialog>,
+      document.body,
     );
   },
 );

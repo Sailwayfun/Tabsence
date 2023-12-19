@@ -10,10 +10,6 @@ interface TabsProps {
   selectedSpace: string;
   isLoggedin: boolean;
   isGrid: boolean;
-  openLink: (
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    tab: Tab,
-  ) => void;
   openSpacesPopup: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   selectSpace: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   closeTab: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -30,7 +26,6 @@ const Tabs = ({
   activeSpaceSelectId,
   selectedSpace,
   isLoggedin,
-  openLink,
   openSpacesPopup,
   selectSpace,
   closeTab,
@@ -53,7 +48,6 @@ const Tabs = ({
               tab={tab}
               spaces={spaces}
               selectId={activeSpaceSelectId}
-              onOpenLink={openLink}
               onOpenSpacesPopup={openSpacesPopup}
               onSelectSpace={selectSpace}
               onCloseTab={closeTab}

@@ -12,10 +12,6 @@ interface TabProps {
   tab: Tab;
   spaces: Space[];
   selectId: string | undefined;
-  onOpenLink: (
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    tab: Tab,
-  ) => void;
   onOpenSpacesPopup: (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => void;
@@ -34,7 +30,6 @@ const TabCard = memo(function TabCard({
   tab,
   spaces,
   selectId,
-  onOpenLink,
   onOpenSpacesPopup,
   onSelectSpace,
   onCloseTab,
@@ -48,6 +43,17 @@ const TabCard = memo(function TabCard({
   const [showIcons, setShowIcons] = useState(false);
   const iconsRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
+
+  function openLink(
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+    tab: Tab,
+  ) {
+    e.preventDefault();
+    if (!tab.url) return;
+    const newTabUrl = tab.url;
+    chrome.tabs.create({ url: newTabUrl });
+  }
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -87,7 +93,7 @@ const TabCard = memo(function TabCard({
         } border bg-white shadow`}
       />
       <a
-        onClick={(e) => onOpenLink(e, tab)}
+        onClick={(e) => openLink(e, tab)}
         className={`${
           isGrid ? "mt-0" : "mt-4"
         } line-clamp-1 max-w-full cursor-pointer flex-wrap hover:text-gray-500 hover:underline xl:mb-0 xl:mt-0`}

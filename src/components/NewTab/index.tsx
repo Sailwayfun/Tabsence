@@ -217,16 +217,6 @@ const NewTab = () => {
     };
   }, [currentWindowId, sharedWindowId]);
 
-  function openLink(
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    tab: Tab,
-  ) {
-    e.preventDefault();
-    if (!tab.url) return;
-    const newTabUrl = tab.url;
-    chrome.tabs.create({ url: newTabUrl });
-  }
-
   function closeTab(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     const id = e.currentTarget.dataset.id;
     if (id) {
@@ -554,7 +544,6 @@ const NewTab = () => {
               activeSpaceSelectId={activeSpaceSelectId}
               selectedSpace={selectedSpace}
               isLoggedin={isLoggedin}
-              openLink={openLink}
               openSpacesPopup={openSpacesPopup}
               selectSpace={selectSpace}
               closeTab={closeTab}

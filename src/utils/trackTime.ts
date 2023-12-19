@@ -10,6 +10,8 @@ import { getFaviconUrl } from "./firestore";
 
 import debounce from "lodash.debounce";
 
+import { subDays, addDays, format } from "date-fns";
+
 import { db } from "../../firebase-config";
 
 async function getUserId(): Promise<string | undefined> {
@@ -18,7 +20,8 @@ async function getUserId(): Promise<string | undefined> {
 
 export function getCurrentDate(): string {
   const today = new Date();
-  return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+  const formattedToday = format(today, "yyyy-MM-dd");
+  return formattedToday;
 }
 
 interface TabInfo {
@@ -127,18 +130,14 @@ function getDebouncedWrite(userId: string, domain: string): DebouncedFunction {
   return debouncedWrites[domain];
 }
 
-function setViewDate(date: string, days: number): string {
-  const today = new Date(date);
-  const newDate = new Date(today.setDate(today.getDate() + days));
-  return `${newDate.getFullYear()}-${
-    newDate.getMonth() + 1
-  }-${newDate.getDate()}`;
-}
-
 export function getPrevDate(date: string): string {
-  return setViewDate(date, -1);
+  const today = new Date(date);
+  const yesterday = subDays(today, 1);
+  return format(yesterday, "yyyy-MM-dd");
 }
 
 export function getNextDate(date: string): string {
-  return setViewDate(date, 1);
+  const today = new Date(date);
+  const tomorrow = addDays(today, 1);
+  return format(tomorrow, "yyyy-MM-dd");
 }

@@ -29,7 +29,7 @@ const Modal = forwardRef<ModalRef, ModalProps>(
           </form>
           {children}
         </div>
-        <form method="dialog" className="modal-backdrop">
+        <form method="dialog" className="modal-backdrop" onClick={handleClose}>
           <button></button>
         </form>
       </dialog>,

@@ -1,5 +1,5 @@
 import { Space } from "../../../types/space";
-import { memo, useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Tab } from "../../../types/tab";
 import MoveToSpace from "./MoveToSpace";
 import CloseBtn from "./CloseBtn";
@@ -26,7 +26,7 @@ interface TabProps {
   zIndex?: number;
 }
 
-const TabCard = memo(function TabCard({
+const TabCard = ({
   tab,
   spaces,
   selectId,
@@ -39,7 +39,7 @@ const TabCard = memo(function TabCard({
   isFirstTab,
   isLastTab,
   isGrid,
-}: TabProps) {
+}: TabProps) => {
   const [showIcons, setShowIcons] = useState(false);
   const iconsRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -183,6 +183,6 @@ const TabCard = memo(function TabCard({
       )}
     </li>
   );
-});
+};
 
 export default TabCard;

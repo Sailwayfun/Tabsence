@@ -1,4 +1,5 @@
 import { forwardRef } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalProps {
   id: string;
@@ -15,20 +16,24 @@ const Modal = forwardRef<ModalRef, ModalProps>(
         onClose();
       }
     }
-    return (
+    return createPortal(
       <dialog id={id} className="modal text-black" ref={ref}>
         <div className="modal-box relative rounded-md">
-          <form method="dialog">
+          <form method="dialog" className="modal-backdrop">
             <button
               onClick={handleClose}
               className="btn btn-ghost btn-sm absolute right-0 top-0 rounded-none bg-red-500 text-white"
             >
               ✕
             </button>
-            {children}
           </form>
+          {children}
         </div>
-      </dialog>
+        <form method="dialog" className="modal-backdrop" onClick={handleClose}>
+          <button></button>
+        </form>
+      </dialog>,
+      document.body,
     );
   },
 );

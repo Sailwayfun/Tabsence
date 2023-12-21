@@ -13,16 +13,18 @@ const ToggleArchiveBtn = ({
   isArchived,
 }: ToggleArchiveBtnProps) => {
   return (
-    <button
-      className="hidden group-hover/space-tab:block"
-      onClick={() => onOpenModal(id, action)}
-    >
-      {!isArchived ? (
-        <Archive className="h-6 w-6 stroke-white" />
-      ) : (
-        <Restore className="h-6 w-6 fill-white" />
-      )}
-    </button>
+    <div className="tooltip" data-tip={`${isArchived ? "Restore" : "Archive"}`}>
+      <button
+        className="hidden group-hover/space-tab:block"
+        onClick={() => onOpenModal(id, action)}
+      >
+        {!isArchived ? (
+          <Archive className="h-6 w-6 stroke-white" />
+        ) : (
+          <Restore className="h-6 w-6 fill-white" />
+        )}
+      </button>
+    </div>
   );
 };
 

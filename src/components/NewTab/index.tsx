@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { useSpaceStore } from "../../store";
-import { useLocation, Outlet } from "react-router-dom";
+import { useArchivedSpaceStore } from "../../store";
+import { useLocation, Outlet, useParams } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import Spaces from "./Spaces";
 import Header from "./Header";
@@ -22,6 +22,7 @@ import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";
 import { Tab } from "../../types/tab";
 import { Space, SpaceDoc } from "../../types/space";
+import Loader from "../UI/Loader";
 interface Response {
   success: boolean;
 }
@@ -32,16 +33,24 @@ const NewTab = () => {
     string | undefined
   >();
   const [selectedSpace, setSelectedSpace] = useState<string>("");
-  const [activeSpaceId, setActiveSpaceId] = useState<string>("");
   const { isLoggedin, currentUserId } = useLogin();
   const [tabOrder, setTabOrder] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
-  const archivedSpaces: string[] = useSpaceStore(
+  const archivedSpaces: string[] = useArchivedSpaceStore(
     (state) => state.archivedSpaces,
   );
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   const currentWindowId = useWindowId();
+  const { windowId: sharedWindowId, spaceId: currentSpaceId } = useParams<{
+    windowId: string;
+    spaceId: string;
+  }>();
+
+  useEffect(() => {
+    setTabOrder([]);
+  }, [location.pathname]);
 
   useEffect(() => {
     function hideArchivedSpacesTabs(
@@ -54,9 +63,11 @@ const NewTab = () => {
     }
     setTabs((t) => hideArchivedSpacesTabs(t, archivedSpaces));
   }, [archivedSpaces]);
+
   useEffect(() => {
+    setIsLoading(true);
     const currentPath = location.pathname.split("/")[1];
-    if (currentPath === "webtime") return;
+    if (currentPath.includes("webtime")) return setIsLoading(false);
     if (currentUserId && currentWindowId) {
       const tabsCollectionRef = collection(db, "users", currentUserId, "tabs");
       const spacesCollectionRef = collection(
@@ -69,10 +80,19 @@ const NewTab = () => {
         currentPath !== ""
           ? query(
               tabsCollectionRef,
-              where("windowId", "==", currentWindowId),
+              where("windowId", "in", [
+                currentWindowId,
+                sharedWindowId ? parseInt(sharedWindowId) : "",
+              ]),
               where("spaceId", "==", currentPath),
             )
-          : query(tabsCollectionRef, where("windowId", "==", currentWindowId));
+          : query(
+              tabsCollectionRef,
+              where("windowId", "in", [
+                currentWindowId,
+                sharedWindowId ? parseInt(sharedWindowId) : "",
+              ]),
+            );
       const unsubscribeTab = onSnapshot(tabQ, (querySnapshot) => {
         const currentTabs: Tab[] = [];
         if (currentPath !== "") {
@@ -83,6 +103,7 @@ const NewTab = () => {
           const sortedTabs = sortTabs(currentTabs, tabOrder);
           console.log("sortedTabs", sortedTabs);
           setTabs(sortedTabs);
+          setIsLoading(false);
           console.log("tabs on snapshot updated");
           return;
         }
@@ -94,6 +115,7 @@ const NewTab = () => {
         const sortedTabs = sortTabs(currentTabs, tabOrder);
         console.log("sortedTabs", sortedTabs, "tabOrder", tabOrder);
         setTabs(sortedTabs);
+        setIsLoading(false);
         console.log("tabs on snapshot updated");
         return;
       });
@@ -105,22 +127,27 @@ const NewTab = () => {
           currentSpaces.push({ id: doc.id, isEditing: false, ...space });
         });
         setSpaces(currentSpaces);
-        const currentActiveId = currentSpaces.find(
-          (space) => space.id === currentPath,
-        )?.id;
-        if (currentPath === "") setActiveSpaceId("");
-        if (currentActiveId) setActiveSpaceId(currentActiveId);
+        setIsLoading(false);
       });
       return () => {
         unsubscribeTab();
         unsubscribeSpace();
       };
     }
-  }, [location.pathname, currentUserId, currentWindowId, tabOrder]);
+  }, [
+    location.pathname,
+    currentUserId,
+    currentWindowId,
+    sharedWindowId,
+    tabOrder,
+  ]);
 
   useEffect(() => {
+    setIsLoading(true);
     const currentPath = location.pathname.split("/")[1];
     const spaceId = currentPath !== "" ? currentPath : "global";
+    const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
+    if (currentPath.includes("webtime")) return setIsLoading(false);
     if (currentUserId) {
       const tabOrderDocRef = doc(
         db,
@@ -130,22 +157,26 @@ const NewTab = () => {
         spaceId,
       );
       const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
-        // console.log("看看snapshot有沒有更新", doc.data());
-        // console.log("看看doc.data()?.windowId", doc.data()?.windowId);
-        // console.log("看看currentWindowId", currentWindowId);
-        if (doc.exists() && doc.data()?.windowId === currentWindowId) {
+        console.log("有sharedWindowId", parsedSharedWindowId);
+        console.log("有doc的windowId", doc.data()?.windowId);
+        if (
+          doc.exists() &&
+          (doc.data()?.windowId === currentWindowId ||
+            doc.data()?.windowId === parsedSharedWindowId)
+        ) {
           const order: number[] = doc.data()?.tabOrder;
-          // console.log("order拿回來是", order);
           if (order) setTabOrder(order);
+          setIsLoading(false);
         }
       });
       return () => {
         unsubscribeTabOrder();
       };
     }
-  }, [currentUserId, location.pathname, currentWindowId]);
+  }, [currentUserId, location.pathname, currentWindowId, sharedWindowId]);
 
   useEffect(() => {
+    const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
     const handleMessagePassing = (
       message: {
         action: string;
@@ -161,12 +192,11 @@ const NewTab = () => {
       }
       if (
         message.action === "tabUpdated" &&
-        message.updatedTab.windowId === currentWindowId
+        (message.updatedTab.windowId === currentWindowId ||
+          message.updatedTab.windowId === parsedSharedWindowId)
       ) {
         setTabs((t) => {
           const updatedTabs: Tab[] = [...t];
-          console.log("updatedTabs", updatedTabs);
-
           const existingTab: Tab | undefined = updatedTabs.find(
             (tab) => tab.tabId === message.updatedTab.tabId,
           );
@@ -175,28 +205,9 @@ const NewTab = () => {
           } else {
             updatedTabs.push(message.updatedTab);
           }
-          console.log("updatedTabsupdatedTabs", updatedTabs);
           return updatedTabs;
         });
-        setTabOrder((o) => {
-          console.log("原有的tabOrder", o);
-          if (message.updatedTab.tabId === undefined) return o;
-          const updatedOrder = [...o];
-          const existingIndex = updatedOrder.findIndex(
-            (id) => id === message.updatedTab.tabId,
-          );
-          console.log("exist!!!", existingIndex);
-          if (existingIndex !== -1) {
-            // updatedOrder.splice(existingIndex, 1);
-            return updatedOrder;
-          }
-          updatedOrder.push(message.updatedTab.tabId);
-
-          console.log("更新後的tabOrder", updatedOrder);
-          return updatedOrder;
-        });
         sendResponse({ success: true });
-        console.log("tabupdated");
       }
       return true;
     };
@@ -204,17 +215,7 @@ const NewTab = () => {
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessagePassing);
     };
-  }, [currentWindowId]);
-
-  function openLink(
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    tab: Tab,
-  ) {
-    e.preventDefault();
-    if (!tab.url) return;
-    const newTabUrl = tab.url;
-    chrome.tabs.create({ url: newTabUrl });
-  }
+  }, [currentWindowId, sharedWindowId]);
 
   function closeTab(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     const id = e.currentTarget.dataset.id;
@@ -224,15 +225,11 @@ const NewTab = () => {
         tabId: parseInt(id),
         userId: currentUserId,
       };
-      chrome.runtime.sendMessage(message, function (response) {
-        const oldTabs = tabs.filter((tab) => tab.tabId !== parseInt(id));
-        if (!response.sucess) {
-          toast.success("Tab Deleted", {
-            className: "w-52 text-lg rounded-md shadow",
-            id: "tab_deleted",
-          });
-        }
-        setTabs(oldTabs);
+      chrome.runtime.sendMessage(message, function () {
+        toast.success("Tab Deleted", {
+          className: "w-52 text-lg rounded-md shadow",
+          id: "tab_deleted",
+        });
         return true;
       });
     }
@@ -256,10 +253,12 @@ const NewTab = () => {
       userId: currentUserId,
     };
     chrome.runtime.sendMessage(message, function (response) {
-      const newTabs = tabs.filter(
-        (tab) => tab.tabId?.toString() !== activeSpaceSelectId,
-      );
-      if (response) setTabs(newTabs);
+      if (response) {
+        toast.success("Tab moved to space", {
+          className: "w-60 text-lg rounded-md shadow",
+          duration: 2000,
+        });
+      }
     });
   }
 
@@ -275,7 +274,7 @@ const NewTab = () => {
       newSpaceInputRef.current?.value.trim();
     const errorToastId: string | null = validateSpaceTitle(
       spaces,
-      "create",
+      undefined,
       newSpaceTitle,
     );
     if (errorToastId) {
@@ -286,11 +285,10 @@ const NewTab = () => {
       { action: "addSpace", newSpaceTitle, userId: currentUserId },
       function (response) {
         if (response && newSpaceTitle) {
-          setSpaces((s) => [
-            ...s,
-            { title: newSpaceTitle, isEditing: false, id: response.id },
-          ]);
-          return;
+          toast.success("Space added", {
+            className: "w-52 text-lg rounded-md shadow",
+            duration: 2000,
+          });
         }
       },
     );
@@ -327,7 +325,7 @@ const NewTab = () => {
     newTabs.splice(movedTabIndex, 1);
     newTabs.splice(movedTabIndex + (direction === "up" ? -1 : 1), 0, movedTab);
     setTabs(newTabs);
-    await onTabOrderChange(newTabs, activeSpaceId);
+    await onTabOrderChange(newTabs, currentSpaceId);
   }
 
   function onTabOrderChange(
@@ -335,13 +333,16 @@ const NewTab = () => {
     spaceId: string | undefined,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
+      const parsedSharedWindowId = sharedWindowId
+        ? parseInt(sharedWindowId)
+        : "";
       chrome.runtime.sendMessage(
         {
           action: "updateTabOrder",
           newTabs,
           spaceId,
           userId: currentUserId,
-          windowId: currentWindowId,
+          windowId: parsedSharedWindowId || currentWindowId,
         },
         function (response) {
           if (response) {
@@ -356,7 +357,8 @@ const NewTab = () => {
   async function copySpaceLink() {
     try {
       const link = window.location.href;
-      await navigator.clipboard.writeText(link);
+      const sharedLink = `${link}/share/${currentWindowId}`;
+      await navigator.clipboard.writeText(sharedLink);
       toast.success("Link copied!", {
         className: "w-52 text-lg rounded-md shadow",
       });
@@ -378,18 +380,23 @@ const NewTab = () => {
       }
       return tab;
     });
-    return newTabs.sort((a, b) => Number(b.isPinned) - Number(a.isPinned));
+    return newTabs.sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return 0;
+    });
   }
 
   function toggleTabPin(tabId?: number, isPinned?: boolean) {
-    setTabs((t) => sortTabsByPin(t, tabId));
+    const newTabs = sortTabsByPin(tabs, tabId);
+    setTabs(newTabs);
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(
         {
           action: "toggleTabPin",
           tabId,
           isPinned,
-          newTabs: sortTabsByPin(tabs, tabId),
+          newTabs,
           spaceId: location.pathname.split("/")[1] || "global",
         },
         function (response) {
@@ -413,8 +420,8 @@ const NewTab = () => {
   ) {
     const newSpaces = spaces.map((space) => {
       if (space.id === id) {
-        if (e.target.value.length > 10) {
-          toast.error("test", {
+        if (e.target.value.length === 11) {
+          toast.error("Space name should be less than 10 characters", {
             className: "w-[400px] text-lg rounded-md shadow",
           });
           return space;
@@ -449,7 +456,7 @@ const NewTab = () => {
     if (!e.target.value) return;
     const errorToastId: string | null = validateSpaceTitle(
       spaces,
-      "edit",
+      id,
       e.target.value,
     );
     if (errorToastId) {
@@ -500,7 +507,7 @@ const NewTab = () => {
             onOpenAddSpacePopup={openAddSpacePopup}
             ref={newSpaceInputRef}
             onAddNewSpace={addNewSpace}
-            currentSpaceId={activeSpaceId}
+            currentSpaceId={currentSpaceId}
             onRemoveSpace={handleRemoveSpace}
             onSpaceEditBlur={handleSpaceEditBlur}
             onSpaceTitleChange={handleSpaceTitleChange}
@@ -508,7 +515,11 @@ const NewTab = () => {
             isWebtimePage={isWebTime}
           />
         )}
-        <div className={`flex ${isWebTime ? "w-full" : "w-5/6"} flex-col`}>
+        <div
+          className={`flex ${
+            isWebTime ? "w-full" : "w-5/6"
+          } relative z-10 flex-col`}
+        >
           <div className="flex items-center gap-8 pb-4">
             {!location.pathname.includes("/webtime") && (
               <>
@@ -527,20 +538,24 @@ const NewTab = () => {
               className="mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-xl shadow hover:bg-orange-700 hover:bg-opacity-70 hover:text-white"
             />
           )}
-          <Tabs
-            tabs={tabs}
-            spaces={spaces}
-            activeSpaceSelectId={activeSpaceSelectId}
-            selectedSpace={selectedSpace}
-            isLoggedin={isLoggedin}
-            openLink={openLink}
-            openSpacesPopup={openSpacesPopup}
-            selectSpace={selectSpace}
-            closeTab={closeTab}
-            handleTabOrderChange={handleTabOrderChange}
-            toggleTabPin={toggleTabPin}
-            isGrid={isTabsGrid}
-          />
+          {isLoading && (
+            <Loader text="Loading Data..." animateClass="animate-spin" />
+          )}
+          {!isLoading && (
+            <Tabs
+              tabs={tabs}
+              spaces={spaces}
+              activeSpaceSelectId={activeSpaceSelectId}
+              selectedSpace={selectedSpace}
+              isLoggedin={isLoggedin}
+              openSpacesPopup={openSpacesPopup}
+              selectSpace={selectSpace}
+              closeTab={closeTab}
+              handleTabOrderChange={handleTabOrderChange}
+              toggleTabPin={toggleTabPin}
+              isGrid={isTabsGrid}
+            />
+          )}
         </div>
       </div>
     </>

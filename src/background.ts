@@ -14,9 +14,15 @@ import {
   arrayUnion,
 } from "firebase/firestore";
 
-import { saveTabInfo, upDateTabBySpace } from "./utils/firestore";
+import { urlsStore } from "./store/tabUrlMap";
 
-import { trackTabTime, updateTabDuration } from "./utils/trackTime";
+import {
+  saveTabInfo,
+  upDateTabBySpace,
+  tabTimes,
+  trackTabTime,
+  updateTabDuration,
+} from "./utils";
 
 interface RuntimeMessage {
   action: string;
@@ -32,15 +38,15 @@ interface RuntimeMessage {
   windowId: number;
 }
 
-chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.url) {
-    const tabDurationUpdated = await updateTabDuration(tab.id);
-    console.log(1, "updateTabDuration", tabDurationUpdated);
-    const tabTimeTracked = trackTabTime(changeInfo.url, tab.id);
-    console.log(2, "tracktabtime", tabTimeTracked);
+    urlsStore.getState().updateTabUrl(tabId, changeInfo.url);
+    const tabTimeTracked = trackTabTime(changeInfo.url);
+    console.log(1, "tracktabtime", tabTimeTracked);
     return true;
   }
   if (changeInfo.status === "complete" && tab.title !== "Tabsence") {
+    if (tab.url?.includes("newtab")) return true;
     const userId = await chrome.storage.local
       .get("userId")
       .then((res) => res.userId);
@@ -108,16 +114,15 @@ chrome.runtime.onMessage.addListener(
         createdAt: serverTimestamp(),
         isArchived: false,
       };
-      await setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
-        merge: true,
-      })
-        .then(() => {
-          sendResponse({ id: spaceId });
-        })
-        .catch((error) => {
-          console.error("Error adding space: ", error);
-          sendResponse(null);
+      try {
+        await setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
+          merge: true,
         });
+        sendResponse({ id: spaceId });
+      } catch (error) {
+        console.error("Error adding space: ", error);
+        sendResponse(null);
+      }
       return true;
     }
     return true;
@@ -178,7 +183,14 @@ chrome.runtime.onMessage.addListener(
 
 async function closeTabAndRemoveFromFirestore(tabId: number, userId?: string) {
   if (!userId) return;
-  await closeTab(tabId);
+  try {
+    const tab = await chrome.tabs.get(tabId);
+    if (tab) {
+      await closeTab(tabId);
+    }
+  } catch (error) {
+    console.log(`Tab with id ${tabId} does not exist in the current window.`);
+  }
   await removeTabFromFirestore(tabId, userId);
 }
 
@@ -193,13 +205,14 @@ async function removeTabFromFirestore(tabId: number, userId: string) {
 }
 
 chrome.tabs.onRemoved.addListener(async (tabId: number) => {
+  const closedTabUrl: string = urlsStore.getState().getTabUrl(tabId);
   const userId: string | undefined = await chrome.storage.local
     .get("userId")
     .then((res) => res.userId);
   if (!userId) return;
   await removeTabFromFirestore(tabId, userId);
-  const tabDurationUpdated = await updateTabDuration(tabId);
-  console.log(3, "updateTabDuration", tabDurationUpdated);
+  await updateTabDuration(closedTabUrl);
+  console.log(3, "updateTabDuration", tabTimes);
   chrome.runtime.sendMessage({ action: "tabClosed", tabId });
   return true;
 });
@@ -327,7 +340,9 @@ async function handleRemoveSpace(message: RuntimeMessage) {
     return { success: false };
   }
   await Promise.all(deletedTabsSnapshot.docs.map((doc) => deleteDoc(doc.ref)));
-
+  await chrome.tabs.remove(
+    deletedTabsSnapshot.docs.map((doc) => doc.data().tabId),
+  );
   return { success: true };
 }
 

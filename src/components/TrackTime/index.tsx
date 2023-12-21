@@ -9,8 +9,11 @@ import {
 import { db } from "../../../firebase-config";
 import { useEffect, useState } from "react";
 import Chart from "./Chart";
-import { useDateStore } from "../../store";
+import { useParams } from "react-router-dom";
 import Header from "./Header";
+import Loader from "../UI/Loader";
+import useLogin from "../../hooks/useLogin";
+import ToggleOrderBtn from "./ToggleOrderBtn";
 
 export interface UrlDuration {
   id: string;
@@ -22,26 +25,16 @@ export interface UrlDuration {
 }
 
 const TrackTime = () => {
-  const [userId, setUserId] = useState<string>("");
   const [urlDurations, setUrlDurations] = useState<UrlDuration[]>([]);
   const [showTable, setShowTable] = useState<boolean>(true);
-  const date = useDateStore((state) => state.date);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isAscending, setIsAscending] = useState<boolean>(true);
+  const { date } = useParams<{ date: string }>();
+  const { currentUserId: userId } = useLogin();
 
   useEffect(() => {
-    async function getUserId() {
-      const userId = await chrome.storage.local
-        .get("userId")
-        .then((res) => res.userId);
-      return userId;
-    }
-
-    getUserId()
-      .then((userId) => setUserId(userId))
-      .catch((err) => console.error(err));
-  }, []);
-
-  useEffect(() => {
-    if (userId) {
+    setIsLoading(true);
+    if (userId && date) {
       const urlDurationCollectionRef = collection(
         db,
         "users",
@@ -59,6 +52,7 @@ const TrackTime = () => {
           id: doc.id,
           ...doc.data(),
         }));
+        setIsLoading(false);
         setUrlDurations(data as UrlDuration[]);
       });
       return () => {
@@ -76,6 +70,19 @@ const TrackTime = () => {
     return urlDurations.reduce((acc, cur) => acc + cur.durationBySecond, 0);
   }
 
+  function toggleDurationsOrder() {
+    setIsAscending(!isAscending);
+    const sortedDurations = [...urlDurations];
+    sortedDurations.sort((a, b) => {
+      if (isAscending) {
+        return b.durationBySecond - a.durationBySecond;
+      }
+      return a.durationBySecond - b.durationBySecond;
+    });
+    setUrlDurations(sortedDurations);
+    return setIsLoading(false);
+  }
+
   const labelFields = [
     "Domain Name",
     "Duration (sec)",
@@ -87,21 +94,32 @@ const TrackTime = () => {
     setShowTable(!showTable);
   }
 
+  function resetDurationOrder() {
+    setIsAscending(true);
+  }
+
   return (
     <>
-      <Header />
+      <Header onResetOrder={resetDurationOrder} />
       {urlDurations.length > 0 && (
         <div className="relative min-h-screen max-w-full rounded-lg border bg-slate-100 p-8 shadow-md">
           <div className="mb-3 grid auto-cols-min grid-flow-col grid-cols-4 text-lg">
             {labelFields.map((label, index) => (
-              <label
-                key={index}
-                className={`"transform ease-in-out" + ${
-                  showTable ? "mx-auto my-0" : "absolute -translate-y-[999px]"
-                } transition duration-300`}
-              >
-                {label}
-              </label>
+              <div className="flex justify-center gap-4" key={index}>
+                <label
+                  className={`"transform ease-in-out" + ${
+                    showTable ? "my-0" : "absolute -translate-y-[999px]"
+                  } transition duration-300`}
+                >
+                  {label}
+                </label>
+                {label.includes("Duration") && showTable && (
+                  <ToggleOrderBtn
+                    onToggleOrder={toggleDurationsOrder}
+                    isAscending={isAscending}
+                  />
+                )}
+              </div>
             ))}
             <button
               className="absolute right-2 top-7 ml-4 h-6 w-6 text-2xl"
@@ -121,7 +139,7 @@ const TrackTime = () => {
               {urlDurations.map((website) => (
                 <li
                   key={website.id}
-                  className="grid w-full grid-cols-4 rounded-md border border-gray-300 p-3 shadow transition delay-100 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg xl:text-2xl"
+                  className="grid w-full grid-cols-4 rounded-md border border-gray-300 p-3 shadow transition duration-200 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg xl:text-2xl"
                 >
                   <div className="flex gap-2 text-xl">
                     <img
@@ -144,29 +162,33 @@ const TrackTime = () => {
               ))}
             </ul>
             <div
-              className={`transform transition duration-300 ease-in-out ${
+              className={`grid transform grid-cols-4 transition duration-300 ease-in-out ${
                 showTable
                   ? "mx-auto my-3 translate-y-0 border-t-2 border-gray-200 pt-3 text-xl"
                   : "absolute -translate-y-[999px]"
               }`}
             >
-              <span className="pl-80 pr-2 tracking-wide">Total Duration:</span>
-              <span>{getTotalDuration()} s</span>
+              <span className="col-start-2 flex justify-center pr-2 tracking-wide">
+                {`Total Duration: ${getTotalDuration()} s`}
+              </span>
             </div>
           </div>
           <Chart durationData={urlDurations} />
         </div>
       )}
-      {urlDurations.length === 0 && (
+      {isLoading && urlDurations.length === 0 && (
+        <Loader text="Loading Data..." animateClass="animate-spin" />
+      )}
+      {!isLoading && urlDurations.length === 0 && (
         <div className="flex min-h-screen max-w-full flex-col items-center gap-4 rounded-lg border bg-slate-100 py-16 shadow-md">
-          <img src={noData} alt="no data" className="mx-auto w-1/2" />
-          <span className="mr-3 self-end">
+          <img src={noData} alt="no data" className="mx-auto w-1/3" />
+          <span className="mr-8 self-end">
             Image by{" "}
             <a href="https://www.freepik.com/free-vector/flat-design-no-data-illustration_47718912.htm#query=not%20data&position=5&from_view=search&track=ais&uuid=7ee5c7a8-e536-4bdb-9331-39411353fc99">
               Freepik
             </a>
           </span>
-          <div className="text-4xl">Sorry! There's no data.</div>
+          <div className="-mt-16 text-3xl">Sorry! There's no data.</div>
         </div>
       )}
     </>

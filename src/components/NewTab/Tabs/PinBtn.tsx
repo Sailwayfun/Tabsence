@@ -2,20 +2,26 @@ import Pin from "../../Icons/Pin";
 interface PinBtnProps {
   id?: number;
   isPinned: boolean;
+  isGrid: boolean;
   onToggleTabPin: (tabId?: number, isPinned?: boolean) => void;
 }
-const PinBtn = ({ onToggleTabPin, id, isPinned }: PinBtnProps) => {
+const PinBtn = ({ onToggleTabPin, id, isPinned, isGrid }: PinBtnProps) => {
   return (
-    <button
-      onClick={() => onToggleTabPin(id, isPinned)}
-      className="ml-4 text-gray-800"
+    <div
+      className={`tooltip  ${isGrid ? "absolute left-2 top-2" : ""}`}
+      data-tip="Pin Tab"
     >
-      <Pin
-        className={`h-6 w-6 stroke-1 ${
-          isPinned ? "fill-orange-700 opacity-80" : "fill-white"
-        } stroke-current`}
-      />
-    </button>
+      <button
+        onClick={() => onToggleTabPin(id, isPinned)}
+        className="text-gray-800"
+      >
+        <Pin
+          className={`h-6 w-6 stroke-1 ${
+            isPinned ? "fill-orange-700 opacity-80" : "fill-transparent"
+          } stroke-current`}
+        />
+      </button>
+    </div>
   );
 };
 

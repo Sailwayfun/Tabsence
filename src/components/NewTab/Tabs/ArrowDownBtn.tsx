@@ -1,3 +1,4 @@
+import { cn } from "../../../utils";
 interface ArrowDownBtnProps {
   onMoveDown: (tabId: number, direction: "down") => void;
   tabId: number;
@@ -12,11 +13,11 @@ const ArrowDownBtn = ({
 }: ArrowDownBtnProps) => {
   return (
     <div
-      className={`tooltip`}
+      className="tooltip"
       data-tip={`${isGrid ? "Move right" : "Move down"}`}
     >
       <button
-        className={`${isGrid ? "-rotate-90" : "rotate-0"}`}
+        className={cn("rotate-0", { "-rotate-90": isGrid })}
         onClick={() => onMoveDown(tabId, direction)}
       >
         <svg

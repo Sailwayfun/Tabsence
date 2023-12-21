@@ -38,7 +38,7 @@ const SpaceTab = ({
   onSpaceTitleChange,
   onEditSpace,
 }: SpaceTabProps) => {
-  // console.log("id", id);
+
   function openModal(id: string, action: string) {
     const modal = document.getElementById(
       `${action}_${id}`,

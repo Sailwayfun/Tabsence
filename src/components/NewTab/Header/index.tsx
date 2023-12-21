@@ -3,15 +3,16 @@ import Clock from "../../Icons/Clock";
 import Home from "../../Icons/Home";
 import Logo from "../Logo";
 import { getCurrentDate } from "../../../utils/trackTime";
+import { cn } from "../../../utils";
 interface HeaderProps {
   isWebtimePage: boolean;
 }
 const Header = ({ isWebtimePage }: HeaderProps) => {
   return (
     <div
-      className={`navbar top-0 flex ${
-        isWebtimePage ? "justify-between pl-0 pt-0" : "justify-end"
-      } bg-base-200`}
+      className={cn("navbar top-0 flex justify-end bg-base-200", {
+        "justify-between pl-0 pt-0": isWebtimePage,
+      })}
     >
       {isWebtimePage && <Logo isWebtimePage={isWebtimePage} />}
       <div className="pr-4">

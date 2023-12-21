@@ -14,6 +14,7 @@ import Header from "./Header";
 import Loader from "../UI/Loader";
 import useLogin from "../../hooks/useLogin";
 import ToggleOrderBtn from "./ToggleOrderBtn";
+import { cn } from "../../utils";
 
 export interface UrlDuration {
   id: string;
@@ -97,6 +98,7 @@ const TrackTime = () => {
   function resetDurationOrder() {
     setIsAscending(true);
   }
+  const showTableAnimation = "transition duration-300 ease-in-out";
 
   return (
     <>
@@ -107,9 +109,11 @@ const TrackTime = () => {
             {labelFields.map((label, index) => (
               <div className="flex justify-center gap-4" key={index}>
                 <label
-                  className={`"transform ease-in-out" + ${
-                    showTable ? "my-0" : "absolute -translate-y-[999px]"
-                  } transition duration-300`}
+                  className={cn(
+                    "absolute -translate-y-[999px]",
+                    showTable && "my-0",
+                    showTableAnimation,
+                  )}
                 >
                   {label}
                 </label>
@@ -130,11 +134,11 @@ const TrackTime = () => {
           </div>
           <div>
             <ul
-              className={`transform transition duration-300 ease-in-out ${
-                showTable
-                  ? "flex translate-y-0 flex-col gap-3"
-                  : "absolute -translate-y-[999px]"
-              }`}
+              className={cn(
+                "absolute -translate-y-[999px]",
+                showTable && "flex translate-y-0 flex-col gap-3",
+                showTableAnimation,
+              )}
             >
               {urlDurations.map((website) => (
                 <li
@@ -162,11 +166,11 @@ const TrackTime = () => {
               ))}
             </ul>
             <div
-              className={`grid transform grid-cols-4 transition duration-300 ease-in-out ${
-                showTable
-                  ? "mx-auto my-3 translate-y-0 border-t-2 border-gray-200 pt-3 text-xl"
-                  : "absolute -translate-y-[999px]"
-              }`}
+              className={cn(
+                "absolute grid -translate-y-[999px] transform grid-cols-4",
+                showTable &&
+                  "mx-auto my-3 translate-y-0 border-t-2 border-gray-200 pt-3 text-xl",
+              )}
             >
               <span className="col-start-2 flex justify-center pr-2 tracking-wide">
                 {`Total Duration: ${getTotalDuration()} s`}

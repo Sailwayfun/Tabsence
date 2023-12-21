@@ -10,6 +10,7 @@ import Folder from "../../Icons/Folder";
 import AddSpace from "./AddSpace";
 import Heading from "../../UI/Heading";
 import Box from "../../Icons/Box";
+import { cn } from "../../../utils";
 interface SpacesProps {
   spaces: Space[];
   onOpenAddSpacePopup: () => void;
@@ -40,9 +41,13 @@ const Spaces = forwardRef(
       currentSpaceId,
       isWebtimePage,
     }: SpacesProps = props;
-    const archivedSpaces = useArchivedSpaceStore((state) => state.archivedSpaces);
+    const archivedSpaces = useArchivedSpaceStore(
+      (state) => state.archivedSpaces,
+    );
     const addArchived = useArchivedSpaceStore((state) => state.addArchived);
-    const restoreArchived = useArchivedSpaceStore((state) => state.restoreArchived);
+    const restoreArchived = useArchivedSpaceStore(
+      (state) => state.restoreArchived,
+    );
     const navigate = useNavigate();
     async function archiveSpace(id: string) {
       return new Promise((resolve, reject) => {
@@ -120,13 +125,14 @@ const Spaces = forwardRef(
     function handleEditSpace(id: string) {
       onEditSpace(id);
     }
+    const sideBarAnimation = "transition duration-300 ease-in-out";
     return (
       <div
-        className={`transform transition duration-300 ease-in-out ${
-          isWebtimePage
-            ? "absolute h-0 -translate-x-[500px]"
-            : "fixed left-0 top-0 z-10 h-full translate-x-0"
-        }  flex w-72 flex-col bg-orange-700 opacity-80`}
+        className={cn(
+          "fixed left-0 top-0 z-10 flex h-full w-72 translate-x-0 transform flex-col bg-orange-700 opacity-80",
+          { "absolute h-0 -translate-x-[500px]": isWebtimePage },
+          sideBarAnimation,
+        )}
       >
         <Logo isWebtimePage={isWebtimePage} />
         <div className="flex max-h-full w-full flex-col">
@@ -145,11 +151,10 @@ const Spaces = forwardRef(
           />
           <ul className="flex flex-col">
             {spaces.map(({ id, title, isEditing }) => {
-              const linkClasses: string = `${
-                currentSpaceId === id
-                  ? "text-yellow-400"
-                  : "bg-orange-700 opacity-80 text-white"
-              }`;
+              const linkClasses: string = cn({
+                "bg-orange-700 opacity-80 text-white": currentSpaceId !== id,
+                "text-yellow-400": currentSpaceId === id,
+              });
               const isSpaceArchived = archivedSpaces.includes(id);
               if (isSpaceArchived) return null;
               return (

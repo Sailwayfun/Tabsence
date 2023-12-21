@@ -1,3 +1,4 @@
+import { cn } from "../../../utils";
 interface ArrowUpBtnProps {
   onMoveUp: (tabId: number, direction: "up") => void;
   tabId: number;
@@ -11,12 +12,9 @@ const ArrowUpBtn = ({
   isGrid,
 }: ArrowUpBtnProps) => {
   return (
-    <div
-      className={`tooltip`}
-      data-tip={`${isGrid ? "Move left" : "Move up"}`}
-    >
+    <div className={`tooltip`} data-tip={`${isGrid ? "Move left" : "Move up"}`}>
       <button
-        className={`${isGrid ? "-rotate-90" : "rotate-0"}`}
+        className={cn("rotate-0", { "-rotate-90": isGrid })}
         onClick={() => onMoveUp(tabId, direction)}
       >
         <svg

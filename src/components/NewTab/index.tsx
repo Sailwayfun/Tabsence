@@ -5,6 +5,7 @@ import { Toaster, toast } from "react-hot-toast";
 import Spaces from "./Spaces";
 import Header from "./Header";
 import Tabs from "./Tabs";
+import MainContainer from "./MainContainer";
 import CopyToClipboard from "./CopyToClipboard";
 import {
   doc,
@@ -23,6 +24,7 @@ import useLogin from "../../hooks/useLogin";
 import { Tab } from "../../types/tab";
 import { Space, SpaceDoc } from "../../types/space";
 import Loader from "../UI/Loader";
+import { cn } from "../../utils";
 interface Response {
   success: boolean;
 }
@@ -47,6 +49,8 @@ const NewTab = () => {
     windowId: string;
     spaceId: string;
   }>();
+
+  console.log("isTabsGrid", isTabsGrid);
 
   useEffect(() => {
     setTabOrder([]);
@@ -492,15 +496,16 @@ const NewTab = () => {
   }
 
   const isWebTime = location.pathname.includes("/webtime");
+  const isRoot = location.pathname === "/";
+  const tabsHeaderClasses = cn("flex relative z-10 flex-col", {
+    "w-full": isWebTime,
+    "w-5/6": !isWebTime,
+  });
 
   return (
     <>
       <Header isWebtimePage={isWebTime} />
-      <div
-        className={`flex min-h-screen gap-5 overflow-x-hidden py-8 ${
-          isWebTime ? "px-24" : "pl-[400px]"
-        } xl:ml-2`}
-      >
+      <MainContainer isWebTime={isWebTime}>
         {isLoggedin && (
           <Spaces
             spaces={spaces}
@@ -515,24 +520,18 @@ const NewTab = () => {
             isWebtimePage={isWebTime}
           />
         )}
-        <div
-          className={`flex ${
-            isWebTime ? "w-full" : "w-5/6"
-          } relative z-10 flex-col`}
-        >
+        <div className={tabsHeaderClasses}>
           <div className="flex items-center gap-8 pb-4">
-            {!location.pathname.includes("/webtime") && (
+            {!isWebTime && (
               <>
                 <h1 className="text-3xl font-bold">Your Tabs</h1>
-                {location.pathname !== "/" && (
-                  <CopyToClipboard onCopySpaceLink={copySpaceLink} />
-                )}
+                {!isRoot && <CopyToClipboard onCopySpaceLink={copySpaceLink} />}
               </>
             )}
           </div>
           <Outlet />
           <Toaster />
-          {!location.pathname.includes("/webtime") && (
+          {!isWebTime && (
             <ToggleViewBtn
               onToggleView={toggleTabsLayout}
               className="mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-xl shadow hover:bg-orange-700 hover:bg-opacity-70 hover:text-white"
@@ -557,7 +556,7 @@ const NewTab = () => {
             />
           )}
         </div>
-      </div>
+      </MainContainer>
     </>
   );
 };

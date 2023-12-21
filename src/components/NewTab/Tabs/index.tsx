@@ -2,6 +2,7 @@ import TabCard from "./TabCard";
 import { Space } from "../../../types/space";
 import { Tab } from "../../../types/tab";
 import { useLocation } from "react-router-dom";
+import { cn } from "../../../utils";
 
 interface TabsProps {
   tabs: Tab[];
@@ -37,7 +38,7 @@ const Tabs = ({
   const listStyles = "flex flex-col gap-5 w-full";
   const gridStyles = "grid grid-cols-3 gap-8 max-h-full w-full";
   return (
-    <ul className={isGrid ? gridStyles : listStyles}>
+    <ul className={cn(listStyles, isGrid && gridStyles)}>
       {isLoggedin &&
         tabs.length > 0 &&
         location.pathname.split("/")[1] !== "webtime" &&

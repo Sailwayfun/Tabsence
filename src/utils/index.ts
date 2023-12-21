@@ -8,3 +8,4 @@ export {
   getNextDate,
 } from "./trackTime";
 export { validateSpaceTitle } from "./validate";
+export { cn } from "./cn";

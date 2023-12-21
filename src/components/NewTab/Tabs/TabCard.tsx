@@ -8,6 +8,7 @@ import ArrowUpBtn from "./ArrowUpBtn";
 import PinBtn from "./PinBtn";
 import Dropdown from "../../UI/Dropdown";
 import KebabBtn from "./KebabBtn";
+import { cn } from "../../../utils";
 interface TabProps {
   tab: Tab;
   spaces: Space[];
@@ -74,14 +75,19 @@ const TabCard = ({
     const newTabUrl = tab.url;
     chrome.tabs.create({ url: newTabUrl });
   }
+  const tabHoverAnimation =
+    "transition duration-200 ease-in-out hover:z-50 hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg";
 
   return (
     <li
-      className={`relative grid grid-rows-2 justify-items-center gap-3 rounded-lg border bg-slate-100  text-lg shadow-md ${
-        isGrid
-          ? "p-3 xl:flex xl:flex-col xl:items-center xl:justify-center xl:gap-3"
-          : "px-4 py-2 xl:flex xl:items-center"
-      } transition duration-200 ease-in-out hover:z-50 hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg xl:text-2xl`}
+      className={cn(
+        "relative grid grid-rows-2 justify-items-center gap-3 rounded-lg border bg-slate-100 px-4 py-2 text-lg shadow-md xl:flex xl:items-center",
+        {
+          "p-3 xl:flex xl:flex-col xl:items-center xl:justify-center xl:gap-3":
+            isGrid,
+        },
+        tabHoverAnimation,
+      )}
     >
       {isGrid && (
         <KebabBtn
@@ -93,25 +99,26 @@ const TabCard = ({
       )}
       <img
         src={tab.favIconUrl}
-        className={`${
-          isGrid ? "h-8 w-8" : "xl:h-4 xl:w-4"
-        } border bg-white shadow`}
+        className={cn("border bg-white shadow", {
+          "h-8 w-8": isGrid,
+          "xl:h-4 xl:w-4": !isGrid,
+        })}
       />
       <a
         onClick={(e) => openLink(e, tab)}
-        className={`${
-          isGrid ? "mt-0" : "mt-4"
-        } line-clamp-1 max-w-full cursor-pointer flex-wrap hover:text-gray-500 hover:underline xl:mb-0 xl:mt-0`}
+        className={cn(
+          "mt-4 line-clamp-1 max-w-full cursor-pointer flex-wrap hover:text-gray-500 hover:underline xl:mb-0 xl:mt-0",
+          { "mt-0": isGrid },
+        )}
       >
         {tab.title}
       </a>
       {((showIcons && isGrid) || !isGrid) && (
         <div
-          className={`flex gap-4 ${
-            isGrid
-              ? "absolute -right-8 top-0 z-50 flex-col justify-center rounded-lg bg-slate-100 p-2 shadow-md"
-              : "mr-3 xl:ml-auto"
-          } `}
+          className={cn("mr-3 flex gap-4", !isGrid && "xl:ml-auto", {
+            "absolute -right-8 top-0 z-50 flex-col justify-center rounded-lg bg-slate-100 p-2 shadow-md":
+              isGrid,
+          })}
           ref={iconsRef}
         >
           {!isGrid && (

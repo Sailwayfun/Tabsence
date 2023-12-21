@@ -1,3 +1,4 @@
+import { cn } from "../../../utils";
 import Pin from "../../Icons/Pin";
 interface PinBtnProps {
   id?: number;
@@ -8,7 +9,7 @@ interface PinBtnProps {
 const PinBtn = ({ onToggleTabPin, id, isPinned, isGrid }: PinBtnProps) => {
   return (
     <div
-      className={`tooltip  ${isGrid ? "absolute left-2 top-2" : ""}`}
+      className={cn("tooltip", { "absolute left-2 top-2": isGrid })}
       data-tip="Pin Tab"
     >
       <button
@@ -16,9 +17,9 @@ const PinBtn = ({ onToggleTabPin, id, isPinned, isGrid }: PinBtnProps) => {
         className="text-gray-800"
       >
         <Pin
-          className={`h-6 w-6 stroke-1 ${
-            isPinned ? "fill-orange-700 opacity-80" : "fill-transparent"
-          } stroke-current`}
+          className={cn("h-6 w-6 fill-transparent stroke-current stroke-1", {
+            "fill-orange-700 opacity-80": isPinned,
+          })}
         />
       </button>
     </div>

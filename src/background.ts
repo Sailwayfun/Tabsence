@@ -16,9 +16,13 @@ import {
 
 import { urlsStore } from "./store/tabUrlMap";
 
-import { saveTabInfo, upDateTabBySpace } from "./utils/firestore";
-
-import { tabTimes, trackTabTime, updateTabDuration } from "./utils/trackTime";
+import {
+  saveTabInfo,
+  upDateTabBySpace,
+  tabTimes,
+  trackTabTime,
+  updateTabDuration,
+} from "./utils";
 
 interface RuntimeMessage {
   action: string;

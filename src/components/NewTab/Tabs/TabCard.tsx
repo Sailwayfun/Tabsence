@@ -26,34 +26,10 @@ interface TabProps {
   zIndex?: number;
 }
 
-const TabCard = ({
-  tab,
-  spaces,
-  selectId,
-  onOpenSpacesPopup,
-  onSelectSpace,
-  onCloseTab,
-  onTabOrderChange,
-  onToggleTabPin,
-  selectedSpace,
-  isFirstTab,
-  isLastTab,
-  isGrid,
-}: TabProps) => {
+function useToggleIcons() {
   const [showIcons, setShowIcons] = useState(false);
   const iconsRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
-
-  function openLink(
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    tab: Tab,
-  ) {
-    e.preventDefault();
-    if (!tab.url) return;
-    const newTabUrl = tab.url;
-    chrome.tabs.create({ url: newTabUrl });
-  }
-
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -70,6 +46,35 @@ const TabCard = ({
       window.removeEventListener("click", handleClickOutside);
     };
   }, []);
+  return { showIcons, setShowIcons, iconsRef, btnRef };
+}
+
+const TabCard = ({
+  tab,
+  spaces,
+  selectId,
+  onOpenSpacesPopup,
+  onSelectSpace,
+  onCloseTab,
+  onTabOrderChange,
+  onToggleTabPin,
+  selectedSpace,
+  isFirstTab,
+  isLastTab,
+  isGrid,
+}: TabProps) => {
+  const { showIcons, setShowIcons, iconsRef, btnRef } = useToggleIcons();
+
+  function openLink(
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+    tab: Tab,
+  ) {
+    e.preventDefault();
+    if (!tab.url) return;
+    const newTabUrl = tab.url;
+    chrome.tabs.create({ url: newTabUrl });
+  }
+
   return (
     <li
       className={`relative grid grid-rows-2 justify-items-center gap-3 rounded-lg border bg-slate-100  text-lg shadow-md ${

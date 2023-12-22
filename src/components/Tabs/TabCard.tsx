@@ -9,6 +9,7 @@ import Dropdown from "../UI/Dropdown";
 import KebabBtn from "./KebabBtn";
 import { cn } from "../../utils";
 import TabOrderBtn from "./TabOrderBtn";
+import { directionStrategies } from "../../strategies";
 interface TabProps {
   tab: Tab;
   spaces: Space[];
@@ -80,11 +81,12 @@ const TabCard = ({
     isFirstTab: boolean,
     isLastTab: boolean,
     isGrid: boolean,
-  ): Direction[] {
-    if (isGrid) {
-      return isFirstTab ? ["right"] : isLastTab ? ["left"] : ["left", "right"];
-    }
-    return isFirstTab ? ["down"] : isLastTab ? ["up"] : ["up", "down"];
+    strategies = directionStrategies,
+  ) {
+    const strategy = isGrid ? strategies.grid : strategies.list;
+    if (isFirstTab) return strategy.isFirst;
+    if (isLastTab) return strategy.isLast;
+    return strategy.isMiddle;
   }
 
   const tabMovingDirections = getTabMovingDirections(

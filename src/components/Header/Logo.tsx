@@ -1,5 +1,4 @@
-import logo from "../../assets/logo.png";
-import tabs from "../../assets/tabs.png";
+import logo from "./logo.png";
 import { Link } from "react-router-dom";
 
 interface LogoProps {
@@ -21,7 +20,7 @@ const Logo = ({ isWebtimePage }: LogoProps) => {
               : `w-1/2 object-contain`
           }
         />
-        <img src={tabs} className="block h-12 w-12" />
+        <img src="/icons/tabs.png" className="block h-12 w-12" />
       </Link>
     </div>
   );

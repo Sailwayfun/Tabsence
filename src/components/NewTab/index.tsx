@@ -72,72 +72,71 @@ const NewTab = () => {
     setIsLoading(true);
     const currentPath = location.pathname.split("/")[1];
     if (currentPath.includes("webtime")) return setIsLoading(false);
-    if (currentUserId && currentWindowId) {
-      const tabsCollectionRef = collection(db, "users", currentUserId, "tabs");
-      const spacesCollectionRef = collection(
-        db,
-        "users",
-        currentUserId,
-        "spaces",
-      );
-      const tabQ =
-        currentPath !== ""
-          ? query(
-              tabsCollectionRef,
-              where("windowId", "in", [
-                currentWindowId,
-                sharedWindowId ? parseInt(sharedWindowId) : "",
-              ]),
-              where("spaceId", "==", currentPath),
-            )
-          : query(
-              tabsCollectionRef,
-              where("windowId", "in", [
-                currentWindowId,
-                sharedWindowId ? parseInt(sharedWindowId) : "",
-              ]),
-            );
-      const unsubscribeTab = onSnapshot(tabQ, (querySnapshot) => {
-        const currentTabs: Tab[] = [];
-        if (currentPath !== "") {
-          querySnapshot.forEach((doc) => {
-            const tab = doc.data() as Tab;
-            currentTabs.push(tab);
-          });
-          const sortedTabs = sortTabs(currentTabs, tabOrder);
-          console.log("sortedTabs", sortedTabs);
-          setTabs(sortedTabs);
-          setIsLoading(false);
-          console.log("tabs on snapshot updated");
-          return;
-        }
+    if (!currentUserId || !currentWindowId) return setIsLoading(false);
+    const tabsCollectionRef = collection(db, "users", currentUserId, "tabs");
+    const spacesCollectionRef = collection(
+      db,
+      "users",
+      currentUserId,
+      "spaces",
+    );
+    const tabQ =
+      currentPath !== ""
+        ? query(
+            tabsCollectionRef,
+            where("windowId", "in", [
+              currentWindowId,
+              sharedWindowId ? parseInt(sharedWindowId) : "",
+            ]),
+            where("spaceId", "==", currentPath),
+          )
+        : query(
+            tabsCollectionRef,
+            where("windowId", "in", [
+              currentWindowId,
+              sharedWindowId ? parseInt(sharedWindowId) : "",
+            ]),
+          );
+    const unsubscribeTab = onSnapshot(tabQ, (querySnapshot) => {
+      const currentTabs: Tab[] = [];
+      if (currentPath !== "") {
         querySnapshot.forEach((doc) => {
           const tab = doc.data() as Tab;
-          if (tab.spaceId) return;
           currentTabs.push(tab);
         });
         const sortedTabs = sortTabs(currentTabs, tabOrder);
-        console.log("sortedTabs", sortedTabs, "tabOrder", tabOrder);
+        console.log("sortedTabs", sortedTabs);
         setTabs(sortedTabs);
         setIsLoading(false);
         console.log("tabs on snapshot updated");
         return;
+      }
+      querySnapshot.forEach((doc) => {
+        const tab = doc.data() as Tab;
+        if (tab.spaceId) return;
+        currentTabs.push(tab);
       });
-      const spaceQ = query(spacesCollectionRef, orderBy("createdAt", "asc"));
-      const unsubscribeSpace = onSnapshot(spaceQ, (querySnapshot) => {
-        const currentSpaces: Space[] = [];
-        querySnapshot.forEach((doc) => {
-          const space = doc.data() as SpaceDoc;
-          currentSpaces.push({ id: doc.id, isEditing: false, ...space });
-        });
-        setSpaces(currentSpaces);
-        setIsLoading(false);
+      const sortedTabs = sortTabs(currentTabs, tabOrder);
+      console.log("sortedTabs", sortedTabs, "tabOrder", tabOrder);
+      setTabs(sortedTabs);
+      setIsLoading(false);
+      console.log("tabs on snapshot updated");
+      return;
+    });
+    const spaceQ = query(spacesCollectionRef, orderBy("createdAt", "asc"));
+    const unsubscribeSpace = onSnapshot(spaceQ, (querySnapshot) => {
+      const currentSpaces: Space[] = [];
+      querySnapshot.forEach((doc) => {
+        const space = doc.data() as SpaceDoc;
+        currentSpaces.push({ id: doc.id, isEditing: false, ...space });
       });
-      return () => {
-        unsubscribeTab();
-        unsubscribeSpace();
-      };
-    }
+      setSpaces(currentSpaces);
+      setIsLoading(false);
+    });
+    return () => {
+      unsubscribeTab();
+      unsubscribeSpace();
+    };
   }, [
     location.pathname,
     currentUserId,
@@ -152,31 +151,28 @@ const NewTab = () => {
     const spaceId = currentPath !== "" ? currentPath : "global";
     const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
     if (currentPath.includes("webtime")) return setIsLoading(false);
-    if (currentUserId) {
-      const tabOrderDocRef = doc(
-        db,
-        "users",
-        currentUserId,
-        "tabOrders",
-        spaceId,
-      );
-      const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
-        console.log("有sharedWindowId", parsedSharedWindowId);
-        console.log("有doc的windowId", doc.data()?.windowId);
-        if (
-          doc.exists() &&
-          (doc.data()?.windowId === currentWindowId ||
-            doc.data()?.windowId === parsedSharedWindowId)
-        ) {
-          const order: number[] = doc.data()?.tabOrder;
-          if (order) setTabOrder(order);
-          setIsLoading(false);
-        }
-      });
-      return () => {
-        unsubscribeTabOrder();
-      };
-    }
+    if (!currentUserId || !currentWindowId) return setIsLoading(false);
+    const tabOrderDocRef = doc(
+      db,
+      "users",
+      currentUserId,
+      "tabOrders",
+      spaceId,
+    );
+    const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
+      if (
+        doc.exists() &&
+        (doc.data()?.windowId === currentWindowId ||
+          doc.data()?.windowId === parsedSharedWindowId)
+      ) {
+        const order: number[] = doc.data()?.tabOrder;
+        if (order) setTabOrder(order);
+        setIsLoading(false);
+      }
+    });
+    return () => {
+      unsubscribeTabOrder();
+    };
   }, [currentUserId, location.pathname, currentWindowId, sharedWindowId]);
 
   useEffect(() => {

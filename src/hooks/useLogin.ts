@@ -6,23 +6,24 @@ export default function useLogin(): {
 } {
   const [userId, setUserId] = useState<string>("");
   const [isLoggedin, setIsLoggedin] = useState<boolean>(false);
-
   useEffect(() => {
-    function getUserId(): Promise<void> {
-      return new Promise((resolve, reject) => {
-        chrome.storage.local.get(["userId"], function (result) {
-          if (result.userId) {
-            setUserId(result.userId);
-            setIsLoggedin(true);
-            resolve();
-            return;
-          }
-          reject();
-        });
-      });
+    async function getUserId() {
+      try {
+        const result = await chrome.storage.local.get(["userId"]);
+        if (result.userId) {
+          return result.userId;
+        }
+        throw new Error("Failed to get userId");
+      } catch (error) {
+        console.error(error);
+      }
     }
-    getUserId().catch((err) => console.error(err));
+    getUserId()
+      .then((userId) => {
+        setUserId(userId);
+        setIsLoggedin(true);
+      })
+      .catch((error) => console.error(error));
   }, []);
-
   return { currentUserId: userId, isLoggedin };
 }

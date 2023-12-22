@@ -36,7 +36,7 @@ const Header = ({ onResetOrder }: HeaderProps) => {
               className="h-8 w-8 cursor-pointer text-4xl"
               onClick={() => getPrevDate(date)}
             >
-              <ArrowLeft className="h-6 w-6" />
+              <ArrowLeft className="h-6 w-6 stroke-current" />
             </button>
           </Link>
         )}
@@ -51,7 +51,7 @@ const Header = ({ onResetOrder }: HeaderProps) => {
               className="h-8 w-8 cursor-pointer text-4xl"
               onClick={() => getNextDate(date)}
             >
-              <ArrowRight className="h-6 w-6" />
+              <ArrowRight className="h-6 w-6 stroke-current" />
             </button>
           </Link>
         )}

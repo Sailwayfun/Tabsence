@@ -21,8 +21,7 @@ import { validateSpaceTitle } from "../../utils/validate";
 import ToggleViewBtn from "./ToggleViewBtn";
 import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";
-import { Tab } from "../../types/tab";
-import { Space, SpaceDoc } from "../../types/space";
+import { Tab, Space, SpaceDoc, Direction } from "../../types";
 import Loader from "../../components/UI/Loader";
 import { cn } from "../../utils";
 interface Response {
@@ -316,14 +315,18 @@ const Home = () => {
 
   async function handleTabOrderChange(
     tabId: number,
-    direction: "up" | "down",
+    direction: Direction,
   ): Promise<void> {
     const movedTab = tabs.find((tab) => tab.tabId === tabId);
     if (!movedTab) return;
     const movedTabIndex = tabs.indexOf(movedTab);
     const newTabs = [...tabs];
     newTabs.splice(movedTabIndex, 1);
-    newTabs.splice(movedTabIndex + (direction === "up" ? -1 : 1), 0, movedTab);
+    newTabs.splice(
+      movedTabIndex + (direction === "up" || direction === "left" ? -1 : 1),
+      0,
+      movedTab,
+    );
     setTabs(newTabs);
     await onTabOrderChange(newTabs, currentSpaceId);
   }

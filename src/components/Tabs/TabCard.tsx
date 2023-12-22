@@ -1,14 +1,14 @@
 import { Space } from "../../types/space";
 import { useState, useEffect, useRef } from "react";
-import { Tab } from "../../types/tab";
+import { Tab, Direction } from "../../types";
 import MoveToSpace from "./MoveToSpace";
 import CloseBtn from "./CloseBtn";
-import ArrowDownBtn from "./ArrowDownBtn";
-import ArrowUpBtn from "./ArrowUpBtn";
+import Tooltip from "../UI/Tooltip";
 import PinBtn from "./PinBtn";
 import Dropdown from "../UI/Dropdown";
 import KebabBtn from "./KebabBtn";
 import { cn } from "../../utils";
+import TabOrderBtn from "./TabOrderBtn";
 interface TabProps {
   tab: Tab;
   spaces: Space[];
@@ -18,7 +18,7 @@ interface TabProps {
   ) => void;
   onSelectSpace: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onCloseTab: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  onTabOrderChange: (tabId: number, direction: "up" | "down") => Promise<void>;
+  onTabOrderChange: (tabId: number, direction: Direction) => Promise<void>;
   onToggleTabPin: (tabId?: number, isPinned?: boolean) => void;
   selectedSpace: string;
   isLastTab: boolean;
@@ -75,6 +75,44 @@ const TabCard = ({
     const newTabUrl = tab.url;
     chrome.tabs.create({ url: newTabUrl });
   }
+
+  function getTabMovingDirections(
+    isFirstTab: boolean,
+    isLastTab: boolean,
+    isGrid: boolean,
+  ): Direction[] {
+    if (isGrid) {
+      return isFirstTab ? ["right"] : isLastTab ? ["left"] : ["left", "right"];
+    }
+    return isFirstTab ? ["down"] : isLastTab ? ["up"] : ["up", "down"];
+  }
+
+  const tabMovingDirections = getTabMovingDirections(
+    isFirstTab,
+    isLastTab,
+    isGrid,
+  );
+
+  function getToolTipText(direction: Direction) {
+    return `Move ${direction}`;
+  }
+
+  function generateTabOrderBtns(directions: Direction[], tabId?: number) {
+    if (!tabId) return null;
+    return directions.map((direction) => {
+      return (
+        <Tooltip key={tabId} data-tip={getToolTipText(direction)}>
+          <TabOrderBtn
+            onMoveUp={onTabOrderChange}
+            onMoveDown={onTabOrderChange}
+            tabId={tabId}
+            direction={direction}
+          />
+        </Tooltip>
+      );
+    });
+  }
+
   const tabHoverAnimation =
     "transition duration-200 ease-in-out hover:z-50 hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg";
 
@@ -162,22 +200,7 @@ const TabCard = ({
               </div>
             )}
           </Dropdown>
-          {!isFirstTab && tab.tabId && (
-            <ArrowUpBtn
-              onMoveUp={onTabOrderChange}
-              tabId={tab.tabId}
-              direction="up"
-              isGrid={isGrid}
-            />
-          )}
-          {!isLastTab && tab.tabId && (
-            <ArrowDownBtn
-              onMoveDown={onTabOrderChange}
-              tabId={tab.tabId}
-              direction="down"
-              isGrid={isGrid}
-            />
-          )}
+          {generateTabOrderBtns(tabMovingDirections, tab.tabId)}
           <CloseBtn
             id={tab.tabId?.toString()}
             onCloseTab={onCloseTab}

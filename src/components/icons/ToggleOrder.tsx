@@ -1,9 +1,12 @@
-interface Iconprops {
+import { IconProps } from "../../types";
+import { cn } from "../../utils";
+
+interface ToggleOrderIconProps extends IconProps {
   className: string;
   direction: "ascend" | "descend";
 }
 
-const ToggleOrder = ({ className, direction }: Iconprops) => {
+const ToggleOrder = ({ className, direction }: ToggleOrderIconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -11,7 +14,7 @@ const ToggleOrder = ({ className, direction }: Iconprops) => {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={`${className} ${direction === "ascend" ? "" : "rotate-180"}`}
+      className={cn(className, direction === "ascend" ? "" : "rotate-180")}
     >
       <path
         strokeLinecap="round"

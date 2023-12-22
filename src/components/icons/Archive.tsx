@@ -1,7 +1,6 @@
-interface ArchiveProps {
-  className: string;
-}
-const Archive = ({ className }: ArchiveProps) => {
+import { IconProps } from "../../types";
+
+const Archive = ({ className }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

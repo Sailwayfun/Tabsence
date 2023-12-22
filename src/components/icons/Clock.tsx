@@ -1,6 +1,5 @@
-interface IconProps {
-  className: string;
-}
+import { IconProps } from "../../types";
+
 const Clock = ({ className }: IconProps) => {
   return (
     <svg

@@ -1,6 +1,5 @@
 import TabCard from "./TabCard";
-import { Space } from "../../types/space";
-import { Tab } from "../../types/tab";
+import { Tab, Space, Direction } from "../../types";
 import { useLocation } from "react-router-dom";
 import { cn } from "../../utils";
 
@@ -14,10 +13,7 @@ interface TabsProps {
   openSpacesPopup: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   selectSpace: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   closeTab: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  handleTabOrderChange: (
-    tabId: number,
-    direction: "up" | "down",
-  ) => Promise<void>;
+  handleTabOrderChange: (tabId: number, direction: Direction) => Promise<void>;
   toggleTabPin: (tabId?: number, isPinned?: boolean) => void;
 }
 

@@ -137,9 +137,7 @@ const Spaces = forwardRef(
         <Logo isWebtimePage={isWebtimePage} />
         <div className="flex max-h-full w-full flex-col">
           <div className="flex items-center gap-3 pl-4 pt-10">
-            <div className="h-4 w-4">
-              <Folder />
-            </div>
+            <Folder className="h-4 w-4 stroke-current" />
             <Heading text="Spaces" />
           </div>
           <span className="mx-auto mt-10 h-[1px] w-full bg-white opacity-60" />

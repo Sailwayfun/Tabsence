@@ -1,5 +1,5 @@
 import { forwardRef, useRef } from "react";
-import Modal from "../../UI/Modal";
+import Modal from "../UI/Modal";
 interface AddSpaceProps {
   onAddNewSpace: (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,

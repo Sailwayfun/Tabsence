@@ -1,29 +1,15 @@
 import noData from "./no-data.png";
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-  FieldValue,
-} from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import { useEffect, useState } from "react";
 import Chart from "./Chart";
 import { useParams } from "react-router-dom";
 import Header from "./Header";
-import Loader from "../UI/Loader";
+import Loader from "../../components/UI/Loader";
 import useLogin from "../../hooks/useLogin";
 import ToggleOrderBtn from "./ToggleOrderBtn";
 import { cn } from "../../utils";
-
-export interface UrlDuration {
-  id: string;
-  url: string;
-  faviconUrl: string;
-  durationBySecond: number;
-  lastVisitTime: FieldValue;
-  visitCounts: number;
-}
+import { UrlDuration } from "../../types";
 
 const TrackTime = () => {
   const [urlDurations, setUrlDurations] = useState<UrlDuration[]>([]);

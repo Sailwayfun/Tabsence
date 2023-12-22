@@ -1,5 +1,5 @@
-import Archive from "../../Icons/Archive";
-import Restore from "../../Icons/Restore";
+import Archive from "../Icons/Archive";
+import Restore from "../Icons/Restore";
 interface ToggleArchiveBtnProps {
   id: string;
   onOpenModal: (id: string, action: string) => void;

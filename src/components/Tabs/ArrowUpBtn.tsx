@@ -1,4 +1,4 @@
-import { cn } from "../../../utils";
+import { cn } from "../../utils";
 interface ArrowUpBtnProps {
   onMoveUp: (tabId: number, direction: "up") => void;
   tabId: number;

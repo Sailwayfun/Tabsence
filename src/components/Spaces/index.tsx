@@ -1,16 +1,16 @@
 import { forwardRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { useArchivedSpaceStore } from "../../../store";
-import { Space } from "../../../types/space";
+import { useArchivedSpaceStore } from "../../store";
+import { Space } from "../../types/space";
 import AddSpaceBtn from "./AddSpaceBtn";
 import SpaceTab from "./SpaceTab";
-import Logo from "../Logo";
-import Folder from "../../Icons/Folder";
+import Logo from "../Header/Logo";
+import Folder from "../Icons/Folder";
 import AddSpace from "./AddSpace";
-import Heading from "../../UI/Heading";
-import Box from "../../Icons/Box";
-import { cn } from "../../../utils";
+import Heading from "../UI/Heading";
+import Box from "../Icons/Box";
+import { cn } from "../../utils";
 interface SpacesProps {
   spaces: Space[];
   onOpenAddSpacePopup: () => void;

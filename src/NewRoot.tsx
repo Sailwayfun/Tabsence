@@ -1,21 +1,20 @@
-import NewTab from "./components/NewTab";
+import { Home, TrackTime } from "./pages";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
-import TrackTime from "./components/TrackTime";
 
 const router = createHashRouter([
   {
     path: "/",
-    element: <NewTab />,
+    element: <Home />,
     children: [
       {
-        path: "/:spaceId",
+        path: ":spaceId",
         children: [{ path: "share/:windowId" }],
       },
       {
-        path: "/webtime",
+        path: "webtime",
         element: <TrackTime />,
         children: [
           {

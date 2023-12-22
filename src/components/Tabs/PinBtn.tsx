@@ -1,5 +1,5 @@
-import { cn } from "../../../utils";
-import Pin from "../../Icons/Pin";
+import { cn } from "../../utils";
+import Pin from "../Icons/Pin";
 interface PinBtnProps {
   id?: number;
   isPinned: boolean;

@@ -1,6 +1,6 @@
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import { UrlDuration } from "./index";
+import { UrlDuration } from "../../types";
 
 interface ChartProps {
   durationData: UrlDuration[];

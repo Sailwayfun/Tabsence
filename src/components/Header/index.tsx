@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import Clock from "../../Icons/Clock";
-import Home from "../../Icons/Home";
-import Logo from "../Logo";
-import { getCurrentDate } from "../../../utils/trackTime";
-import { cn } from "../../../utils";
+import Clock from "../Icons/Clock";
+import Home from "../Icons/Home";
+import Logo from "./Logo";
+import { getCurrentDate } from "../../utils/trackTime";
+import { cn } from "../../utils";
 interface HeaderProps {
   isWebtimePage: boolean;
 }

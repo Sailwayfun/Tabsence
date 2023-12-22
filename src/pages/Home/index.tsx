@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { useArchivedSpaceStore } from "../../store";
 import { useLocation, Outlet, useParams } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
-import Spaces from "./Spaces";
-import Header from "./Header";
-import Tabs from "./Tabs";
-import MainContainer from "./MainContainer";
+import Spaces from "../../components/Spaces";
+import Header from "../../components/Header";
+import Tabs from "../../components/Tabs";
+import MainContainer from "../../components/MainContainer";
 import CopyToClipboard from "./CopyToClipboard";
 import {
   doc,
@@ -23,12 +23,12 @@ import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";
 import { Tab } from "../../types/tab";
 import { Space, SpaceDoc } from "../../types/space";
-import Loader from "../UI/Loader";
+import Loader from "../../components/UI/Loader";
 import { cn } from "../../utils";
 interface Response {
   success: boolean;
 }
-const NewTab = () => {
+const Home = () => {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [activeSpaceSelectId, setActiveSpaceSelectId] = useState<
@@ -557,4 +557,4 @@ const NewTab = () => {
   );
 };
 
-export default NewTab;
+export default Home;

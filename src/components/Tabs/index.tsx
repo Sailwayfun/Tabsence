@@ -1,8 +1,8 @@
 import TabCard from "./TabCard";
-import { Space } from "../../../types/space";
-import { Tab } from "../../../types/tab";
+import { Space } from "../../types/space";
+import { Tab } from "../../types/tab";
 import { useLocation } from "react-router-dom";
-import { cn } from "../../../utils";
+import { cn } from "../../utils";
 
 interface TabsProps {
   tabs: Tab[];

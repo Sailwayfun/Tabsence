@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import ArrowLeft from "../Icons/ArrowLeft";
-import ArrowRight from "../Icons/ArrowRight";
+import ArrowLeft from "../../components/Icons/ArrowLeft";
+import ArrowRight from "../../components/Icons/ArrowRight";
 import { useParams } from "react-router-dom";
 import {
   getCurrentDate,

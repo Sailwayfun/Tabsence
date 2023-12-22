@@ -1,4 +1,4 @@
-import ToggleOrder from "../Icons/ToggleOrder";
+import ToggleOrder from "../../components/Icons/ToggleOrder";
 interface ToggleOrderBtnProps {
   isAscending: boolean;
   onToggleOrder: () => void;

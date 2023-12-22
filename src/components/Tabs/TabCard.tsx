@@ -1,14 +1,14 @@
-import { Space } from "../../../types/space";
+import { Space } from "../../types/space";
 import { useState, useEffect, useRef } from "react";
-import { Tab } from "../../../types/tab";
+import { Tab } from "../../types/tab";
 import MoveToSpace from "./MoveToSpace";
 import CloseBtn from "./CloseBtn";
 import ArrowDownBtn from "./ArrowDownBtn";
 import ArrowUpBtn from "./ArrowUpBtn";
 import PinBtn from "./PinBtn";
-import Dropdown from "../../UI/Dropdown";
+import Dropdown from "../UI/Dropdown";
 import KebabBtn from "./KebabBtn";
-import { cn } from "../../../utils";
+import { cn } from "../../utils";
 interface TabProps {
   tab: Tab;
   spaces: Space[];

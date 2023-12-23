@@ -13,6 +13,7 @@ import {
   DocumentData,
   serverTimestamp,
   arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
 
 import { urlsStore } from "./store/tabUrlMap";
@@ -28,6 +29,7 @@ interface RuntimeMessage {
   action: string;
   currentPath: string;
   updatedTab: Tab;
+  originalSpaceId: string;
   spaceId: string;
   spaceName: string;
   newSpaceTitle: string;
@@ -67,7 +69,9 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
 chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
-    if (!message.userId) return true;
+    if (!message.userId) {
+      return sendResponse({ success: false });
+    }
     if (message.action === "moveTabToSpace") {
       const tabOrdersCollectionRef = collection(
         db,
@@ -75,26 +79,28 @@ chrome.runtime.onMessage.addListener(
         message.userId,
         "tabOrders",
       );
+      const oldTabOrderDocRef = doc(
+        tabOrdersCollectionRef,
+        message.originalSpaceId || "global",
+      );
       const tabOrderDocRef = doc(tabOrdersCollectionRef, message.spaceId);
       const tabsCollectionRef = collection(db, "users", message.userId, "tabs");
       const tabId = message.updatedTab.tabId;
+      const windowId = message.updatedTab.windowId;
+
       await setDoc(
         tabOrderDocRef,
-        { tabOrder: arrayUnion(tabId) },
+        { tabOrder: arrayUnion(tabId), windowId },
         { merge: true },
       );
+
+      await updateDoc(oldTabOrderDocRef, { tabOrder: arrayRemove(tabId) });
+
       const q = query(tabsCollectionRef, where("tabId", "==", tabId));
       const tabsQuerySnapshot = await getDocs(q);
-      tabsQuerySnapshot.forEach((doc) => {
+      tabsQuerySnapshot.forEach(async (doc) => {
         const tabDocRef = doc.ref;
-        upDateTabBySpace(message, tabDocRef)
-          .then((updatedTab) => {
-            sendResponse(updatedTab);
-          })
-          .catch((error) => {
-            console.error("Error updating tab: ", error);
-            sendResponse(null);
-          });
+        await upDateTabBySpace(message, tabDocRef);
       });
       return true;
     }
@@ -116,10 +122,10 @@ chrome.runtime.onMessage.addListener(
         await setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
           merge: true,
         });
-        sendResponse({ id: spaceId });
+        sendResponse({ success: true });
       } catch (error) {
         console.error("Error adding space: ", error);
-        sendResponse(null);
+        sendResponse({ success: false });
       }
       return true;
     }

@@ -11,7 +11,10 @@ interface TabsProps {
   isLoggedin: boolean;
   isGrid: boolean;
   openSpacesPopup: (tabId?: number) => void;
-  selectSpace: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  selectSpace: (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    originalSpaceId: string,
+  ) => void;
   closeTab: (tabId?: number) => Promise<void>;
   handleTabOrderChange: (tabId: number, direction: Direction) => Promise<void>;
   toggleTabPin: (tabId?: number, isPinned?: boolean) => void;

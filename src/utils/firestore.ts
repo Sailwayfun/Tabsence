@@ -47,8 +47,7 @@ async function upDateTabBySpace(
 ) {
   try {
     await updateDoc(tabDocRef, { spaceId: message.spaceId });
-    const updatedTab = { ...message.updatedTab, spaceId: message.spaceId };
-    return updatedTab;
+    return;
   } catch (error) {
     console.error("Error updating tabs: ", error);
   }

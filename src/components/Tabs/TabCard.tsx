@@ -1,4 +1,5 @@
 import { Space } from "../../types/space";
+import { useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { Tab, Direction } from "../../types";
 import MoveToSpace from "./MoveToSpaceBtn";
@@ -14,7 +15,10 @@ interface TabProps {
   spaces: Space[];
   selectId?: number;
   onOpenSpacesPopup: (tabId?: number) => void;
-  onSelectSpace: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onSelectSpace: (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    originalSpaceId: string,
+  ) => void;
   onCloseTab: (tabId?: number) => Promise<void>;
   onTabOrderChange: (tabId: number, direction: Direction) => Promise<void>;
   onToggleTabPin: (tabId?: number, isPinned?: boolean) => void;
@@ -63,6 +67,8 @@ const TabCard = ({
   isGrid,
 }: TabProps) => {
   const { showIcons, setShowIcons, iconsRef, btnRef } = useToggleIcons();
+  const { spaceId: originalSpaceId } = useParams<{ spaceId: string }>();
+  console.log("originalSpaceId", originalSpaceId);
 
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
@@ -184,7 +190,9 @@ const TabCard = ({
                 </label>
                 <select
                   id={tab.tabId?.toString() || "spaces"}
-                  onChange={onSelectSpace}
+                  onChange={(e) =>
+                    onSelectSpace(e, originalSpaceId || "global")
+                  }
                   value={selectedSpace}
                 >
                   <option value="">Select a space</option>

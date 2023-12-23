@@ -8,8 +8,8 @@ import Tabs from "../../components/Tabs";
 import MainContainer from "../../components/MainContainer";
 import CopyToClipboard from "./CopyToClipboard";
 import {
-  doc,
   collection,
+  doc,
   query,
   where,
   onSnapshot,
@@ -22,6 +22,7 @@ import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";
 import { Tab, Space, SpaceDoc, Direction } from "../../types";
 import { Loader } from "../../components/UI";
+
 interface Response {
   success: boolean;
 }
@@ -44,6 +45,8 @@ const Home = () => {
     windowId: string;
     spaceId: string;
   }>();
+
+  console.log("現在的tab order", tabOrder);
 
   useEffect(() => {
     function hideArchivedSpacesTabs(
@@ -120,10 +123,9 @@ const Home = () => {
   ]);
 
   useEffect(() => {
-    const currentPath = location.pathname.split("/")[1];
-    const spaceId = currentPath !== "" ? currentPath : "global";
+    const spaceId = currentSpaceId || "global";
     const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
-    if (currentPath.includes("webtime")) return setIsLoading(false);
+    if (location.pathname.includes("webtime")) return setIsLoading(false);
     if (!currentUserId || !currentWindowId) return setIsLoading(false);
     const tabOrderDocRef = doc(
       db,
@@ -132,20 +134,26 @@ const Home = () => {
       "tabOrders",
       spaceId,
     );
-    const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (doc) => {
+    const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (docSnapshot) => {
+      if (!docSnapshot.exists()) return;
+      const tabOrderData = docSnapshot.data();
       if (
-        doc.exists() &&
-        (doc.data()?.windowId === currentWindowId ||
-          doc.data()?.windowId === parsedSharedWindowId)
-      ) {
-        const order: number[] = doc.data()?.tabOrder;
-        if (order) setTabOrder(order);
-      }
+        tabOrderData.windowId !== currentWindowId &&
+        tabOrderData.windowId !== parsedSharedWindowId
+      )
+        return;
+      setTabOrder(tabOrderData.tabOrder);
     });
     return () => {
       unsubscribeTabOrder();
     };
-  }, [currentUserId, location.pathname, currentWindowId, sharedWindowId]);
+  }, [
+    currentUserId,
+    location.pathname,
+    currentSpaceId,
+    currentWindowId,
+    sharedWindowId,
+  ]);
 
   useEffect(() => {
     const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
@@ -219,17 +227,22 @@ const Home = () => {
     if (tabId) setActiveSpaceSelectId(tabId);
   }
 
-  function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
+  function selectSpace(
+    e: React.ChangeEvent<HTMLSelectElement>,
+    originalSpaceId: string,
+  ) {
+    if (!e.target.value) return;
     setSelectedSpace(e.target.value);
-    if (e.target.value === "") return;
     const message = {
       action: "moveTabToSpace",
       updatedTab: tabs.find((tab) => tab.tabId === activeSpaceSelectId),
+      originalSpaceId,
       spaceId: e.target.value,
       userId: currentUserId,
     };
     chrome.runtime.sendMessage(message, function (response) {
-      if (response) {
+      console.log(response);
+      if (response.success) {
         toast.success("Tab moved to space", {
           className: "w-60 text-lg rounded-md shadow",
           duration: 2000,
@@ -253,7 +266,7 @@ const Home = () => {
     chrome.runtime.sendMessage(
       { action: "addSpace", newSpaceTitle, userId: currentUserId },
       function (response) {
-        if (response && newSpaceTitle) {
+        if (response.id && newSpaceTitle) {
           toast.success("Space added", {
             className: "w-52 text-lg rounded-md shadow",
             duration: 2000,

@@ -96,7 +96,7 @@ const TrackTime = () => {
               <div className="flex justify-center gap-4" key={index}>
                 <label
                   className={cn(
-                    "absolute -translate-y-[999px]",
+                    !showTable && "absolute -translate-y-[999px]",
                     showTable && "my-0",
                     showTableAnimation,
                   )}
@@ -121,8 +121,8 @@ const TrackTime = () => {
           <div>
             <ul
               className={cn(
-                "absolute -translate-y-[999px]",
                 showTable && "flex translate-y-0 flex-col gap-3",
+                !showTable && "absolute -translate-y-[999px]",
                 showTableAnimation,
               )}
             >
@@ -153,7 +153,8 @@ const TrackTime = () => {
             </ul>
             <div
               className={cn(
-                "absolute grid -translate-y-[999px] transform grid-cols-4",
+                " grid grid-cols-4",
+                !showTable && "absolute -translate-y-[999px] transform",
                 showTable &&
                   "mx-auto my-3 translate-y-0 border-t-2 border-gray-200 pt-3 text-xl",
               )}

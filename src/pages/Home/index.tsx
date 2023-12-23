@@ -47,8 +47,6 @@ const Home = () => {
     spaceId: string;
   }>();
 
-  console.log("isTabsGrid", isTabsGrid);
-
   useEffect(() => {
     setTabOrder([]);
   }, [location.pathname]);
@@ -102,10 +100,8 @@ const Home = () => {
           currentTabs.push(tab);
         });
         const sortedTabs = sortTabs(currentTabs, tabOrder);
-        console.log("sortedTabs", sortedTabs);
         setTabs(sortedTabs);
         setIsLoading(false);
-        console.log("tabs on snapshot updated");
         return;
       }
       querySnapshot.forEach((doc) => {
@@ -114,10 +110,8 @@ const Home = () => {
         currentTabs.push(tab);
       });
       const sortedTabs = sortTabs(currentTabs, tabOrder);
-      console.log("sortedTabs", sortedTabs, "tabOrder", tabOrder);
       setTabs(sortedTabs);
       setIsLoading(false);
-      console.log("tabs on snapshot updated");
       return;
     });
     const spaceQ = query(spacesCollectionRef, orderBy("createdAt", "asc"));

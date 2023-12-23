@@ -42,8 +42,7 @@ interface RuntimeMessage {
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.url) {
     urlsStore.getState().updateTabUrl(tabId, changeInfo.url);
-    const tabTimeTracked = trackTabTime(changeInfo.url);
-    console.log(1, "tracktabtime", tabTimeTracked);
+    trackTabTime(changeInfo.url);
     return true;
   }
   if (changeInfo.status === "complete" && tab.title !== "Tabsence") {
@@ -52,7 +51,6 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
       .get("userId")
       .then((res) => res.userId);
     const tabData = await saveTabInfo(tab, userId);
-    console.log("tabinfo saved", tabData);
     chrome.runtime.sendMessage(
       {
         action: "tabUpdated",
@@ -188,9 +186,13 @@ async function closeTabAndRemoveFromFirestore(tabId: number, userId?: string) {
     const tab = await chrome.tabs.get(tabId);
     if (tab) {
       await closeTab(tabId);
+      return;
     }
+    throw new Error("Failed to close or delete the tab from Firestore.");
   } catch (error) {
-    console.log(`Tab with id ${tabId} does not exist in the current window.`);
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
   }
   await removeTabFromFirestore(tabId, userId);
 }
@@ -201,7 +203,6 @@ async function closeTab(tabId: number) {
 
 async function removeTabFromFirestore(tabId: number, userId: string) {
   const tabDocRef = doc(db, "users", userId, "tabs", tabId.toString());
-  console.log("removeTabFromFirestore", tabDocRef);
   await deleteDoc(tabDocRef);
 }
 
@@ -213,7 +214,6 @@ chrome.tabs.onRemoved.addListener(async (tabId: number) => {
   if (!userId) return;
   await removeTabFromFirestore(tabId, userId);
   await updateTabDuration(closedTabUrl);
-  console.log(3, "updateTabDuration", tabTimes);
   chrome.runtime.sendMessage({ action: "tabClosed", tabId });
   return true;
 });

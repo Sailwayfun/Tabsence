@@ -50,44 +50,54 @@ const Spaces = forwardRef(
     );
     const navigate = useNavigate();
     async function archiveSpace(id: string) {
-      return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage(
-          { action: "archiveSpace", spaceId: id },
-          (res) => {
-            if (res) {
-              addArchived(id);
-              toast.success("Space archived", {
-                className: "w-52 text-lg rounded-md shadow",
-                duration: 2000,
-              });
-              navigate("/");
-              resolve(res);
-            } else {
-              reject();
-            }
-          },
-        );
-      });
+      try {
+        const response = await chrome.runtime.sendMessage({
+          action: "archiveSpace",
+          spaceId: id,
+        });
+        if (response) {
+          addArchived(id);
+          toast.success("Space archived", {
+            className: "w-52 text-lg rounded-md shadow",
+            duration: 2000,
+          });
+          navigate("/");
+          return;
+        }
+        throw new Error("Failed to archive space");
+      } catch (err) {
+        if (err instanceof Error) {
+          toast.error(err.message, {
+            className: "w-52 text-lg rounded-md shadow",
+            duration: 2000,
+          });
+        }
+      }
     }
     async function restoreSpace(id: string) {
-      return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage(
-          { action: "restoreSpace", spaceId: id },
-          (res) => {
-            if (res) {
-              restoreArchived(id);
-              toast.success("Space restored", {
-                className: "w-52 text-lg rounded-md shadow",
-                duration: 2000,
-              });
-              navigate(`/${id}`);
-              resolve(res);
-            } else {
-              reject();
-            }
-          },
-        );
-      });
+      try {
+        const response = await chrome.runtime.sendMessage({
+          action: "restoreSpace",
+          spaceId: id,
+        });
+        if (response) {
+          restoreArchived(id);
+          toast.success("Space restored", {
+            className: "w-52 text-lg rounded-md shadow",
+            duration: 2000,
+          });
+          navigate(`/${id}`);
+          return;
+        }
+        throw new Error("Failed to restore space");
+      } catch (err) {
+        if (err instanceof Error) {
+          toast.error(err.message, {
+            className: "w-52 text-lg rounded-md shadow",
+            duration: 2000,
+          });
+        }
+      }
     }
     function handleAddNewSpace(
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>,

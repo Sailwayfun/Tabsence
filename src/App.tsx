@@ -1,15 +1,22 @@
+import toast from "react-hot-toast";
+
 const App = () => {
-  function newTab() {
-    return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage({ action: "signIn" }, (response) => {
-        if (response.success && response.userId) {
-          resolve(chrome.tabs.create({ url: "newTab.html" }));
-          return;
-        }
-        reject(console.log("Please sign in to continue"));
+  async function openExtentionPage() {
+    try {
+      const response = await chrome.runtime.sendMessage({ action: "signIn" });
+      if (response.success && response.userId) {
+        chrome.tabs.create({ url: "newTab.html" });
         return;
-      });
-    });
+      }
+      throw new Error("Please sign in to continue");
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(err.message, {
+          className: "w-52 text-lg rounded-md shadow",
+          duration: 2000,
+        });
+      }
+    }
   }
   return (
     <div className="flex h-60 w-80 flex-col gap-10 p-4">
@@ -21,7 +28,7 @@ const App = () => {
       <div className="py-3">
         <button
           className="mb-4 w-full rounded-md border bg-orange-700 px-6 py-2 text-lg text-white opacity-80 hover:bg-orange-900"
-          onClick={newTab}
+          onClick={openExtentionPage}
         >
           View tabs
         </button>

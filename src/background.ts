@@ -9,7 +9,8 @@ import {
   query,
   where,
   setDoc,
-  getDoc,
+  QuerySnapshot,
+  DocumentData,
   serverTimestamp,
   arrayUnion,
 } from "firebase/firestore";
@@ -243,29 +244,49 @@ chrome.runtime.onMessage.addListener(
 chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
     const result = await chrome.storage.local.get("userId");
-    if (!result.userId) return;
+    if (!result.userId) return sendResponse({ success: false });
     if (message.action === "toggleTabPin" && message.tabId) {
-      await chrome.tabs.update(message.tabId, { pinned: !message.isPinned });
-      const tabDocRef = doc(
-        db,
-        "users",
-        result.userId,
-        "tabs",
-        message.tabId.toString(),
-      );
-      const tabOrderDocRef = doc(
-        db,
-        "users",
-        result.userId,
-        "tabOrders",
-        message.spaceId,
-      );
-      const newTabOrder = message.newTabs
-        .map((tab) => tab.tabId)
-        .filter(Boolean);
-      await setDoc(tabOrderDocRef, { tabOrder: newTabOrder }, { merge: true });
-      await updateDoc(tabDocRef, { isPinned: !message.isPinned });
-      sendResponse({ success: true });
+      try {
+        const tab = await chrome.tabs.update(message.tabId, {
+          pinned: !message.isPinned,
+        });
+        if (!tab) throw new Error("tab not found");
+
+        const tabDocRef = doc(
+          db,
+          "users",
+          result.userId,
+          "tabs",
+          message.tabId.toString(),
+        );
+
+        const tabOrderDocRef = doc(
+          db,
+          "users",
+          result.userId,
+          "tabOrders",
+          message.spaceId,
+        );
+
+        const newTabOrder = message.newTabs
+          .map((tab) => tab.tabId)
+          .filter(Boolean);
+
+        await setDoc(
+          tabOrderDocRef,
+          { tabOrder: newTabOrder },
+          { merge: true },
+        );
+
+        await updateDoc(tabDocRef, { isPinned: !message.isPinned });
+
+        sendResponse({ success: true });
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error(err.message);
+          sendResponse({ success: false });
+        }
+      }
     }
     return true;
   },
@@ -301,48 +322,62 @@ chrome.runtime.onMessage.addListener(
   },
 );
 
+async function deleteSpaceDoc(spaceId: string, userId: string) {
+  try {
+    const spaceDocRef = doc(db, "users", userId, "spaces", spaceId);
+    await deleteDoc(spaceDocRef);
+  } catch (err) {
+    return { success: false };
+  }
+}
+
+async function deleteTabOrderDoc(spaceId: string, userId: string) {
+  try {
+    const tabOrderDocRef = doc(db, "users", userId, "tabOrders", spaceId);
+    await deleteDoc(tabOrderDocRef);
+  } catch (err) {
+    return { success: false };
+  }
+}
+
+async function deleteTabDocsOfSpace(spaceId: string, userId: string) {
+  try {
+    const tabCollectionRef = collection(db, "users", userId, "tabs");
+    const tabQuery = query(tabCollectionRef, where("spaceId", "==", spaceId));
+    const deletedTabsSnapshot = await getDocs(tabQuery);
+    if (deletedTabsSnapshot.empty) {
+      return;
+    }
+    await closeDeletedTabs(deletedTabsSnapshot);
+    await Promise.all(
+      deletedTabsSnapshot.docs.map((doc) => deleteDoc(doc.ref)),
+    );
+  } catch (err) {
+    return { success: false };
+  }
+}
+
+async function closeDeletedTabs(
+  deletedTabsSnapshot: QuerySnapshot<DocumentData, DocumentData>,
+) {
+  try {
+    await Promise.all(
+      deletedTabsSnapshot.docs.map((doc) =>
+        chrome.tabs.remove(doc.data().tabId),
+      ),
+    );
+  } catch (err) {
+    return { success: false };
+  }
+}
+
 async function handleRemoveSpace(message: RuntimeMessage) {
   if (!message.userId || !message.spaceId) {
     return { success: false };
   }
-
-  const spaceDocRef = doc(
-    db,
-    "users",
-    message.userId,
-    "spaces",
-    message.spaceId,
-  );
-  const tabCollectionRef = collection(db, "users", message.userId, "tabs");
-
-  await deleteDoc(spaceDocRef);
-
-  const tabQuery = query(
-    tabCollectionRef,
-    where("spaceId", "==", message.spaceId),
-  );
-
-  const tabOrderDocRef = doc(
-    db,
-    "users",
-    message.userId,
-    "tabOrders",
-    message.spaceId,
-  );
-  const tabOrderSnapshot = await getDoc(tabOrderDocRef);
-  if (!tabOrderSnapshot.exists()) {
-    return { success: false };
-  }
-  await deleteDoc(tabOrderSnapshot.ref);
-
-  const deletedTabsSnapshot = await getDocs(tabQuery);
-  if (deletedTabsSnapshot.empty) {
-    return { success: false };
-  }
-  await Promise.all(deletedTabsSnapshot.docs.map((doc) => deleteDoc(doc.ref)));
-  await chrome.tabs.remove(
-    deletedTabsSnapshot.docs.map((doc) => doc.data().tabId),
-  );
+  await deleteSpaceDoc(message.spaceId, message.userId);
+  await deleteTabOrderDoc(message.spaceId, message.userId);
+  await deleteTabDocsOfSpace(message.spaceId, message.userId);
   return { success: true };
 }
 

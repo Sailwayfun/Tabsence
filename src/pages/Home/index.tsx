@@ -294,23 +294,31 @@ const Home = () => {
     if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
   }
 
-  function handleRemoveSpace(id: string) {
+  async function removeSpaceFromFirestore(spaceId: string, userId: string) {
+    try {
+      const response = await chrome.runtime.sendMessage({
+        action: "removeSpace",
+        spaceId,
+        userId,
+      });
+      if (!response.success) {
+        throw new Error(
+          "Failed to remove space, tabs, or taborder in Firestore",
+        );
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
+    }
+  }
+
+  async function handleRemoveSpace(id: string) {
     const removedSpace = spaces.find((space) => space.id === id);
     if (!removedSpace) return;
     setSpaces(spaces.filter((space) => space.id !== id));
     setTabs(tabs.filter((tab) => tab.spaceId !== id));
-    return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage(
-        { action: "removeSpace", spaceId: id, userId: currentUserId },
-        function (response) {
-          if (response) {
-            resolve(response);
-            return;
-          }
-          reject();
-        },
-      );
-    });
+    await removeSpaceFromFirestore(id, currentUserId);
   }
 
   async function handleTabOrderChange(
@@ -331,30 +339,25 @@ const Home = () => {
     await onTabOrderChange(newTabs, currentSpaceId);
   }
 
-  function onTabOrderChange(
+  async function onTabOrderChange(
     newTabs: Tab[],
     spaceId: string | undefined,
   ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const parsedSharedWindowId = sharedWindowId
-        ? parseInt(sharedWindowId)
-        : "";
-      chrome.runtime.sendMessage(
-        {
-          action: "updateTabOrder",
-          newTabs,
-          spaceId,
-          userId: currentUserId,
-          windowId: parsedSharedWindowId || currentWindowId,
-        },
-        function (response) {
-          if (response) {
-            resolve(response);
-          }
-          reject();
-        },
-      );
-    });
+    const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
+    try {
+      const response = await chrome.runtime.sendMessage({
+        action: "updateTabOrder",
+        newTabs,
+        spaceId,
+        userId: currentUserId,
+        windowId: parsedSharedWindowId || currentWindowId,
+      });
+      if (!response.success) throw new Error("Failed to update tab order");
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
+    }
   }
 
   async function copySpaceLink() {
@@ -390,27 +393,26 @@ const Home = () => {
     });
   }
 
-  function toggleTabPin(tabId?: number, isPinned?: boolean) {
+  async function toggleTabPin(tabId?: number, isPinned?: boolean) {
     const newTabs = sortTabsByPin(tabs, tabId);
     setTabs(newTabs);
-    return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage(
-        {
-          action: "toggleTabPin",
-          tabId,
-          isPinned,
-          newTabs,
-          spaceId: location.pathname.split("/")[1] || "global",
-        },
-        function (response) {
-          if (response) {
-            resolve(response);
-            return;
-          }
-          reject();
-        },
-      );
-    });
+    try {
+      const response = await chrome.runtime.sendMessage({
+        action: "toggleTabPin",
+        tabId,
+        isPinned,
+        newTabs,
+        spaceId: currentSpaceId || "global",
+      });
+      if (!response.success) throw new Error("Failed to toggle tab pin");
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(err.message, {
+          className: "w-72 text-lg rounded-md shadow",
+          duration: 2000,
+        });
+      }
+    }
   }
 
   function toggleTabsLayout() {
@@ -452,7 +454,7 @@ const Home = () => {
     setSpaces(newSpaces);
   }
 
-  function handleSpaceEditBlur(
+  async function handleSpaceEditBlur(
     e: React.FocusEvent<HTMLInputElement, Element>,
     id: string,
   ) {
@@ -475,23 +477,29 @@ const Home = () => {
       return space;
     });
     setSpaces(newSpaces);
-    return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage(
-        {
-          action: "updateSpaceTitle",
-          spaceId: id,
-          newSpaceTitle: newSpaces.find((space) => space.id === id)?.title,
-          userId: currentUserId,
-        },
-        function (response) {
-          if (response) {
-            resolve(response);
-            return;
-          }
-          reject();
-        },
-      );
-    });
+    await updateSpaceTitleInFirestore(id, e.target.value.trim(), currentUserId);
+  }
+
+  async function updateSpaceTitleInFirestore(
+    spaceId: string,
+    newSpaceTitle: string | undefined,
+    userId: string,
+  ) {
+    try {
+      const response = await chrome.runtime.sendMessage({
+        action: "updateSpaceTitle",
+        spaceId,
+        newSpaceTitle,
+        userId,
+      });
+      if (!response.success) {
+        throw new Error("Failed to update space title in Firestore");
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
+    }
   }
 
   const isWebTime = location.pathname.includes("/webtime");

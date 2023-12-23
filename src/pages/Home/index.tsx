@@ -16,13 +16,12 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
-import { sortTabs, validateSpaceTitle } from "../../utils";
+import { cn, sortTabs, validateSpaceTitle } from "../../utils";
 import ToggleViewBtn from "./ToggleViewBtn";
 import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";
 import { Tab, Space, SpaceDoc, Direction } from "../../types";
 import { Loader } from "../../components/UI";
-import { cn } from "../../utils";
 interface Response {
   success: boolean;
 }

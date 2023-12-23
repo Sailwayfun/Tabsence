@@ -16,8 +16,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
-import { sortTabs } from "../../utils/firestore";
-import { validateSpaceTitle } from "../../utils/validate";
+import { sortTabs, validateSpaceTitle } from "../../utils";
 import ToggleViewBtn from "./ToggleViewBtn";
 import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";

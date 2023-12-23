@@ -6,7 +6,7 @@ import {
   increment,
   serverTimestamp,
 } from "firebase/firestore";
-import { getFaviconUrl } from "./firestore";
+import { getFaviconUrl } from "./tabs";
 
 import debounce from "lodash.debounce";
 

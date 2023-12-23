@@ -88,19 +88,8 @@ const Home = () => {
           );
     const unsubscribeTab = onSnapshot(tabQ, (querySnapshot) => {
       const currentTabs: Tab[] = [];
-      if (currentPath !== "") {
-        querySnapshot.forEach((doc) => {
-          const tab = doc.data() as Tab;
-          currentTabs.push(tab);
-        });
-        const sortedTabs = sortTabs(currentTabs, tabOrder);
-        setTabs(sortedTabs);
-        setIsLoading(false);
-        return;
-      }
       querySnapshot.forEach((doc) => {
         const tab = doc.data() as Tab;
-        if (tab.spaceId) return;
         currentTabs.push(tab);
       });
       const sortedTabs = sortTabs(currentTabs, tabOrder);

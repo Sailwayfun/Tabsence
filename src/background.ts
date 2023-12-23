@@ -20,7 +20,6 @@ import { urlsStore } from "./store/tabUrlMap";
 import {
   saveTabInfo,
   upDateTabBySpace,
-  tabTimes,
   trackTabTime,
   updateTabDuration,
 } from "./utils";

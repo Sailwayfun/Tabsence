@@ -1,4 +1,4 @@
-import Modal from "../UI/Modal";
+import { Modal } from "../UI";
 interface RemoveSpaceModalProps {
   id: string;
   onRemoveSpace: (id: string) => void;

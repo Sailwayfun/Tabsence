@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import Kebab from "../Icons/Kebab";
-import IconButton from "../UI/IconButton";
+import { IconButton } from "../UI";
 interface KebabBtnProps {
   onClick: () => void;
 }

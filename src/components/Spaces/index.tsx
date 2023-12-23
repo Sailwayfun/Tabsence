@@ -8,7 +8,7 @@ import SpaceTab from "./SpaceTab";
 import Logo from "../Header/Logo";
 import Folder from "../Icons/Folder";
 import AddSpace from "./AddSpace";
-import Heading from "../UI/Heading";
+import { Heading } from "../UI";
 import Box from "../Icons/Box";
 import { cn } from "../../utils";
 interface SpacesProps {

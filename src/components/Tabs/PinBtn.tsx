@@ -1,7 +1,6 @@
 import { cn } from "../../utils";
 import Pin from "../Icons/Pin";
-import Tooltip from "../UI/Tooltip";
-import IconButton from "../UI/IconButton";
+import { Tooltip, IconButton } from "../UI";
 interface PinBtnProps {
   id?: number;
   isPinned: boolean;

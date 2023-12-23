@@ -1,6 +1,6 @@
 import { cn } from "../../utils";
 import TabOrderIcon from "../Icons/TabOrderIcon";
-import IconButton from "../UI/IconButton";
+import { IconButton } from "../UI";
 import { Direction } from "../../types";
 
 interface TabOrderBtnProps {

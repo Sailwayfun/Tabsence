@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Chart from "./Chart";
 import { useParams } from "react-router-dom";
 import Header from "./Header";
-import Loader from "../../components/UI/Loader";
+import { Loader } from "../../components/UI";
 import useLogin from "../../hooks/useLogin";
 import ToggleOrderBtn from "./ToggleOrderBtn";
 import { cn } from "../../utils";

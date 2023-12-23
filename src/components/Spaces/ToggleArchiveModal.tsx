@@ -1,4 +1,4 @@
-import Modal from "../UI/Modal";
+import { Modal } from "../UI";
 interface ToggleArchiveModalProps {
   id: string;
   onAction: (id: string) => void;

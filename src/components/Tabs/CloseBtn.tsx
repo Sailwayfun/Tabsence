@@ -1,4 +1,4 @@
-import IconButton from "../UI/IconButton";
+import { IconButton } from "../UI";
 import Close from "../Icons/Close";
 
 interface CloseBtnProps {

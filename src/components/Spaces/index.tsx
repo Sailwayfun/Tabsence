@@ -13,7 +13,6 @@ import Box from "../Icons/Box";
 import { cn } from "../../utils";
 interface SpacesProps {
   spaces: Space[];
-  onOpenAddSpacePopup: () => void;
   onAddNewSpace: () => void;
   onRemoveSpace: (id: string) => void;
   onSpaceEditBlur: (
@@ -32,7 +31,6 @@ const Spaces = forwardRef(
   (props: SpacesProps, ref: React.Ref<HTMLInputElement>) => {
     const {
       spaces,
-      onOpenAddSpacePopup,
       onAddNewSpace,
       onRemoveSpace,
       onSpaceEditBlur,
@@ -135,6 +133,12 @@ const Spaces = forwardRef(
     function handleEditSpace(id: string) {
       onEditSpace(id);
     }
+    function openAddSpaceModal() {
+      const targetModal = document.getElementById(
+        "add_space",
+      ) as HTMLDialogElement | null;
+      if (targetModal) targetModal.showModal();
+    }
     const sideBarAnimation = "transition duration-300 ease-in-out";
     return (
       <div
@@ -151,7 +155,7 @@ const Spaces = forwardRef(
             <Heading text="Spaces" />
           </div>
           <span className="mx-auto mt-10 h-[1px] w-full bg-white opacity-60" />
-          <AddSpaceBtn onAddSpace={onOpenAddSpacePopup} />
+          <AddSpaceBtn onAddSpace={openAddSpaceModal} />
           <AddSpace
             ref={ref}
             onAddNewSpace={handleAddNewSpace}

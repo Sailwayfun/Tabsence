@@ -255,13 +255,6 @@ const Home = () => {
     });
   }
 
-  function openAddSpacePopup() {
-    const targetModal = document.getElementById(
-      "add_space",
-    ) as HTMLDialogElement | null;
-    if (targetModal) targetModal.showModal();
-  }
-
   function addNewSpace() {
     const newSpaceTitle: string | undefined =
       newSpaceInputRef.current?.value.trim();
@@ -510,7 +503,6 @@ const Home = () => {
         {isLoggedin && (
           <Spaces
             spaces={spaces}
-            onOpenAddSpacePopup={openAddSpacePopup}
             ref={newSpaceInputRef}
             onAddNewSpace={addNewSpace}
             currentSpaceId={currentSpaceId}

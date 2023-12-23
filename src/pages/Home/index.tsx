@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useArchivedSpaceStore } from "../../store";
+import { useArchivedSpaceStore } from "../../store/archiveSpace";
 import { useLocation, Outlet, useParams } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import Spaces from "../../components/Spaces";

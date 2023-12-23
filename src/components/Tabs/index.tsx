@@ -6,13 +6,13 @@ import { cn } from "../../utils";
 interface TabsProps {
   tabs: Tab[];
   spaces: Space[];
-  activeSpaceSelectId?: string;
+  activeSpaceSelectId?: number;
   selectedSpace: string;
   isLoggedin: boolean;
   isGrid: boolean;
-  openSpacesPopup: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  openSpacesPopup: (tabId?: number) => void;
   selectSpace: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  closeTab: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  closeTab: (tabId?: number) => Promise<void>;
   handleTabOrderChange: (tabId: number, direction: Direction) => Promise<void>;
   toggleTabPin: (tabId?: number, isPinned?: boolean) => void;
 }

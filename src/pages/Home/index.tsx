@@ -30,9 +30,7 @@ interface Response {
 const Home = () => {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [spaces, setSpaces] = useState<Space[]>([]);
-  const [activeSpaceSelectId, setActiveSpaceSelectId] = useState<
-    string | undefined
-  >();
+  const [activeSpaceSelectId, setActiveSpaceSelectId] = useState<number>(0);
   const [selectedSpace, setSelectedSpace] = useState<string>("");
   const { isLoggedin, currentUserId } = useLogin();
   const [tabOrder, setTabOrder] = useState<number[]>([]);
@@ -216,28 +214,34 @@ const Home = () => {
     };
   }, [currentWindowId, sharedWindowId]);
 
-  function closeTab(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    const id = e.currentTarget.dataset.id;
-    if (id) {
-      const message = {
-        action: "closeTab",
-        tabId: parseInt(id),
-        userId: currentUserId,
-      };
-      chrome.runtime.sendMessage(message, function () {
-        toast.success("Tab Deleted", {
-          className: "w-52 text-lg rounded-md shadow",
+  async function closeTab(tabId: number | undefined) {
+    if (!tabId) return;
+    const message = {
+      action: "closeTab",
+      tabId,
+      userId: currentUserId,
+    };
+    try {
+      const response = await chrome.runtime.sendMessage(message);
+      if (!response.success) throw new Error("Failed to close tab");
+      toast.success("Tab Closed", {
+        className: "w-52 text-lg rounded-md shadow",
+        id: "tab_deleted",
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error("This tab is already closed", {
+          className: "w-[400px] text-lg rounded-md shadow",
           id: "tab_deleted",
         });
-        return true;
-      });
+      }
     }
+    return;
   }
 
-  function openSpacesPopup(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  function openSpacesPopup(tabId?: number) {
     setSelectedSpace("");
-    const id: string | undefined = e.currentTarget.dataset.id;
-    if (id) setActiveSpaceSelectId(id);
+    if (tabId) setActiveSpaceSelectId(tabId);
   }
 
   function selectSpace(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -245,9 +249,7 @@ const Home = () => {
     if (e.target.value === "") return;
     const message = {
       action: "moveTabToSpace",
-      updatedTab: tabs.find(
-        (tab) => tab.tabId?.toString() === activeSpaceSelectId,
-      ),
+      updatedTab: tabs.find((tab) => tab.tabId === activeSpaceSelectId),
       spaceId: e.target.value,
       userId: currentUserId,
     };

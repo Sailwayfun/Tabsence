@@ -1,7 +1,7 @@
 import { Space } from "../../types/space";
 import { useState, useEffect, useRef } from "react";
 import { Tab, Direction } from "../../types";
-import MoveToSpace from "./MoveToSpace";
+import MoveToSpace from "./MoveToSpaceBtn";
 import CloseBtn from "./CloseBtn";
 import Tooltip from "../UI/Tooltip";
 import PinBtn from "./PinBtn";
@@ -13,12 +13,10 @@ import { directionStrategies } from "../../strategies";
 interface TabProps {
   tab: Tab;
   spaces: Space[];
-  selectId: string | undefined;
-  onOpenSpacesPopup: (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ) => void;
+  selectId?: number;
+  onOpenSpacesPopup: (tabId?: number) => void;
   onSelectSpace: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  onCloseTab: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onCloseTab: (tabId?: number) => Promise<void>;
   onTabOrderChange: (tabId: number, direction: Direction) => Promise<void>;
   onToggleTabPin: (tabId?: number, isPinned?: boolean) => void;
   selectedSpace: string;
@@ -172,12 +170,12 @@ const TabCard = ({
           <Dropdown
             button={
               <MoveToSpace
-                id={tab.tabId?.toString()}
+                id={tab.tabId}
                 onOpenSpacesPopup={onOpenSpacesPopup}
               />
             }
           >
-            {tab.tabId?.toString() === selectId && (
+            {tab.tabId === selectId && (
               <div className="ml-5 h-14 w-52 px-3">
                 <label
                   htmlFor={tab.id?.toString() || "spaces"}
@@ -207,7 +205,7 @@ const TabCard = ({
             data-tip="Close Tab"
             orderClass={isGrid ? "order-first" : ""}
           >
-            <CloseBtn id={tab.tabId?.toString()} onCloseTab={onCloseTab} />
+            <CloseBtn id={tab.tabId} onCloseTab={onCloseTab} />
           </Tooltip>
         </div>
       )}

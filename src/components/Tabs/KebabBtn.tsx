@@ -1,18 +1,18 @@
 import { forwardRef } from "react";
 import Kebab from "../Icons/Kebab";
+import IconButton from "../UI/IconButton";
 interface KebabBtnProps {
   onClick: () => void;
 }
 type Ref = HTMLButtonElement;
 const KebabBtn = forwardRef<Ref, KebabBtnProps>(({ onClick }, ref) => {
   return (
-    <button
-      className="absolute right-2 top-2 h-5 w-5"
+    <IconButton
+      customClasses="absolute right-2 top-2 h-5 w-5"
       onClick={onClick}
       ref={ref}
-    >
-      <Kebab className="h-full w-full" />
-    </button>
+      icon={<Kebab className="h-full w-full" />}
+    />
   );
 });
 

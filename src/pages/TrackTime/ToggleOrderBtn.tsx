@@ -1,4 +1,6 @@
 import ToggleOrder from "../../components/Icons/ToggleOrder";
+import { Tooltip, IconButton } from "../../components/UI";
+
 interface ToggleOrderBtnProps {
   isAscending: boolean;
   onToggleOrder: () => void;
@@ -9,17 +11,20 @@ const ToggleOrderBtn = ({
   isAscending,
 }: ToggleOrderBtnProps) => {
   return (
-    <div
-      className="tooltip flex items-center justify-center"
+    <Tooltip
+      className="flex items-center justify-center"
       data-tip={isAscending ? "descending" : "ascending"}
     >
-      <button onClick={onToggleOrder}>
-        <ToggleOrder
-          className="h-6 w-6"
-          direction={isAscending ? "ascend" : "descend"}
-        />
-      </button>
-    </div>
+      <IconButton
+        onClick={onToggleOrder}
+        icon={
+          <ToggleOrder
+            className="h-full w-full"
+            direction={isAscending ? "ascend" : "descend"}
+          />
+        }
+      />
+    </Tooltip>
   );
 };
 

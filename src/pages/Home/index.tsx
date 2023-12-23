@@ -46,10 +46,6 @@ const Home = () => {
   }>();
 
   useEffect(() => {
-    setTabOrder([]);
-  }, [location.pathname]);
-
-  useEffect(() => {
     function hideArchivedSpacesTabs(
       currentTabs: Tab[],
       archivedSpaces: string[],
@@ -135,7 +131,6 @@ const Home = () => {
   ]);
 
   useEffect(() => {
-    setIsLoading(true);
     const currentPath = location.pathname.split("/")[1];
     const spaceId = currentPath !== "" ? currentPath : "global";
     const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
@@ -156,7 +151,6 @@ const Home = () => {
       ) {
         const order: number[] = doc.data()?.tabOrder;
         if (order) setTabOrder(order);
-        setIsLoading(false);
       }
     });
     return () => {

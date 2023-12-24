@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useArchivedSpaceStore } from "../../store/archiveSpace";
+import { useTabStore } from "../../store/tabs";
 import { useLocation, Outlet, useParams } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import Spaces from "../../components/Spaces";
@@ -16,7 +17,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
-import { cn, sortTabs, validateSpaceTitle } from "../../utils";
+import { cn, validateSpaceTitle } from "../../utils";
 import ToggleViewBtn from "./ToggleViewBtn";
 import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";
@@ -27,17 +28,15 @@ interface Response {
   success: boolean;
 }
 const Home = () => {
-  const [tabs, setTabs] = useState<Tab[]>([]);
+  // const [tabs, setTabs] = useState<Tab[]>([]);
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [activeSpaceSelectId, setActiveSpaceSelectId] = useState<number>(0);
   const [selectedSpace, setSelectedSpace] = useState<string>("");
   const { isLoggedin, currentUserId } = useLogin();
-  const [tabOrder, setTabOrder] = useState<number[]>([]);
+  // const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
-  const archivedSpaces: string[] = useArchivedSpaceStore(
-    (state) => state.archivedSpaces,
-  );
+
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   const currentWindowId = useWindowId();
@@ -46,19 +45,34 @@ const Home = () => {
     spaceId: string;
   }>();
 
+  const archivedSpaces: string[] = useArchivedSpaceStore(
+    (state) => state.archivedSpaces,
+  );
+
+  const tabs: Tab[] = useTabStore((state) => state.tabs);
+  const tabOrder: number[] = useTabStore((state) => state.tabOrder);
+  const hideArchivedTabs = useTabStore((state) => state.hideArchivedTabs);
+  const sortTabs = useTabStore((state) => state.sortTabs);
+  const removeTab = useTabStore((state) => state.closeTab);
+  const updateTabInTabs = useTabStore((state) => state.updateTab);
+  const removeTabsFromSpace = useTabStore((state) => state.removeTabsFromSpace);
+  const moveTabOrder = useTabStore((state) => state.moveTabOrder);
+  const sortTabsByPin = useTabStore((state) => state.sortTabsByPin);
+  const setTabOrder = useTabStore((state) => state.setTabOrder);
   console.log("現在的tab order", tabOrder);
 
   useEffect(() => {
-    function hideArchivedSpacesTabs(
-      currentTabs: Tab[],
-      archivedSpaces: string[],
-    ) {
-      return currentTabs.filter(
-        (tab) => !archivedSpaces.includes(tab.spaceId || ""),
-      );
-    }
-    setTabs((t) => hideArchivedSpacesTabs(t, archivedSpaces));
-  }, [archivedSpaces]);
+    hideArchivedTabs(archivedSpaces);
+    // function hideArchivedSpacesTabs(
+    //   currentTabs: Tab[],
+    //   archivedSpaces: string[],
+    // ) {
+    //   return currentTabs.filter(
+    //     (tab) => !archivedSpaces.includes(tab.spaceId || ""),
+    //   );
+    // }
+    // setTabs((t) => hideArchivedSpacesTabs(t, archivedSpaces));
+  }, [archivedSpaces, hideArchivedTabs]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -95,8 +109,9 @@ const Home = () => {
         const tab = doc.data() as Tab;
         currentTabs.push(tab);
       });
-      const sortedTabs = sortTabs(currentTabs, tabOrder);
-      setTabs(sortedTabs);
+      // const sortedTabs = sortTabs(currentTabs, tabOrder);
+      // setTabs(sortedTabs);
+      sortTabs();
       setIsLoading(false);
       return;
     });
@@ -120,6 +135,7 @@ const Home = () => {
     currentWindowId,
     sharedWindowId,
     tabOrder,
+    sortTabs,
   ]);
 
   useEffect(() => {
@@ -153,6 +169,7 @@ const Home = () => {
     currentSpaceId,
     currentWindowId,
     sharedWindowId,
+    setTabOrder,
   ]);
 
   useEffect(() => {
@@ -166,8 +183,9 @@ const Home = () => {
       _: chrome.runtime.MessageSender | undefined,
       sendResponse: (response: Response) => void,
     ) => {
-      if (message.action === "tabClosed") {
-        setTabs((t) => t.filter((tab) => tab.tabId !== message.tabId));
+      if (message.action === "tabClosed" && message.tabId) {
+        // setTabs((t) => t.filter((tab) => tab.tabId !== message.tabId));
+        removeTab(message.tabId);
         sendResponse({ success: true });
       }
       if (
@@ -175,15 +193,16 @@ const Home = () => {
         (message.updatedTab.windowId === currentWindowId ||
           message.updatedTab.windowId === parsedSharedWindowId)
       ) {
-        setTabs((t) => {
-          const updatedTabs = t.map((tab) => {
-            if (tab.tabId === message.updatedTab.tabId) {
-              return message.updatedTab;
-            }
-            return tab;
-          })
-          return updatedTabs;
-        });
+        // setTabs((t) => {
+        //   const updatedTabs = t.map((tab) => {
+        //     if (tab.tabId === message.updatedTab.tabId) {
+        //       return message.updatedTab;
+        //     }
+        //     return tab;
+        //   });
+        //   return updatedTabs;
+        // });
+        updateTabInTabs(message.updatedTab);
         sendResponse({ success: true });
       }
       return true;
@@ -192,7 +211,7 @@ const Home = () => {
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessagePassing);
     };
-  }, [currentWindowId, sharedWindowId]);
+  }, [currentWindowId, sharedWindowId, removeTab, updateTabInTabs]);
 
   async function closeTab(tabId: number | undefined) {
     if (!tabId) return;
@@ -300,7 +319,7 @@ const Home = () => {
     const removedSpace = spaces.find((space) => space.id === id);
     if (!removedSpace) return;
     setSpaces(spaces.filter((space) => space.id !== id));
-    setTabs(tabs.filter((tab) => tab.spaceId !== id));
+    removeTabsFromSpace(id);
     await removeSpaceFromFirestore(id, currentUserId);
   }
 
@@ -310,15 +329,17 @@ const Home = () => {
   ): Promise<void> {
     const movedTab = tabs.find((tab) => tab.tabId === tabId);
     if (!movedTab) return;
-    const movedTabIndex = tabs.indexOf(movedTab);
-    const newTabs = [...tabs];
-    newTabs.splice(movedTabIndex, 1);
-    newTabs.splice(
-      movedTabIndex + (direction === "up" || direction === "left" ? -1 : 1),
-      0,
-      movedTab,
-    );
-    setTabs(newTabs);
+    // const movedTabIndex = tabs.indexOf(movedTab);
+    // const newTabs = [...tabs];
+    // newTabs.splice(movedTabIndex, 1);
+    // newTabs.splice(
+    //   movedTabIndex + (direction === "up" || direction === "left" ? -1 : 1),
+    //   0,
+    //   movedTab,
+    // );
+    // setTabs(newTabs);
+    moveTabOrder(tabId, direction);
+    const newTabs = useTabStore.getState().tabs;
     await onTabOrderChange(newTabs, currentSpaceId);
   }
 
@@ -359,26 +380,28 @@ const Home = () => {
     }
   }
 
-  function sortTabsByPin(tabs: Tab[], tabId?: number) {
-    const newTabs = tabs.map((tab) => {
-      if (tabId && tab.tabId === tabId) {
-        return {
-          ...tab,
-          isPinned: !tab.isPinned,
-        };
-      }
-      return tab;
-    });
-    return newTabs.sort((a, b) => {
-      if (a.isPinned && !b.isPinned) return -1;
-      if (!a.isPinned && b.isPinned) return 1;
-      return 0;
-    });
-  }
+  // function sortTabsByPin(tabs: Tab[], tabId?: number) {
+  //   const newTabs = tabs.map((tab) => {
+  //     if (tabId && tab.tabId === tabId) {
+  //       return {
+  //         ...tab,
+  //         isPinned: !tab.isPinned,
+  //       };
+  //     }
+  //     return tab;
+  //   });
+  //   return newTabs.sort((a, b) => {
+  //     if (a.isPinned && !b.isPinned) return -1;
+  //     if (!a.isPinned && b.isPinned) return 1;
+  //     return 0;
+  //   });
+  // }
 
-  async function toggleTabPin(tabId?: number, isPinned?: boolean) {
-    const newTabs = sortTabsByPin(tabs, tabId);
-    setTabs(newTabs);
+  async function toggleTabPin(tabId: number, isPinned: boolean) {
+    // const newTabs = sortTabsByPin(tabs, tabId);
+    // setTabs(newTabs);
+    sortTabsByPin(tabId);
+    const newTabs = useTabStore.getState().tabs;
     try {
       const response = await chrome.runtime.sendMessage({
         action: "toggleTabPin",

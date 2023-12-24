@@ -21,7 +21,7 @@ interface TabProps {
   ) => Promise<void>;
   onCloseTab: (tabId?: number) => Promise<void>;
   onTabOrderChange: (tabId: number, direction: Direction) => Promise<void>;
-  onToggleTabPin: (tabId?: number, isPinned?: boolean) => void;
+  onToggleTabPin: (tabId: number, isPinned: boolean) => void;
   selectedSpace: string;
   isLastTab: boolean;
   isFirstTab: boolean;

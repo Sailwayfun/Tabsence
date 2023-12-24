@@ -58,7 +58,6 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         updatedTab: { ...tab, ...tabData },
       });
       if (!response.succes) throw new Error("Failed to update tabs state");
-      return true;
     } catch (err) {
       if (err instanceof Error) {
         console.error(err.message);
@@ -230,8 +229,8 @@ async function getUserId() {
   const userId = result.userId;
   if (!userId) {
     const userCollectionRef = collection(db, "users");
-    const userId: string = doc(userCollectionRef).id;
-    return userId;
+    const docId: string = doc(userCollectionRef).id;
+    return docId;
   }
   return userId;
 }

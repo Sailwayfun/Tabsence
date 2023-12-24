@@ -5,7 +5,7 @@ interface PinBtnProps {
   id?: number;
   isPinned: boolean;
   isGrid: boolean;
-  onToggleTabPin: (tabId?: number, isPinned?: boolean) => void;
+  onToggleTabPin: (tabId: number, isPinned: boolean) => void;
 }
 const PinBtn = ({ onToggleTabPin, id, isPinned, isGrid }: PinBtnProps) => {
   return (
@@ -14,7 +14,7 @@ const PinBtn = ({ onToggleTabPin, id, isPinned, isGrid }: PinBtnProps) => {
       data-tip="Pin Tab"
     >
       <IconButton
-        onClick={() => onToggleTabPin(id, isPinned)}
+        onClick={() => onToggleTabPin(id!, isPinned)}
         customClasses="text-gray-800"
         icon={
           <Pin

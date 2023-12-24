@@ -6,6 +6,7 @@ const App = () => {
       const response = await chrome.runtime.sendMessage({ action: "signIn" });
       if (response.success && response.userId) {
         chrome.tabs.create({ url: "newTab.html" });
+        console.log("success!!!!");
         return;
       }
       throw new Error("Please sign in to continue");

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useArchivedSpaceStore } from "../../store/archiveSpace";
+import { useSpaceStore } from "../../store/spaces";
 import { useTabStore } from "../../store/tabs";
 import { useLocation, Outlet, useParams } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
@@ -28,7 +29,6 @@ interface Response {
   success: boolean;
 }
 const Home = () => {
-  const [spaces, setSpaces] = useState<Space[]>([]);
   const [selectedTabId, setSelectedTabId] = useState<number>(0);
   const [selectedSpaceId, setSelectedSpaceId] = useState<string>("");
   const { isLoggedin, currentUserId } = useLogin();
@@ -58,6 +58,16 @@ const Home = () => {
   const moveTabToSpace = useTabStore((state) => state.moveTabToSpace);
   const sortTabsByPin = useTabStore((state) => state.sortTabsByPin);
   const setTabOrder = useTabStore((state) => state.setTabOrder);
+
+  const spaces: Space[] = useSpaceStore((state) => state.spaces);
+  const setSpaces = useSpaceStore((state) => state.setSpaces);
+  const removeSpace = useSpaceStore((state) => state.removeSpace);
+  const startEditingSpaceTitle = useSpaceStore(
+    (state) => state.startEditingSpaceTitle,
+  );
+  const inputSpaceTitle = useSpaceStore((state) => state.inputSpaceTitle);
+  const changeSpaceTitle = useSpaceStore((state) => state.changeSpaceTitle);
+
   useEffect(() => {
     hideArchivedTabs(archivedSpaces);
   }, [archivedSpaces, hideArchivedTabs]);
@@ -122,6 +132,7 @@ const Home = () => {
     sharedWindowId,
     tabOrder,
     sortTabsByTabOrder,
+    setSpaces,
   ]);
 
   useEffect(() => {
@@ -298,7 +309,7 @@ const Home = () => {
   async function handleRemoveSpace(id: string) {
     const removedSpace = spaces.find((space) => space.id === id);
     if (!removedSpace) return;
-    setSpaces(spaces.filter((space) => space.id !== id));
+    removeSpace(id);
     removeTabsFromSpace(id);
     await removeSpaceFromFirestore(id, currentUserId);
   }
@@ -381,61 +392,21 @@ const Home = () => {
     e: React.ChangeEvent<HTMLInputElement>,
     id: string,
   ) {
-    const newSpaces = spaces.map((space) => {
-      if (space.id === id) {
-        if (e.target.value.length === 11) {
-          toast.error("Space name should be less than 10 characters", {
-            className: "w-[400px] text-lg rounded-md shadow",
-          });
-          return space;
-        }
-        return {
-          ...space,
-          title: e.target.value,
-        };
-      }
-      return space;
-    });
-    setSpaces(newSpaces);
+    const newTitle = e.target.value;
+    inputSpaceTitle(newTitle, id);
   }
 
   function handleEditSpace(id: string) {
-    const newSpaces = spaces.map((space) => {
-      if (space.id === id) {
-        return {
-          ...space,
-          isEditing: true,
-        };
-      }
-      return space;
-    });
-    setSpaces(newSpaces);
+    startEditingSpaceTitle(id);
   }
 
   async function handleSpaceEditBlur(
     e: React.FocusEvent<HTMLInputElement, Element>,
     id: string,
   ) {
-    if (!e.target.value) return;
-    const errorToastId: string | null = validateSpaceTitle(
-      spaces,
-      id,
-      e.target.value,
-    );
-    if (errorToastId) {
-      return;
-    }
-    const newSpaces = spaces.map((space) => {
-      if (space.id === id) {
-        return {
-          ...space,
-          isEditing: false,
-        };
-      }
-      return space;
-    });
-    setSpaces(newSpaces);
-    await updateSpaceTitleInFirestore(id, e.target.value.trim(), currentUserId);
+    const newTitle = e.target.value.trim();
+    changeSpaceTitle(newTitle, id);
+    await updateSpaceTitleInFirestore(id, newTitle, currentUserId);
   }
 
   async function updateSpaceTitleInFirestore(

@@ -26,7 +26,6 @@ export function getCurrentDate(): string {
 
 interface TabInfo {
   startTime: number;
-  // url: string;
   durationBySecond: number;
   date: string;
 }

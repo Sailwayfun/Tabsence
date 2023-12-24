@@ -40,8 +40,6 @@ interface RuntimeMessage {
   windowId: number;
 }
 
-console.log("background script running");
-
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.url) {
     urlsStore.getState().updateTabUrl(tabId, changeInfo.url);

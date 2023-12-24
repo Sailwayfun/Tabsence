@@ -4,7 +4,6 @@ const App = () => {
   async function openExtentionPage() {
     try {
       const response = await chrome.runtime.sendMessage({ action: "signIn" });
-      console.log("response in popup", response);
       if (!response.success && !response.userId) {
         throw new Error("Please sign in to continue");
       }

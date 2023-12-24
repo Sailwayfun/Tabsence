@@ -68,7 +68,6 @@ const TabCard = ({
 }: TabProps) => {
   const { showIcons, setShowIcons, iconsRef, btnRef } = useToggleIcons();
   const { spaceId: originalSpaceId } = useParams<{ spaceId: string }>();
-  console.log("originalSpaceId", originalSpaceId);
 
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,

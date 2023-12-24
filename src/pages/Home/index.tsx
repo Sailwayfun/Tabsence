@@ -176,15 +176,12 @@ const Home = () => {
           message.updatedTab.windowId === parsedSharedWindowId)
       ) {
         setTabs((t) => {
-          const updatedTabs: Tab[] = [...t];
-          const existingTab: Tab | undefined = updatedTabs.find(
-            (tab) => tab.tabId === message.updatedTab.tabId,
-          );
-          if (existingTab) {
-            Object.assign(existingTab, message.updatedTab);
-          } else {
-            updatedTabs.push(message.updatedTab);
-          }
+          const updatedTabs = t.map((tab) => {
+            if (tab.tabId === message.updatedTab.tabId) {
+              return message.updatedTab;
+            }
+            return tab;
+          })
           return updatedTabs;
         });
         sendResponse({ success: true });

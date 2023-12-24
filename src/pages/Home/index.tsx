@@ -227,7 +227,7 @@ const Home = () => {
     if (tabId) setActiveSpaceSelectId(tabId);
   }
 
-  function selectSpace(
+  async function selectSpace(
     e: React.ChangeEvent<HTMLSelectElement>,
     originalSpaceId: string,
   ) {
@@ -240,18 +240,22 @@ const Home = () => {
       spaceId: e.target.value,
       userId: currentUserId,
     };
-    chrome.runtime.sendMessage(message, function (response) {
-      console.log(response);
-      if (response.success) {
-        toast.success("Tab moved to space", {
-          className: "w-60 text-lg rounded-md shadow",
-          duration: 2000,
-        });
-      }
+    const response = await chrome.runtime.sendMessage(message);
+    if (!response.success) {
+      toast.error("Failed to move tab to space", {
+        className: "w-60 text-lg rounded-md shadow",
+        duration: 2000,
+      });
+      return;
+    }
+    toast.success("Tab moved to space", {
+      className: "w-60 text-lg rounded-md shadow",
+      duration: 2000,
     });
+    return;
   }
 
-  function addNewSpace() {
+  async function addNewSpace() {
     const newSpaceTitle: string | undefined =
       newSpaceInputRef.current?.value.trim();
     const errorToastId: string | null = validateSpaceTitle(
@@ -263,17 +267,16 @@ const Home = () => {
       if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
       return;
     }
-    chrome.runtime.sendMessage(
-      { action: "addSpace", newSpaceTitle, userId: currentUserId },
-      function (response) {
-        if (response.id && newSpaceTitle) {
-          toast.success("Space added", {
-            className: "w-52 text-lg rounded-md shadow",
-            duration: 2000,
-          });
-        }
-      },
-    );
+    const response = await chrome.runtime.sendMessage({
+      action: "addSpace",
+      newSpaceTitle,
+      userId: currentUserId,
+    });
+    if (!response.id || !newSpaceTitle) return;
+    toast.success("Space added", {
+      className: "w-52 text-lg rounded-md shadow",
+      duration: 2000,
+    });
     if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
   }
 

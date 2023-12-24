@@ -14,7 +14,7 @@ interface TabsProps {
   selectSpace: (
     e: React.ChangeEvent<HTMLSelectElement>,
     originalSpaceId: string,
-  ) => void;
+  ) => Promise<void>;
   closeTab: (tabId?: number) => Promise<void>;
   handleTabOrderChange: (tabId: number, direction: Direction) => Promise<void>;
   toggleTabPin: (tabId?: number, isPinned?: boolean) => void;

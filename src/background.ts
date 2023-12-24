@@ -52,17 +52,18 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
       .get("userId")
       .then((res) => res.userId);
     const tabData = await saveTabInfo(tab, userId);
-    chrome.runtime.sendMessage(
-      {
+    try {
+      const response = await chrome.runtime.sendMessage({
         action: "tabUpdated",
         updatedTab: { ...tab, ...tabData },
-      },
-      () => {
-        if (chrome.runtime.lastError) {
-          console.error(chrome.runtime.lastError.message);
-        }
-      },
-    );
+      });
+      if (!response.succes) throw new Error("Failed to update tabs state");
+      return true;
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
+    }
   }
   return true;
 });

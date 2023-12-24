@@ -13,7 +13,7 @@ import Box from "../Icons/Box";
 import { cn } from "../../utils";
 interface SpacesProps {
   spaces: Space[];
-  onAddNewSpace: () => void;
+  onAddNewSpace: () => Promise<void>;
   onRemoveSpace: (id: string) => void;
   onSpaceEditBlur: (
     e: React.FocusEvent<HTMLInputElement, Element>,

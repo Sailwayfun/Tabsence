@@ -4,12 +4,11 @@ const App = () => {
   async function openExtentionPage() {
     try {
       const response = await chrome.runtime.sendMessage({ action: "signIn" });
-      if (response.success && response.userId) {
-        chrome.tabs.create({ url: "newTab.html" });
-        console.log("success!!!!");
-        return;
+      console.log("response in popup", response);
+      if (!response.success && !response.userId) {
+        throw new Error("Please sign in to continue");
       }
-      throw new Error("Please sign in to continue");
+      chrome.tabs.create({ url: "newTab.html" });
     } catch (err) {
       if (err instanceof Error) {
         toast.error(err.message, {

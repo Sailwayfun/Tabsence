@@ -40,6 +40,8 @@ interface RuntimeMessage {
   windowId: number;
 }
 
+console.log("background script running");
+
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.url) {
     urlsStore.getState().updateTabUrl(tabId, changeInfo.url);
@@ -69,9 +71,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
 chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
-    if (!message.userId) {
-      return sendResponse({ success: false });
-    }
+    if (message.action === "signIn" || !message.userId) return;
     if (message.action === "moveTabToSpace") {
       const tabOrdersCollectionRef = collection(
         db,
@@ -240,9 +240,11 @@ chrome.runtime.onMessage.addListener(
     if (message.action === "signIn") {
       const userId = await getUserId();
       await chrome.storage.local.set({ userId });
+      const response = { success: true, userId };
+      console.log("sigin response from background script: ", response);
       sendResponse({ success: true, userId });
-      return true;
     }
+    return true;
   },
 );
 

@@ -263,8 +263,8 @@ const Home = () => {
       undefined,
       newSpaceTitle,
     );
-    if (errorToastId) {
-      if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
+    if (errorToastId && newSpaceInputRef.current) {
+      newSpaceInputRef.current.value = "";
       return;
     }
     const response = await chrome.runtime.sendMessage({

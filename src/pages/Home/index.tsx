@@ -28,12 +28,10 @@ interface Response {
   success: boolean;
 }
 const Home = () => {
-  // const [tabs, setTabs] = useState<Tab[]>([]);
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [activeSpaceSelectId, setActiveSpaceSelectId] = useState<number>(0);
   const [selectedSpace, setSelectedSpace] = useState<string>("");
   const { isLoggedin, currentUserId } = useLogin();
-  // const [tabOrder, setTabOrder] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
 
@@ -62,15 +60,6 @@ const Home = () => {
   const setTabOrder = useTabStore((state) => state.setTabOrder);
   useEffect(() => {
     hideArchivedTabs(archivedSpaces);
-    // function hideArchivedSpacesTabs(
-    //   currentTabs: Tab[],
-    //   archivedSpaces: string[],
-    // ) {
-    //   return currentTabs.filter(
-    //     (tab) => !archivedSpaces.includes(tab.spaceId || ""),
-    //   );
-    // }
-    // setTabs((t) => hideArchivedSpacesTabs(t, archivedSpaces));
   }, [archivedSpaces, hideArchivedTabs]);
 
   useEffect(() => {
@@ -108,8 +97,6 @@ const Home = () => {
         const tab = doc.data() as Tab;
         currentTabs.push(tab);
       });
-      // const sortedTabs = sortTabs(currentTabs, tabOrder);
-      // setTabs(sortedTabs);
       sortTabsByTabOrder(currentTabs);
       setIsLoading(false);
       return;
@@ -184,7 +171,6 @@ const Home = () => {
       sendResponse: (response: Response) => void,
     ) => {
       if (message.action === "tabClosed" && message.tabId) {
-        // setTabs((t) => t.filter((tab) => tab.tabId !== message.tabId));
         removeTab(message.tabId);
         sendResponse({ success: true });
       }
@@ -193,15 +179,6 @@ const Home = () => {
         (message.updatedTab.windowId === currentWindowId ||
           message.updatedTab.windowId === parsedSharedWindowId)
       ) {
-        // setTabs((t) => {
-        //   const updatedTabs = t.map((tab) => {
-        //     if (tab.tabId === message.updatedTab.tabId) {
-        //       return message.updatedTab;
-        //     }
-        //     return tab;
-        //   });
-        //   return updatedTabs;
-        // });
         updateTabInTabs(message.updatedTab);
         sendResponse({ success: true });
       }
@@ -332,15 +309,6 @@ const Home = () => {
   ): Promise<void> {
     const movedTab = tabs.find((tab) => tab.tabId === tabId);
     if (!movedTab) return;
-    // const movedTabIndex = tabs.indexOf(movedTab);
-    // const newTabs = [...tabs];
-    // newTabs.splice(movedTabIndex, 1);
-    // newTabs.splice(
-    //   movedTabIndex + (direction === "up" || direction === "left" ? -1 : 1),
-    //   0,
-    //   movedTab,
-    // );
-    // setTabs(newTabs);
     moveTabOrder(tabId, direction);
     const newTabs = useTabStore.getState().tabs;
     await onTabOrderChange(newTabs, currentSpaceId);
@@ -383,26 +351,7 @@ const Home = () => {
     }
   }
 
-  // function sortTabsByPin(tabs: Tab[], tabId?: number) {
-  //   const newTabs = tabs.map((tab) => {
-  //     if (tabId && tab.tabId === tabId) {
-  //       return {
-  //         ...tab,
-  //         isPinned: !tab.isPinned,
-  //       };
-  //     }
-  //     return tab;
-  //   });
-  //   return newTabs.sort((a, b) => {
-  //     if (a.isPinned && !b.isPinned) return -1;
-  //     if (!a.isPinned && b.isPinned) return 1;
-  //     return 0;
-  //   });
-  // }
-
   async function toggleTabPin(tabId: number, isPinned: boolean) {
-    // const newTabs = sortTabsByPin(tabs, tabId);
-    // setTabs(newTabs);
     sortTabsByPin(tabId);
     const newTabs = useTabStore.getState().tabs;
     try {

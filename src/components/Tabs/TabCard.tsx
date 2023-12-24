@@ -22,7 +22,7 @@ interface TabProps {
   onCloseTab: (tabId?: number) => Promise<void>;
   onTabOrderChange: (tabId: number, direction: Direction) => Promise<void>;
   onToggleTabPin: (tabId: number, isPinned: boolean) => void;
-  selectedSpace: string;
+  selectedSpaceId: string;
   isLastTab: boolean;
   isFirstTab: boolean;
   isGrid: boolean;
@@ -61,7 +61,7 @@ const TabCard = ({
   onCloseTab,
   onTabOrderChange,
   onToggleTabPin,
-  selectedSpace,
+  selectedSpaceId,
   isFirstTab,
   isLastTab,
   isGrid,
@@ -193,7 +193,7 @@ const TabCard = ({
                   onChange={(e) =>
                     onSelectSpace(e, originalSpaceId || "global")
                   }
-                  value={selectedSpace}
+                  value={selectedSpaceId}
                 >
                   <option value="">Select a space</option>
                   {spaces.map(({ id, title }) => {

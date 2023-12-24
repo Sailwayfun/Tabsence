@@ -7,7 +7,7 @@ interface TabsProps {
   tabs: Tab[];
   spaces: Space[];
   activeSpaceSelectId?: number;
-  selectedSpace: string;
+  selectedSpaceId: string;
   isLoggedin: boolean;
   isGrid: boolean;
   openSpacesPopup: (tabId?: number) => void;
@@ -24,7 +24,7 @@ const Tabs = ({
   tabs,
   spaces,
   activeSpaceSelectId,
-  selectedSpace,
+  selectedSpaceId,
   isLoggedin,
   openSpacesPopup,
   selectSpace,
@@ -51,7 +51,7 @@ const Tabs = ({
               onOpenSpacesPopup={openSpacesPopup}
               onSelectSpace={selectSpace}
               onCloseTab={closeTab}
-              selectedSpace={selectedSpace}
+              selectedSpaceId={selectedSpaceId}
               isFirstTab={index === 0}
               isLastTab={tabs.length - 1 === index}
               onTabOrderChange={handleTabOrderChange}

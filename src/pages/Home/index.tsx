@@ -52,14 +52,14 @@ const Home = () => {
   const tabs: Tab[] = useTabStore((state) => state.tabs);
   const tabOrder: number[] = useTabStore((state) => state.tabOrder);
   const hideArchivedTabs = useTabStore((state) => state.hideArchivedTabs);
-  const sortTabs = useTabStore((state) => state.sortTabs);
+  const sortTabsByTabOrder = useTabStore((state) => state.sortTabsByTabOrder);
   const removeTab = useTabStore((state) => state.closeTab);
   const updateTabInTabs = useTabStore((state) => state.updateTab);
   const removeTabsFromSpace = useTabStore((state) => state.removeTabsFromSpace);
   const moveTabOrder = useTabStore((state) => state.moveTabOrder);
   const sortTabsByPin = useTabStore((state) => state.sortTabsByPin);
   const setTabOrder = useTabStore((state) => state.setTabOrder);
-  console.log("現在的tab order", tabOrder);
+  
 
   useEffect(() => {
     hideArchivedTabs(archivedSpaces);
@@ -111,7 +111,7 @@ const Home = () => {
       });
       // const sortedTabs = sortTabs(currentTabs, tabOrder);
       // setTabs(sortedTabs);
-      sortTabs();
+      sortTabsByTabOrder(currentTabs);
       setIsLoading(false);
       return;
     });
@@ -135,7 +135,7 @@ const Home = () => {
     currentWindowId,
     sharedWindowId,
     tabOrder,
-    sortTabs,
+    sortTabsByTabOrder,
   ]);
 
   useEffect(() => {
@@ -156,8 +156,9 @@ const Home = () => {
       if (
         tabOrderData.windowId !== currentWindowId &&
         tabOrderData.windowId !== parsedSharedWindowId
-      )
+      ) {
         return;
+      }
       setTabOrder(tabOrderData.tabOrder);
     });
     return () => {
@@ -549,7 +550,7 @@ const Home = () => {
               className="mb-5 w-52 rounded-md bg-slate-100 px-2 py-3 text-xl shadow hover:bg-orange-700 hover:bg-opacity-70 hover:text-white"
             />
           )}
-          {isLoading && (
+          {isLoading && tabs.length === 0 && (
             <Loader text="Loading Data..." animateClass="animate-spin" />
           )}
           {!isLoading && (

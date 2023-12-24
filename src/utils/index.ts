@@ -9,4 +9,4 @@ export {
 } from "./trackTime";
 export { validateSpaceTitle } from "./validate";
 export { cn } from "./cn";
-export { getFaviconUrl, sortTabs } from "./tabs";
+export { getFaviconUrl } from "./tabs";

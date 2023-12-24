@@ -59,7 +59,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         action: "tabUpdated",
         updatedTab: { ...tab, ...tabData },
       });
-      if (!response.succes) throw new Error("Failed to update tabs state");
+      if (!response.success) throw new Error("Failed to update tabs state");
     } catch (err) {
       if (err instanceof Error) {
         console.error(err.message);

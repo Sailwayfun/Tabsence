@@ -1,18 +1,26 @@
 import { create } from "zustand";
 import { Tab, Direction } from "../types";
-import { sortTabs } from "../utils";
 
 interface TabStoreState {
   tabs: Tab[];
   tabOrder: number[];
   hideArchivedTabs: (archivedSpaces: string[]) => void;
-  sortTabs: () => void;
+  sortTabsByTabOrder: (tabsFromFirestore: Tab[]) => void;
   closeTab: (tabId: number) => void;
   updateTab: (tab: Tab) => void;
   removeTabsFromSpace: (spaceId: string) => void;
   moveTabOrder: (tabId: number, direction: Direction) => void;
   sortTabsByPin: (tabId: number) => void;
-  setTabOrder: (tabOrder: number[]) => void;
+  setTabOrder: (tabOrderFromFirestore: number[]) => void;
+}
+
+function sortTabs(tabs: Tab[], tabOrder?: number[]) {
+  if (!tabOrder || tabOrder.length === 0) return tabs;
+  const tabMap = new Map(tabs.map((tab) => [tab.tabId, tab]));
+  const sortByOrder = (index: number) => tabMap.get(tabOrder[index]);
+  return tabOrder
+    .map((_, index) => sortByOrder(index))
+    .filter((tab): tab is Tab => tab !== undefined);
 }
 
 function sortTabsByPin(tabs: Tab[], tabId?: number) {
@@ -41,9 +49,9 @@ const useTabStore = create<TabStoreState>((set) => ({
         archivedSpaces.every((spaceId) => spaceId !== tab.spaceId),
       ),
     })),
-  sortTabs: () =>
+  sortTabsByTabOrder: (tabs) =>
     set((state) => ({
-      tabs: sortTabs(state.tabs, state.tabOrder),
+      tabs: sortTabs(tabs, state.tabOrder),
     })),
   closeTab: (tabId) =>
     set((state) => ({
@@ -51,7 +59,7 @@ const useTabStore = create<TabStoreState>((set) => ({
     })),
   updateTab: (tab) =>
     set((state) => ({
-      tabs: state.tabs.map((t) => (t.id === tab.tabId ? tab : t)),
+      tabs: state.tabs.map((t) => (t.tabId === tab.tabId ? tab : t)),
     })),
   removeTabsFromSpace: (spaceId) =>
     set((state) => ({

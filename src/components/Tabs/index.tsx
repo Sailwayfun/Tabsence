@@ -6,7 +6,7 @@ import { cn } from "../../utils";
 interface TabsProps {
   tabs: Tab[];
   spaces: Space[];
-  activeSpaceSelectId?: number;
+  selectedTabId?: number;
   selectedSpaceId: string;
   isLoggedin: boolean;
   isGrid: boolean;
@@ -23,7 +23,7 @@ interface TabsProps {
 const Tabs = ({
   tabs,
   spaces,
-  activeSpaceSelectId,
+  selectedTabId,
   selectedSpaceId,
   isLoggedin,
   openSpacesPopup,
@@ -47,7 +47,7 @@ const Tabs = ({
               key={tab.tabId}
               tab={tab}
               spaces={spaces}
-              selectId={activeSpaceSelectId}
+              selectedTabId={selectedTabId}
               onOpenSpacesPopup={openSpacesPopup}
               onSelectSpace={selectSpace}
               onCloseTab={closeTab}

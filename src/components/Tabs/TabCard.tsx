@@ -13,7 +13,7 @@ import { directionStrategies } from "../../strategies";
 interface TabProps {
   tab: Tab;
   spaces: Space[];
-  selectId?: number;
+  selectedTabId?: number;
   onOpenSpacesPopup: (tabId?: number) => void;
   onSelectSpace: (
     e: React.ChangeEvent<HTMLSelectElement>,
@@ -55,7 +55,7 @@ function useToggleIcons() {
 const TabCard = ({
   tab,
   spaces,
-  selectId,
+  selectedTabId,
   onOpenSpacesPopup,
   onSelectSpace,
   onCloseTab,
@@ -180,7 +180,7 @@ const TabCard = ({
               />
             }
           >
-            {tab.tabId === selectId && (
+            {tab.tabId === selectedTabId && (
               <div className="ml-5 h-14 w-52 px-3">
                 <label
                   htmlFor={tab.id?.toString() || "spaces"}

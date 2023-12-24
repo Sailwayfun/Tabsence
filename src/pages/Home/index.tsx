@@ -29,7 +29,7 @@ interface Response {
 }
 const Home = () => {
   const [spaces, setSpaces] = useState<Space[]>([]);
-  const [activeSpaceSelectId, setActiveSpaceSelectId] = useState<number>(0);
+  const [selectedTabId, setSelectedTabId] = useState<number>(0);
   const [selectedSpaceId, setSelectedSpaceId] = useState<string>("");
   const { isLoggedin, currentUserId } = useLogin();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -217,7 +217,7 @@ const Home = () => {
 
   function openSpacesPopup(tabId?: number) {
     setSelectedSpaceId("");
-    if (tabId) setActiveSpaceSelectId(tabId);
+    if (tabId) setSelectedTabId(tabId);
   }
 
   async function selectSpace(
@@ -226,7 +226,7 @@ const Home = () => {
   ) {
     if (!e.target.value) return;
     setSelectedSpaceId(e.target.value);
-    const updatedTab = tabs.find((tab) => tab.tabId === activeSpaceSelectId);
+    const updatedTab = tabs.find((tab) => tab.tabId === selectedTabId);
     if (!updatedTab) return;
     const message = {
       action: "moveTabToSpace",
@@ -508,7 +508,7 @@ const Home = () => {
             <Tabs
               tabs={tabs}
               spaces={spaces}
-              activeSpaceSelectId={activeSpaceSelectId}
+              selectedTabId={selectedTabId}
               selectedSpaceId={selectedSpaceId}
               isLoggedin={isLoggedin}
               openSpacesPopup={openSpacesPopup}

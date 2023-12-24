@@ -208,12 +208,11 @@ const TabCard = ({
             )}
           </Dropdown>
           {generateTabOrderBtns(tabMovingDirections, tab.tabId)}
-          <Tooltip
-            data-tip="Close Tab"
-            orderClass={isGrid ? "order-first" : ""}
-          >
-            <CloseBtn id={tab.tabId} onCloseTab={onCloseTab} />
-          </Tooltip>
+          <CloseBtn
+            id={tab.tabId}
+            onCloseTab={onCloseTab}
+            orderClass={cn({ "order-first": isGrid })}
+          />
         </div>
       )}
       {isGrid && (

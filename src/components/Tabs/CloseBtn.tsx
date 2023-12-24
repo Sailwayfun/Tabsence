@@ -1,16 +1,19 @@
-import { IconButton } from "../UI";
+import { IconButton, Tooltip } from "../UI";
 import Close from "../Icons/Close";
 
 interface CloseBtnProps {
   onCloseTab: (id?: number) => Promise<void>;
   id?: number;
+  orderClass?: string;
 }
-const CloseBtn = ({ id, onCloseTab }: CloseBtnProps) => {
+const CloseBtn = ({ id, onCloseTab, orderClass }: CloseBtnProps) => {
   return (
-    <IconButton
-      onClick={() => onCloseTab(id)}
-      icon={<Close className="h-full w-full" />}
-    />
+    <Tooltip data-tip="Close Tab" orderClass={orderClass}>
+      <IconButton
+        onClick={() => onCloseTab(id)}
+        icon={<Close className="h-full w-full" />}
+      />
+    </Tooltip>
   );
 };
 

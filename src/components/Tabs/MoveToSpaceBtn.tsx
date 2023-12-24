@@ -1,4 +1,4 @@
-import {Tooltip, IconButton} from "../UI";
+import { Tooltip, IconButton } from "../UI";
 import MoveToSpace from "../Icons/MoveToSpace";
 
 interface MoveToSpaceProps {

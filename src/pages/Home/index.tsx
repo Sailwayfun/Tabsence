@@ -57,10 +57,9 @@ const Home = () => {
   const updateTabInTabs = useTabStore((state) => state.updateTab);
   const removeTabsFromSpace = useTabStore((state) => state.removeTabsFromSpace);
   const moveTabOrder = useTabStore((state) => state.moveTabOrder);
+  const moveTabToSpace = useTabStore((state) => state.moveTabToSpace);
   const sortTabsByPin = useTabStore((state) => state.sortTabsByPin);
   const setTabOrder = useTabStore((state) => state.setTabOrder);
-  
-
   useEffect(() => {
     hideArchivedTabs(archivedSpaces);
     // function hideArchivedSpacesTabs(
@@ -250,10 +249,12 @@ const Home = () => {
   ) {
     if (!e.target.value) return;
     setSelectedSpace(e.target.value);
+    const updatedTab = tabs.find((tab) => tab.tabId === activeSpaceSelectId);
+    if (!updatedTab) return;
     const message = {
       action: "moveTabToSpace",
-      updatedTab: tabs.find((tab) => tab.tabId === activeSpaceSelectId),
-      originalSpaceId,
+      updatedTab,
+      originalSpaceId: originalSpaceId || "global",
       spaceId: e.target.value,
       userId: currentUserId,
     };
@@ -265,6 +266,7 @@ const Home = () => {
       });
       return;
     }
+    moveTabToSpace(updatedTab);
     toast.success("Tab moved to space", {
       className: "w-60 text-lg rounded-md shadow",
       duration: 2000,

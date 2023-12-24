@@ -12,17 +12,17 @@ import {
   QuerySnapshot,
   DocumentData,
   serverTimestamp,
-  arrayUnion,
-  arrayRemove,
 } from "firebase/firestore";
 
 import { urlsStore } from "./store/tabUrlMap";
 
 import {
   saveTabInfo,
-  upDateTabBySpace,
   trackTabTime,
   updateTabDuration,
+  updateOldTabOrderDoc,
+  updateNewTabOrderDoc,
+  updateSpaceOfTab,
 } from "./utils";
 
 interface RuntimeMessage {
@@ -73,36 +73,25 @@ chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
     if (message.action === "signIn" || !message.userId) return;
     if (message.action === "moveTabToSpace") {
-      const tabOrdersCollectionRef = collection(
-        db,
-        "users",
-        message.userId,
-        "tabOrders",
-      );
-      const oldTabOrderDocRef = doc(
-        tabOrdersCollectionRef,
-        message.originalSpaceId || "global",
-      );
-      const tabOrderDocRef = doc(tabOrdersCollectionRef, message.spaceId);
-      const tabsCollectionRef = collection(db, "users", message.userId, "tabs");
       const tabId = message.updatedTab.tabId;
-      const windowId = message.updatedTab.windowId;
+      if (!tabId) return sendResponse({ success: false });
 
-      await setDoc(
-        tabOrderDocRef,
-        { tabOrder: arrayUnion(tabId), windowId },
-        { merge: true },
+      await updateOldTabOrderDoc(
+        message.userId,
+        message.originalSpaceId,
+        tabId,
       );
 
-      await updateDoc(oldTabOrderDocRef, { tabOrder: arrayRemove(tabId) });
+      await updateNewTabOrderDoc(
+        message.userId,
+        message.spaceId,
+        tabId,
+        message.updatedTab.windowId,
+      );
 
-      const q = query(tabsCollectionRef, where("tabId", "==", tabId));
-      const tabsQuerySnapshot = await getDocs(q);
-      tabsQuerySnapshot.forEach(async (doc) => {
-        const tabDocRef = doc.ref;
-        await upDateTabBySpace(message, tabDocRef);
-      });
-      return true;
+      await updateSpaceOfTab(tabId, message.spaceId, message.userId);
+
+      sendResponse({ success: true });
     }
     if (message.action === "addSpace") {
       const spaceCollectionRef = collection(
@@ -240,8 +229,6 @@ chrome.runtime.onMessage.addListener(
     if (message.action === "signIn") {
       const userId = await getUserId();
       await chrome.storage.local.set({ userId });
-      const response = { success: true, userId };
-      console.log("sigin response from background script: ", response);
       sendResponse({ success: true, userId });
     }
     return true;

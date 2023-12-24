@@ -1,4 +1,9 @@
-export { saveTabInfo, upDateTabBySpace } from "./firestore";
+export {
+  saveTabInfo,
+  updateOldTabOrderDoc,
+  updateNewTabOrderDoc,
+  updateSpaceOfTab,
+} from "./firestore";
 export {
   tabTimes,
   getCurrentDate,

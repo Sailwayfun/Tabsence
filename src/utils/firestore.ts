@@ -1,56 +1,81 @@
 import {
   serverTimestamp,
   setDoc,
-  updateDoc,
+  collection,
   doc,
-  DocumentReference,
-  DocumentData,
   arrayUnion,
+  arrayRemove,
+  updateDoc,
 } from "firebase/firestore";
-import { Tab } from "../types/tab";
 import { db } from "../../firebase-config";
 import { getFaviconUrl } from "./tabs";
 
 async function saveTabInfo(tab: chrome.tabs.Tab, userId?: string) {
-  if (!userId) return;
-  if (tab.url && tab.title && tab.id) {
-    const tabData = {
-      windowId: tab.windowId,
-      tabId: tab.id,
-      title: tab.title,
-      url: tab.url,
-      favIconUrl: getFaviconUrl(tab.url) || tab.favIconUrl || "",
-      lastAccessed: serverTimestamp(),
-      isPinned: false,
-    };
-    const newTabId = tab.id;
-    const tabDocRef = doc(db, "users", userId, "tabs", tab.id.toString());
-    const tabOrderDocRef = doc(db, "users", userId, "tabOrders", "global");
-    await setDoc(
-      tabOrderDocRef,
-      { tabOrder: arrayUnion(newTabId) },
-      { merge: true },
-    );
-    await setDoc(tabDocRef, tabData, { merge: true });
-    return tabData;
-  }
+  if (!userId || !tab.url || !tab.title || !tab.id) return;
+
+  const tabData = {
+    windowId: tab.windowId,
+    tabId: tab.id,
+    title: tab.title,
+    url: tab.url,
+    favIconUrl: getFaviconUrl(tab.url) || tab.favIconUrl || "",
+    lastAccessed: serverTimestamp(),
+    isPinned: false,
+  };
+  const newTabId = tab.id;
+  const tabDocRef = doc(db, "users", userId, "tabs", tab.id.toString());
+  const tabOrderDocRef = doc(db, "users", userId, "tabOrders", "global");
+  await setDoc(
+    tabOrderDocRef,
+    { tabOrder: arrayUnion(newTabId), windowId: tab.windowId },
+    { merge: true },
+  );
+  await setDoc(tabDocRef, tabData, { merge: true });
+  return tabData;
 }
 
-async function upDateTabBySpace(
-  message: {
-    action: string;
-    updatedTab: Tab;
-    spaceId: string;
-    spaceName: string;
-  },
-  tabDocRef: DocumentReference<DocumentData, DocumentData>,
+async function updateOldTabOrderDoc(
+  userId: string,
+  originalSpaceId: string,
+  tabId: number,
 ) {
+  const tabOrdersCollectionRef = collection(db, "users", userId, "tabOrders");
+  const spaceId = originalSpaceId || "global";
+  const oldTabOrderDocRef = doc(tabOrdersCollectionRef, spaceId);
+  await updateDoc(oldTabOrderDocRef, { tabOrder: arrayRemove(tabId) });
+}
+
+async function updateNewTabOrderDoc(
+  userId: string,
+  spaceId: string,
+  tabId: number,
+  windowId: number,
+) {
+  const tabOrdersCollectionRef = collection(db, "users", userId, "tabOrders");
+  const newTabOrderDocRef = doc(tabOrdersCollectionRef, spaceId);
+  await setDoc(
+    newTabOrderDocRef,
+    { tabOrder: arrayUnion(tabId), windowId },
+    { merge: true },
+  );
+}
+
+async function updateSpaceOfTab(
+  tabId: number,
+  spaceId: string,
+  userId: string,
+) {
+  const tabDocRef = doc(db, "users", userId, "tabs", tabId.toString());
   try {
-    await updateDoc(tabDocRef, { spaceId: message.spaceId });
-    return;
+    await updateDoc(tabDocRef, { spaceId });
   } catch (error) {
-    console.error("Error updating tabs: ", error);
+    console.error(error);
   }
 }
 
-export { saveTabInfo, upDateTabBySpace };
+export {
+  saveTabInfo,
+  updateOldTabOrderDoc,
+  updateNewTabOrderDoc,
+  updateSpaceOfTab,
+};

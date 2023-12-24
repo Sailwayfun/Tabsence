@@ -2,7 +2,7 @@ import { Space } from "../../types/space";
 import { useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { Tab, Direction } from "../../types";
-import MoveToSpace from "./MoveToSpaceBtn";
+import MoveToSpaceBtn from "./MoveToSpaceBtn";
 import CloseBtn from "./CloseBtn";
 import { Tooltip, Dropdown } from "../UI";
 import PinBtn from "./PinBtn";
@@ -174,7 +174,7 @@ const TabCard = ({
           )}
           <Dropdown
             button={
-              <MoveToSpace
+              <MoveToSpaceBtn
                 id={tab.tabId}
                 onOpenSpacesPopup={onOpenSpacesPopup}
               />

@@ -4,6 +4,10 @@ import { toast } from "react-hot-toast";
 
 type ErrorToastId = string;
 
+function showErrorToast(message: string, style: "large" | "larger" = "large") {
+  return toast.error(message, getToastVariant(style));
+}
+
 function validateSpaceTitle(
   spaces: Space[],
   id?: string,
@@ -17,21 +21,18 @@ function validateSpaceTitle(
   const spaceLimitReached: boolean =
     spaces.length >= 5 && spaces.every((space) => space.id !== id);
   if (nameEmpty) {
-    return toast.error("Please enter a space title", getToastVariant("large"));
+    return showErrorToast("Please enter a space title");
   }
   if (spaceLimitReached) {
-    return toast.error(
-      "You can only create up to 5 spaces",
-      getToastVariant("large"),
-    );
+    return showErrorToast("You can only create up to 5 spaces");
   }
   if (nameExists) {
-    return toast.error("Space name already exists", getToastVariant("large"));
+    return showErrorToast("Space name already exists");
   }
   if (nameTooLong) {
-    return toast.error(
+    return showErrorToast(
       "Space name should be less than 10 characters",
-      getToastVariant("larger"),
+      "larger",
     );
   }
 

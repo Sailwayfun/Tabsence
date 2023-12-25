@@ -58,11 +58,6 @@ const Home = () => {
   const spaces: Space[] = useSpacesStore((state) => state.spaces);
   const setSpaces = useSpacesStore((state) => state.setSpaces);
   const removeSpace = useSpacesStore((state) => state.removeSpace);
-  const startEditingSpaceTitle = useSpacesStore(
-    (state) => state.startEditingSpaceTitle,
-  );
-  const inputSpaceTitle = useSpacesStore((state) => state.inputSpaceTitle);
-  const changeSpaceTitle = useSpacesStore((state) => state.changeSpaceTitle);
 
   useEffect(() => {
     hideArchivedTabs(archivedSpaces);
@@ -333,48 +328,48 @@ const Home = () => {
     setIsTabsGrid((prev) => !prev);
   }
 
-  function handleSpaceTitleChange(
-    e: React.ChangeEvent<HTMLInputElement>,
-    id: string,
-  ) {
-    const newTitle = e.target.value;
-    inputSpaceTitle(newTitle, id);
-  }
+  // function handleSpaceTitleChange(
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   id: string,
+  // ) {
+  //   const newTitle = e.target.value;
+  //   inputSpaceTitle(newTitle, id);
+  // }
 
-  function handleEditSpace(id: string) {
-    startEditingSpaceTitle(id);
-  }
+  // function handleEditSpace(id: string) {
+  //   startEditingSpaceTitle(id);
+  // }
 
-  async function handleSpaceEditBlur(
-    e: React.FocusEvent<HTMLInputElement, Element>,
-    id: string,
-  ) {
-    const newTitle = e.target.value.trim();
-    changeSpaceTitle(newTitle, id);
-    await updateSpaceTitleInFirestore(id, newTitle, currentUserId);
-  }
+  // async function handleSpaceEditBlur(
+  //   e: React.FocusEvent<HTMLInputElement, Element>,
+  //   id: string,
+  // ) {
+  //   const newTitle = e.target.value.trim();
+  //   changeSpaceTitle(newTitle, id);
+  //   await updateSpaceTitleInFirestore(id, newTitle, currentUserId);
+  // }
 
-  async function updateSpaceTitleInFirestore(
-    spaceId: string,
-    newSpaceTitle: string | undefined,
-    userId: string,
-  ) {
-    try {
-      const response = await chrome.runtime.sendMessage({
-        action: "updateSpaceTitle",
-        spaceId,
-        newSpaceTitle,
-        userId,
-      });
-      if (!response.success) {
-        throw new Error("Failed to update space title in Firestore");
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        console.error(err.message);
-      }
-    }
-  }
+  // async function updateSpaceTitleInFirestore(
+  //   spaceId: string,
+  //   newSpaceTitle: string | undefined,
+  //   userId: string,
+  // ) {
+  //   try {
+  //     const response = await chrome.runtime.sendMessage({
+  //       action: "updateSpaceTitle",
+  //       spaceId,
+  //       newSpaceTitle,
+  //       userId,
+  //     });
+  //     if (!response.success) {
+  //       throw new Error("Failed to update space title in Firestore");
+  //     }
+  //   } catch (err) {
+  //     if (err instanceof Error) {
+  //       console.error(err.message);
+  //     }
+  //   }
+  // }
 
   const isWebTime = location.pathname.includes("/webtime");
   const isRoot = location.pathname === "/";
@@ -389,15 +384,12 @@ const Home = () => {
       <MainContainer isWebTime={isWebTime}>
         {isLoggedin && (
           <Spaces
-            spaces={spaces}
             ref={newSpaceInputRef}
             onAddNewSpace={addNewSpace}
             currentSpaceId={currentSpaceId}
             onRemoveSpace={handleRemoveSpace}
-            onSpaceEditBlur={handleSpaceEditBlur}
-            onSpaceTitleChange={handleSpaceTitleChange}
-            onEditSpace={handleEditSpace}
             isWebtimePage={isWebTime}
+            currentUserId={currentUserId}
           />
         )}
         <div className={tabsHeaderClasses}>
@@ -428,6 +420,7 @@ const Home = () => {
               handleTabOrderChange={handleTabOrderChange}
               toggleTabPin={toggleTabPin}
               isGrid={isTabsGrid}
+              currentUserId={currentUserId}
             />
           )}
         </div>

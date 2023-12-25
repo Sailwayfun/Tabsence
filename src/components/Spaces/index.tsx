@@ -2,7 +2,6 @@ import { forwardRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useArchivedSpaceStore } from "../../store/archiveSpace";
-import { Space } from "../../types/space";
 import AddSpaceBtn from "./AddSpaceBtn";
 import SpaceTab from "./SpaceTab";
 import Logo from "../Header/Logo";
@@ -11,33 +10,22 @@ import AddSpace from "./AddSpace";
 import { Heading } from "../UI";
 import Box from "../Icons/Box";
 import { cn, getToastVariant } from "../../utils";
+import { useSpacesStore } from "../../store";
 interface SpacesProps {
-  spaces: Space[];
   onAddNewSpace: () => Promise<void>;
   onRemoveSpace: (id: string) => void;
-  onSpaceEditBlur: (
-    e: React.FocusEvent<HTMLInputElement, Element>,
-    id: string,
-  ) => void;
-  onSpaceTitleChange: (
-    e: React.ChangeEvent<HTMLInputElement>,
-    id: string,
-  ) => void;
-  onEditSpace: (id: string) => void;
   currentSpaceId?: string;
+  currentUserId?: string;
   isWebtimePage: boolean;
 }
 const Spaces = forwardRef(
   (props: SpacesProps, ref: React.Ref<HTMLInputElement>) => {
     const {
-      spaces,
       onAddNewSpace,
       onRemoveSpace,
-      onSpaceEditBlur,
-      onSpaceTitleChange,
-      onEditSpace,
       currentSpaceId,
       isWebtimePage,
+      currentUserId,
     }: SpacesProps = props;
     const archivedSpaces = useArchivedSpaceStore(
       (state) => state.archivedSpaces,
@@ -47,6 +35,14 @@ const Spaces = forwardRef(
       (state) => state.restoreArchived,
     );
     const navigate = useNavigate();
+
+    const spaces = useSpacesStore((state) => state.spaces);
+    const inputSpaceTitle = useSpacesStore((state) => state.inputSpaceTitle);
+    const startEditingSpaceTitle = useSpacesStore(
+      (state) => state.startEditingSpaceTitle,
+    );
+    const changeSpaceTitle = useSpacesStore((state) => state.changeSpaceTitle);
+
     async function archiveSpace(id: string) {
       try {
         const response = await chrome.runtime.sendMessage({
@@ -100,26 +96,70 @@ const Spaces = forwardRef(
         inputRef.current.value = "";
       }
     }
-    function handleSpaceEditBlur(
-      e: React.FocusEvent<HTMLInputElement>,
-      id: string,
-    ) {
-      const space = spaces.find((space) => space.id === id);
-      if (!space) return;
-      if (space.isEditing) {
-        onSpaceEditBlur(e, id);
-      }
-    }
+    // function handleSpaceEditBlur(
+    //   e: React.FocusEvent<HTMLInputElement>,
+    //   id: string,
+    // ) {
+    //   const space = spaces.find((space) => space.id === id);
+    //   if (!space) return;
+    //   if (space.isEditing) {
+    //     onSpaceEditBlur(e, id);
+    //   }
+    // }
+    // function handleSpaceTitleChange(
+    //   e: React.ChangeEvent<HTMLInputElement>,
+    //   id: string,
+    // ) {
+    //   const space = spaces.find((space) => space.id === id);
+    //   if (!space) return;
+    //   onSpaceTitleChange(e, id);
+    // }
+    // function handleEditSpace(id: string) {
+    //   onEditSpace(id);
+    // }
+
     function handleSpaceTitleChange(
       e: React.ChangeEvent<HTMLInputElement>,
       id: string,
     ) {
-      const space = spaces.find((space) => space.id === id);
-      if (!space) return;
-      onSpaceTitleChange(e, id);
+      const newTitle = e.target.value;
+      inputSpaceTitle(newTitle, id);
     }
+
     function handleEditSpace(id: string) {
-      onEditSpace(id);
+      startEditingSpaceTitle(id);
+    }
+
+    async function handleSpaceEditBlur(
+      e: React.FocusEvent<HTMLInputElement, Element>,
+      id: string,
+    ) {
+      const newTitle = e.target.value.trim();
+      changeSpaceTitle(newTitle, id);
+      await updateSpaceTitleInFirestore(id, newTitle, currentUserId);
+    }
+
+    async function updateSpaceTitleInFirestore(
+      spaceId: string,
+      newSpaceTitle: string | undefined,
+      userId?: string,
+    ) {
+      if (!userId) return;
+      try {
+        const response = await chrome.runtime.sendMessage({
+          action: "updateSpaceTitle",
+          spaceId,
+          newSpaceTitle,
+          userId,
+        });
+        if (!response.success) {
+          throw new Error("Failed to update space title in Firestore");
+        }
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error(err.message);
+        }
+      }
     }
     function openAddSpaceModal() {
       const targetModal = document.getElementById(

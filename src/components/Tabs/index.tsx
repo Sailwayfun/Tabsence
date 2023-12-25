@@ -11,6 +11,7 @@ interface TabsProps {
   closeTab: (tabId?: number) => Promise<void>;
   handleTabOrderChange: (tabId: number, direction: Direction) => Promise<void>;
   toggleTabPin: (tabId: number, isPinned: boolean) => void;
+  currentUserId?: string;
 }
 
 const Tabs = ({
@@ -20,6 +21,7 @@ const Tabs = ({
   handleTabOrderChange,
   toggleTabPin,
   isGrid,
+  currentUserId,
 }: TabsProps) => {
   const location = useLocation();
   const listStyles = "flex flex-col gap-5 w-full";
@@ -40,6 +42,7 @@ const Tabs = ({
               onTabOrderChange={handleTabOrderChange}
               onToggleTabPin={toggleTabPin}
               isGrid={isGrid}
+              currentUserId={currentUserId}
             ></Card>
           );
         })}

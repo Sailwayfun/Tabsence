@@ -12,7 +12,6 @@ import { directionStrategies } from "../../strategies";
 import { useSpacesStore } from "../../store/spaces";
 import { useTabsStore } from "../../store/tabs";
 import { toast } from "react-hot-toast";
-import useLogin from "../../hooks/useLogin";
 interface TabProps {
   tab: Tab;
   onCloseTab: (tabId?: number) => Promise<void>;
@@ -22,6 +21,7 @@ interface TabProps {
   isFirstTab: boolean;
   isGrid: boolean;
   zIndex?: number;
+  currentUserId?: string;
 }
 
 function useToggleIcons() {
@@ -55,6 +55,7 @@ const TabCard = ({
   isFirstTab,
   isLastTab,
   isGrid,
+  currentUserId,
 }: TabProps) => {
   const { showIcons, setShowIcons, iconsRef, btnRef } = useToggleIcons();
   const { spaceId: originalSpaceId } = useParams<{ spaceId: string }>();
@@ -63,7 +64,6 @@ const TabCard = ({
   const spaces = useSpacesStore((state) => state.spaces);
   const tabs = useTabsStore((state) => state.tabs);
   const moveTabToSpace = useTabsStore((state) => state.moveTabToSpace);
-  const { currentUserId } = useLogin();
 
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,

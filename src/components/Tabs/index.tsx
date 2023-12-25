@@ -1,20 +1,13 @@
-import TabCard from "./TabCard";
-import { Tab, Space, Direction } from "../../types";
+import Card from "./Card";
+import { Tab, Direction } from "../../types";
 import { useLocation } from "react-router-dom";
 import { cn } from "../../utils";
 
 interface TabsProps {
   tabs: Tab[];
-  spaces: Space[];
   selectedTabId?: number;
-  selectedSpaceId: string;
   isLoggedin: boolean;
   isGrid: boolean;
-  openSpacesPopup: (tabId?: number) => void;
-  selectSpace: (
-    e: React.ChangeEvent<HTMLSelectElement>,
-    originalSpaceId: string,
-  ) => Promise<void>;
   closeTab: (tabId?: number) => Promise<void>;
   handleTabOrderChange: (tabId: number, direction: Direction) => Promise<void>;
   toggleTabPin: (tabId: number, isPinned: boolean) => void;
@@ -22,12 +15,7 @@ interface TabsProps {
 
 const Tabs = ({
   tabs,
-  spaces,
-  selectedTabId,
-  selectedSpaceId,
   isLoggedin,
-  openSpacesPopup,
-  selectSpace,
   closeTab,
   handleTabOrderChange,
   toggleTabPin,
@@ -43,21 +31,16 @@ const Tabs = ({
         location.pathname.split("/")[1] !== "webtime" &&
         tabs.map((tab, index) => {
           return (
-            <TabCard
+            <Card
               key={tab.tabId}
               tab={tab}
-              spaces={spaces}
-              selectedTabId={selectedTabId}
-              onOpenSpacesPopup={openSpacesPopup}
-              onSelectSpace={selectSpace}
               onCloseTab={closeTab}
-              selectedSpaceId={selectedSpaceId}
               isFirstTab={index === 0}
               isLastTab={tabs.length - 1 === index}
               onTabOrderChange={handleTabOrderChange}
               onToggleTabPin={toggleTabPin}
               isGrid={isGrid}
-            ></TabCard>
+            ></Card>
           );
         })}
     </ul>

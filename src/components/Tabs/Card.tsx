@@ -1,28 +1,23 @@
-import { Space } from "../../types/space";
 import { useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { Tab, Direction } from "../../types";
+import { Tab, Direction, Space } from "../../types";
 import MoveToSpaceBtn from "./MoveToSpaceBtn";
 import CloseBtn from "./CloseBtn";
 import { Tooltip, Dropdown } from "../UI";
 import PinBtn from "./PinBtn";
 import KebabBtn from "./KebabBtn";
-import { cn } from "../../utils";
+import { cn, getToastVariant } from "../../utils";
 import TabOrderBtn from "./TabOrderBtn";
 import { directionStrategies } from "../../strategies";
+import { useSpacesStore } from "../../store/spaces";
+import { useTabsStore } from "../../store/tabs";
+import { toast } from "react-hot-toast";
+import useLogin from "../../hooks/useLogin";
 interface TabProps {
   tab: Tab;
-  spaces: Space[];
-  selectedTabId?: number;
-  onOpenSpacesPopup: (tabId?: number) => void;
-  onSelectSpace: (
-    e: React.ChangeEvent<HTMLSelectElement>,
-    originalSpaceId: string,
-  ) => Promise<void>;
   onCloseTab: (tabId?: number) => Promise<void>;
   onTabOrderChange: (tabId: number, direction: Direction) => Promise<void>;
   onToggleTabPin: (tabId: number, isPinned: boolean) => void;
-  selectedSpaceId: string;
   isLastTab: boolean;
   isFirstTab: boolean;
   isGrid: boolean;
@@ -54,20 +49,21 @@ function useToggleIcons() {
 
 const TabCard = ({
   tab,
-  spaces,
-  selectedTabId,
-  onOpenSpacesPopup,
-  onSelectSpace,
   onCloseTab,
   onTabOrderChange,
   onToggleTabPin,
-  selectedSpaceId,
   isFirstTab,
   isLastTab,
   isGrid,
 }: TabProps) => {
   const { showIcons, setShowIcons, iconsRef, btnRef } = useToggleIcons();
   const { spaceId: originalSpaceId } = useParams<{ spaceId: string }>();
+  const [selectedSpaceId, setSelectedSpaceId] = useState<string>("");
+  const [selectedTabId, setSelectedTabId] = useState<number>(0);
+  const spaces = useSpacesStore((state) => state.spaces);
+  const tabs = useTabsStore((state) => state.tabs);
+  const moveTabToSpace = useTabsStore((state) => state.moveTabToSpace);
+  const { currentUserId } = useLogin();
 
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
@@ -115,6 +111,46 @@ const TabCard = ({
         </Tooltip>
       );
     });
+  }
+
+  function generateSpaceOptions(spaces: Space[]) {
+    return spaces.map(({ id, title }) => {
+      return (
+        <option value={id} key={id}>
+          {title}
+        </option>
+      );
+    });
+  }
+
+  async function selectSpace(
+    e: React.ChangeEvent<HTMLSelectElement>,
+    originalSpaceId: string,
+  ) {
+    if (!e.target.value) return;
+    setSelectedSpaceId(e.target.value);
+    const updatedTab = tabs.find((tab) => tab.tabId === selectedTabId);
+    if (!updatedTab) return;
+    const message = {
+      action: "moveTabToSpace",
+      updatedTab,
+      originalSpaceId: originalSpaceId || "global",
+      spaceId: e.target.value,
+      userId: currentUserId,
+    };
+    const response = await chrome.runtime.sendMessage(message);
+    if (!response.success) {
+      toast.error("Failed to move tab to space", getToastVariant("normal"));
+      return;
+    }
+    moveTabToSpace(updatedTab);
+    toast.success("Tab moved to space", getToastVariant("normal"));
+    return;
+  }
+
+  function openSpacesPopup(tabId?: number) {
+    setSelectedSpaceId("");
+    if (tabId) setSelectedTabId(tabId);
   }
 
   const tabHoverAnimation =
@@ -175,7 +211,7 @@ const TabCard = ({
             button={
               <MoveToSpaceBtn
                 id={tab.tabId}
-                onOpenSpacesPopup={onOpenSpacesPopup}
+                onOpenSpacesPopup={openSpacesPopup}
               />
             }
           >
@@ -189,19 +225,11 @@ const TabCard = ({
                 </label>
                 <select
                   id={tab.tabId?.toString() || "spaces"}
-                  onChange={(e) =>
-                    onSelectSpace(e, originalSpaceId || "global")
-                  }
+                  onChange={(e) => selectSpace(e, originalSpaceId || "global")}
                   value={selectedSpaceId}
                 >
                   <option value="">Select a space</option>
-                  {spaces.map(({ id, title }) => {
-                    return (
-                      <option value={id} key={id}>
-                        {title}
-                      </option>
-                    );
-                  })}
+                  {generateSpaceOptions(spaces)}
                 </select>
               </div>
             )}

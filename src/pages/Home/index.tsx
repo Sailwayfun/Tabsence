@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { useArchivedSpaceStore } from "../../store/archiveSpace";
-import { useSpaceStore } from "../../store/spaces";
-import { useTabStore } from "../../store/tabs";
+import {
+  useArchivedSpaceStore,
+  useSpacesStore,
+  useTabsStore,
+} from "../../store";
 import { useLocation, Outlet, useParams } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import Spaces from "../../components/Spaces";
@@ -25,12 +27,9 @@ interface Response {
   success: boolean;
 }
 const Home = () => {
-  const [selectedTabId, setSelectedTabId] = useState<number>(0);
-  const [selectedSpaceId, setSelectedSpaceId] = useState<string>("");
   const { isLoggedin, currentUserId } = useLogin();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
-
   const location = useLocation();
   const newSpaceInputRef = useRef<HTMLInputElement>(null);
   const currentWindowId = useWindowId();
@@ -43,26 +42,27 @@ const Home = () => {
     (state) => state.archivedSpaces,
   );
 
-  const tabs: Tab[] = useTabStore((state) => state.tabs);
-  const tabOrder: number[] = useTabStore((state) => state.tabOrder);
-  const hideArchivedTabs = useTabStore((state) => state.hideArchivedTabs);
-  const sortTabsByTabOrder = useTabStore((state) => state.sortTabsByTabOrder);
-  const removeTab = useTabStore((state) => state.closeTab);
-  const updateTabInTabs = useTabStore((state) => state.updateTab);
-  const removeTabsFromSpace = useTabStore((state) => state.removeTabsFromSpace);
-  const moveTabOrder = useTabStore((state) => state.moveTabOrder);
-  const moveTabToSpace = useTabStore((state) => state.moveTabToSpace);
-  const sortTabsByPin = useTabStore((state) => state.sortTabsByPin);
-  const setTabOrder = useTabStore((state) => state.setTabOrder);
+  const tabs: Tab[] = useTabsStore((state) => state.tabs);
+  const tabOrder: number[] = useTabsStore((state) => state.tabOrder);
+  const hideArchivedTabs = useTabsStore((state) => state.hideArchivedTabs);
+  const sortTabsByTabOrder = useTabsStore((state) => state.sortTabsByTabOrder);
+  const removeTab = useTabsStore((state) => state.closeTab);
+  const updateTabInTabs = useTabsStore((state) => state.updateTab);
+  const removeTabsFromSpace = useTabsStore(
+    (state) => state.removeTabsFromSpace,
+  );
+  const moveTabOrder = useTabsStore((state) => state.moveTabOrder);
+  const sortTabsByPin = useTabsStore((state) => state.sortTabsByPin);
+  const setTabOrder = useTabsStore((state) => state.setTabOrder);
 
-  const spaces: Space[] = useSpaceStore((state) => state.spaces);
-  const setSpaces = useSpaceStore((state) => state.setSpaces);
-  const removeSpace = useSpaceStore((state) => state.removeSpace);
-  const startEditingSpaceTitle = useSpaceStore(
+  const spaces: Space[] = useSpacesStore((state) => state.spaces);
+  const setSpaces = useSpacesStore((state) => state.setSpaces);
+  const removeSpace = useSpacesStore((state) => state.removeSpace);
+  const startEditingSpaceTitle = useSpacesStore(
     (state) => state.startEditingSpaceTitle,
   );
-  const inputSpaceTitle = useSpaceStore((state) => state.inputSpaceTitle);
-  const changeSpaceTitle = useSpaceStore((state) => state.changeSpaceTitle);
+  const inputSpaceTitle = useSpacesStore((state) => state.inputSpaceTitle);
+  const changeSpaceTitle = useSpacesStore((state) => state.changeSpaceTitle);
 
   useEffect(() => {
     hideArchivedTabs(archivedSpaces);
@@ -214,36 +214,6 @@ const Home = () => {
     return;
   }
 
-  function openSpacesPopup(tabId?: number) {
-    setSelectedSpaceId("");
-    if (tabId) setSelectedTabId(tabId);
-  }
-
-  async function selectSpace(
-    e: React.ChangeEvent<HTMLSelectElement>,
-    originalSpaceId: string,
-  ) {
-    if (!e.target.value) return;
-    setSelectedSpaceId(e.target.value);
-    const updatedTab = tabs.find((tab) => tab.tabId === selectedTabId);
-    if (!updatedTab) return;
-    const message = {
-      action: "moveTabToSpace",
-      updatedTab,
-      originalSpaceId: originalSpaceId || "global",
-      spaceId: e.target.value,
-      userId: currentUserId,
-    };
-    const response = await chrome.runtime.sendMessage(message);
-    if (!response.success) {
-      toast.error("Failed to move tab to space", getToastVariant("normal"));
-      return;
-    }
-    moveTabToSpace(updatedTab);
-    toast.success("Tab moved to space", getToastVariant("normal"));
-    return;
-  }
-
   async function addNewSpace() {
     const newSpaceTitle: string | undefined =
       newSpaceInputRef.current?.value.trim();
@@ -300,7 +270,7 @@ const Home = () => {
     const movedTab = tabs.find((tab) => tab.tabId === tabId);
     if (!movedTab) return;
     moveTabOrder(tabId, direction);
-    const newTabs = useTabStore.getState().tabs;
+    const newTabs = useTabsStore.getState().tabs;
     await onTabOrderChange(newTabs, currentSpaceId);
   }
 
@@ -342,7 +312,7 @@ const Home = () => {
 
   async function toggleTabPin(tabId: number, isPinned: boolean) {
     sortTabsByPin(tabId);
-    const newTabs = useTabStore.getState().tabs;
+    const newTabs = useTabsStore.getState().tabs;
     try {
       const response = await chrome.runtime.sendMessage({
         action: "toggleTabPin",
@@ -453,12 +423,7 @@ const Home = () => {
           {!isLoading && (
             <Tabs
               tabs={tabs}
-              spaces={spaces}
-              selectedTabId={selectedTabId}
-              selectedSpaceId={selectedSpaceId}
               isLoggedin={isLoggedin}
-              openSpacesPopup={openSpacesPopup}
-              selectSpace={selectSpace}
               closeTab={closeTab}
               handleTabOrderChange={handleTabOrderChange}
               toggleTabPin={toggleTabPin}

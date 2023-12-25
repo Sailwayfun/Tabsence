@@ -41,7 +41,7 @@ function sortTabsByPin(tabs: Tab[], tabId?: number) {
   });
 }
 
-const useTabStore = create<TabStoreState>((set) => ({
+const useTabsStore = create<TabStoreState>((set) => ({
   tabs: [],
   tabOrder: [],
   hideArchivedTabs: (archivedSpaces) =>
@@ -91,4 +91,4 @@ const useTabStore = create<TabStoreState>((set) => ({
   setTabOrder: (tabOrder) => set({ tabOrder }),
 }));
 
-export { useTabStore };
+export { useTabsStore };

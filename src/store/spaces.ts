@@ -12,7 +12,7 @@ interface SpacesState {
   changeSpaceTitle: (newTitle: string, editingSpaceId: string) => void;
 }
 
-const useSpaceStore = create<SpacesState>((set) => ({
+const useSpacesStore = create<SpacesState>((set) => ({
   spaces: [],
   setSpaces: (spaces) => set({ spaces }),
   removeSpace: (spaceId) =>
@@ -62,4 +62,4 @@ const useSpaceStore = create<SpacesState>((set) => ({
     }),
 }));
 
-export { useSpaceStore };
+export { useSpacesStore };

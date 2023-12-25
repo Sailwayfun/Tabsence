@@ -11,6 +11,7 @@ import {
   orderBy,
   OrderByDirection,
   DocumentReference,
+  WhereFilterOp,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -75,5 +76,13 @@ export const firebaseService = {
     direction: OrderByDirection,
   ): Query => {
     return query(spacesCollectionRef, orderBy(field, direction));
+  },
+  createUrlDurationQuery: (
+    urlDurationCollectionRef: CollectionReference,
+    field: string,
+    operator: WhereFilterOp,
+    value: number,
+  ) => {
+    return query(urlDurationCollectionRef, where(field, operator, value));
   },
 };

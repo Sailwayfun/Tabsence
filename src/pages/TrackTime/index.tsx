@@ -1,6 +1,4 @@
 import noData from "./no-data.png";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
-import { db } from "../../../firebase-config";
 import { useEffect, useState } from "react";
 import Chart from "./Chart";
 import { useParams } from "react-router-dom";
@@ -8,7 +6,7 @@ import Header from "./Header";
 import { Loader } from "../../components/UI";
 import useLogin from "../../hooks/useLogin";
 import ToggleOrderBtn from "./ToggleOrderBtn";
-import { cn } from "../../utils";
+import { cn, firebaseService } from "../../utils";
 import { UrlDuration } from "../../types";
 
 const TrackTime = () => {
@@ -22,26 +20,26 @@ const TrackTime = () => {
   useEffect(() => {
     setIsLoading(true);
     if (userId && date) {
-      const urlDurationCollectionRef = collection(
-        db,
+      const urlDurationCollectionRef = firebaseService.getCollectionRef([
         "users",
         userId,
         "urlDurations",
         date,
         "domains",
-      );
-      const q = query(
+      ]);
+      const urlDurationQuery = firebaseService.createUrlDurationQuery(
         urlDurationCollectionRef,
-        where("durationBySecond", ">", 0),
+        "durationBySecond",
+        ">",
+        0,
       );
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setIsLoading(false);
-        setUrlDurations(data as UrlDuration[]);
-      });
+      const unsubscribe = firebaseService.subscribeToQuery<UrlDuration>(
+        urlDurationQuery,
+        (data) => {
+          setIsLoading(false);
+          setUrlDurations(data);
+        },
+      )
       return () => {
         unsubscribe();
       };

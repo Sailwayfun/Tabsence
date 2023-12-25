@@ -1,4 +1,4 @@
-import noData from "./no-data.png";
+import image404 from "./image404.png";
 import { useEffect, useState } from "react";
 import Chart from "./Chart";
 import { useParams } from "react-router-dom";
@@ -6,6 +6,7 @@ import Header from "./Header";
 import { Loader } from "../../components/UI";
 import useLogin from "../../hooks/useLogin";
 import Card from "./Card";
+import NoData from "./Nodata";
 import ToggleOrderBtn from "./ToggleOrderBtn";
 import { cn, firebaseService } from "../../utils";
 import { UrlDuration } from "../../types";
@@ -156,16 +157,7 @@ const TrackTime = () => {
         <Loader text="Loading Data..." animateClass="animate-spin" />
       )}
       {!isLoading && urlDurations.length === 0 && (
-        <div className="flex min-h-screen max-w-full flex-col items-center gap-4 rounded-lg border bg-slate-100 py-16 shadow-md">
-          <img src={noData} alt="no data" className="mx-auto w-1/3" />
-          <span className="mr-8 self-end">
-            Image by{" "}
-            <a href="https://www.freepik.com/free-vector/flat-design-no-data-illustration_47718912.htm#query=not%20data&position=5&from_view=search&track=ais&uuid=7ee5c7a8-e536-4bdb-9331-39411353fc99">
-              Freepik
-            </a>
-          </span>
-          <div className="-mt-16 text-3xl">Sorry! There's no data.</div>
-        </div>
+        <NoData image={image404} message="Sorry! There's no data." />
       )}
     </>
   );

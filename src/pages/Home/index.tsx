@@ -18,7 +18,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
-import { cn, validateSpaceTitle } from "../../utils";
+import { cn, validateSpaceTitle, getToastVariant } from "../../utils";
 import ToggleViewBtn from "./ToggleViewBtn";
 import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";
@@ -211,16 +211,10 @@ const Home = () => {
     try {
       const response = await chrome.runtime.sendMessage(message);
       if (!response.success) throw new Error("Failed to close tab");
-      toast.success("Tab Closed", {
-        className: "w-52 text-lg rounded-md shadow",
-        id: "tab_deleted",
-      });
+      toast.success("Tab Closed", getToastVariant("small"));
     } catch (error) {
       if (error instanceof Error) {
-        toast.error("This tab is already closed", {
-          className: "w-[400px] text-lg rounded-md shadow",
-          id: "tab_deleted",
-        });
+        toast.error("This tab is already closed", getToastVariant("larger"));
       }
     }
     return;
@@ -248,17 +242,11 @@ const Home = () => {
     };
     const response = await chrome.runtime.sendMessage(message);
     if (!response.success) {
-      toast.error("Failed to move tab to space", {
-        className: "w-60 text-lg rounded-md shadow",
-        duration: 2000,
-      });
+      toast.error("Failed to move tab to space", getToastVariant("normal"));
       return;
     }
     moveTabToSpace(updatedTab);
-    toast.success("Tab moved to space", {
-      className: "w-60 text-lg rounded-md shadow",
-      duration: 2000,
-    });
+    toast.success("Tab moved to space", getToastVariant("normal"));
     return;
   }
 
@@ -280,10 +268,7 @@ const Home = () => {
       userId: currentUserId,
     });
     if (!response.id || !newSpaceTitle) return;
-    toast.success("Space added", {
-      className: "w-52 text-lg rounded-md shadow",
-      duration: 2000,
-    });
+    toast.success("Space added", getToastVariant("small"));
     if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
   }
 
@@ -351,14 +336,13 @@ const Home = () => {
       const link = window.location.href;
       const sharedLink = `${link}/share/${currentWindowId}`;
       await navigator.clipboard.writeText(sharedLink);
-      toast.success("Link copied!", {
-        className: "w-52 text-lg rounded-md shadow",
-      });
+      toast.success("Link copied!", getToastVariant("small"));
     } catch (err) {
       console.error(err);
-      toast.error("Failed to copy link. Please try again.", {
-        className: "w-72 text-lg rounded-md shadow",
-      });
+      toast.error(
+        "Failed to copy link. Please try again.",
+        getToastVariant("large"),
+      );
     }
   }
 
@@ -376,10 +360,7 @@ const Home = () => {
       if (!response.success) throw new Error("Failed to toggle tab pin");
     } catch (err) {
       if (err instanceof Error) {
-        toast.error(err.message, {
-          className: "w-72 text-lg rounded-md shadow",
-          duration: 2000,
-        });
+        toast.error(err.message, getToastVariant("large"));
       }
     }
   }

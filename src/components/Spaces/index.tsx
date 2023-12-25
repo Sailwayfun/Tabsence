@@ -10,7 +10,7 @@ import Folder from "../Icons/Folder";
 import AddSpace from "./AddSpace";
 import { Heading } from "../UI";
 import Box from "../Icons/Box";
-import { cn } from "../../utils";
+import { cn, getToastVariant } from "../../utils";
 interface SpacesProps {
   spaces: Space[];
   onAddNewSpace: () => Promise<void>;
@@ -55,20 +55,14 @@ const Spaces = forwardRef(
         });
         if (response) {
           addArchived(id);
-          toast.success("Space archived", {
-            className: "w-52 text-lg rounded-md shadow",
-            duration: 2000,
-          });
+          toast.success("Space archived", getToastVariant("normal"));
           navigate("/");
           return;
         }
         throw new Error("Failed to archive space");
       } catch (err) {
         if (err instanceof Error) {
-          toast.error(err.message, {
-            className: "w-52 text-lg rounded-md shadow",
-            duration: 2000,
-          });
+          toast.error(err.message, getToastVariant("large"));
         }
       }
     }
@@ -80,20 +74,14 @@ const Spaces = forwardRef(
         });
         if (response) {
           restoreArchived(id);
-          toast.success("Space restored", {
-            className: "w-52 text-lg rounded-md shadow",
-            duration: 2000,
-          });
+          toast.success("Space restored", getToastVariant("normal"));
           navigate(`/${id}`);
           return;
         }
         throw new Error("Failed to restore space");
       } catch (err) {
         if (err instanceof Error) {
-          toast.error(err.message, {
-            className: "w-52 text-lg rounded-md shadow",
-            duration: 2000,
-          });
+          toast.error(err.message, getToastVariant("large"));
         }
       }
     }

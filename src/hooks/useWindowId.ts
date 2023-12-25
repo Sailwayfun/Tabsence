@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { getToastVariant } from "../utils";
 
 export default function useWindowId(): number {
   const [windowId, setWindowId] = useState<number>(0);
@@ -13,10 +14,7 @@ export default function useWindowId(): number {
         return window.id;
       } catch (err) {
         if (err instanceof Error) {
-          toast.error(err.message, {
-            className: "w-52 text-lg rounded-md shadow",
-            duration: 2000,
-          });
+          toast.error(err.message, getToastVariant("normal"));
         }
       }
     }

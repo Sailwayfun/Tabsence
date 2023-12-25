@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { Space } from "../types";
 import { toast } from "react-hot-toast";
-import { validateSpaceTitle } from "../utils";
+import { validateSpaceTitle, getToastVariant } from "../utils";
 
 interface SpacesState {
   spaces: Space[];
@@ -31,9 +31,10 @@ const useSpaceStore = create<SpacesState>((set) => ({
       spaces: state.spaces.map((space) => {
         if (space.id !== editingSpaceId) return space;
         if (newTitle.length === 11) {
-          toast.error("Space name should be less than 10 characters", {
-            className: "w-[400px] text-lg rounded-md shadow",
-          });
+          toast.error(
+            "Space name should be less than 10 characters",
+            getToastVariant("larger"),
+          );
           return space;
         }
         return {

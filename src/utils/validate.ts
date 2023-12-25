@@ -1,3 +1,4 @@
+import { getToastVariant } from "./toastConfig";
 import { Space } from "../types/space";
 import { toast } from "react-hot-toast";
 
@@ -16,24 +17,22 @@ function validateSpaceTitle(
   const spaceLimitReached: boolean =
     spaces.length >= 5 && spaces.every((space) => space.id !== id);
   if (nameEmpty) {
-    return toast.error("Please enter a space title", {
-      className: "w-72 text-lg rounded-md shadow",
-    });
+    return toast.error("Please enter a space title", getToastVariant("large"));
   }
   if (spaceLimitReached) {
-    return toast.error("You can only create up to 5 spaces", {
-      className: "w-72 text-lg rounded-md shadow",
-    });
+    return toast.error(
+      "You can only create up to 5 spaces",
+      getToastVariant("large"),
+    );
   }
   if (nameExists) {
-    return toast.error("Space name already exists", {
-      className: "w-72 text-lg rounded-md shadow",
-    });
+    return toast.error("Space name already exists", getToastVariant("large"));
   }
   if (nameTooLong) {
-    return toast.error("Space name should be less than 10 characters", {
-      className: "w-[400px] text-lg rounded-md shadow",
-    });
+    return toast.error(
+      "Space name should be less than 10 characters",
+      getToastVariant("larger"),
+    );
   }
 
   return null;

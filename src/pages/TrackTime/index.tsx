@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import Header from "./Header";
 import { Loader } from "../../components/UI";
 import useLogin from "../../hooks/useLogin";
+import Card from "./Card";
 import ToggleOrderBtn from "./ToggleOrderBtn";
 import { cn, firebaseService } from "../../utils";
 import { UrlDuration } from "../../types";
@@ -39,7 +40,7 @@ const TrackTime = () => {
           setIsLoading(false);
           setUrlDurations(data);
         },
-      )
+      );
       return () => {
         unsubscribe();
       };
@@ -48,7 +49,7 @@ const TrackTime = () => {
 
   function getDurationPercentge(duration: number) {
     const totalDuration = getTotalDuration();
-    return ((duration / totalDuration) * 100).toFixed(2);
+    return parseFloat(((duration / totalDuration) * 100).toFixed(2));
   }
 
   function getTotalDuration() {
@@ -125,28 +126,14 @@ const TrackTime = () => {
               )}
             >
               {urlDurations.map((website) => (
-                <li
+                <Card
                   key={website.id}
-                  className="grid w-full grid-cols-4 rounded-md border border-gray-300 p-3 shadow transition duration-200 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-slate-300 hover:shadow-lg xl:text-2xl"
-                >
-                  <div className="flex gap-2 text-xl">
-                    <img
-                      className="h-8 w-8"
-                      src={website.faviconUrl}
-                      alt={website.id}
-                    />
-                    <span>{website.id}</span>
-                  </div>
-                  <div className="mx-auto my-0 text-lg">
-                    {website.durationBySecond}
-                  </div>
-                  <div className="mx-auto my-0 text-xl">
-                    {website.visitCounts}
-                  </div>
-                  <div className="mx-auto my-0 text-xl">
-                    {getDurationPercentge(website.durationBySecond)}
-                  </div>
-                </li>
+                  id={website.id}
+                  faviconUrl={website.faviconUrl}
+                  durationBySecond={website.durationBySecond}
+                  visitCounts={website.visitCounts}
+                  percentage={getDurationPercentge(website.durationBySecond)}
+                />
               ))}
             </ul>
             <div

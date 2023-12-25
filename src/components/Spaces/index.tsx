@@ -96,28 +96,6 @@ const Spaces = forwardRef(
         inputRef.current.value = "";
       }
     }
-    // function handleSpaceEditBlur(
-    //   e: React.FocusEvent<HTMLInputElement>,
-    //   id: string,
-    // ) {
-    //   const space = spaces.find((space) => space.id === id);
-    //   if (!space) return;
-    //   if (space.isEditing) {
-    //     onSpaceEditBlur(e, id);
-    //   }
-    // }
-    // function handleSpaceTitleChange(
-    //   e: React.ChangeEvent<HTMLInputElement>,
-    //   id: string,
-    // ) {
-    //   const space = spaces.find((space) => space.id === id);
-    //   if (!space) return;
-    //   onSpaceTitleChange(e, id);
-    // }
-    // function handleEditSpace(id: string) {
-    //   onEditSpace(id);
-    // }
-
     function handleSpaceTitleChange(
       e: React.ChangeEvent<HTMLInputElement>,
       id: string,

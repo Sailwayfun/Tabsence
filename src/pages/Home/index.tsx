@@ -328,49 +328,6 @@ const Home = () => {
     setIsTabsGrid((prev) => !prev);
   }
 
-  // function handleSpaceTitleChange(
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   id: string,
-  // ) {
-  //   const newTitle = e.target.value;
-  //   inputSpaceTitle(newTitle, id);
-  // }
-
-  // function handleEditSpace(id: string) {
-  //   startEditingSpaceTitle(id);
-  // }
-
-  // async function handleSpaceEditBlur(
-  //   e: React.FocusEvent<HTMLInputElement, Element>,
-  //   id: string,
-  // ) {
-  //   const newTitle = e.target.value.trim();
-  //   changeSpaceTitle(newTitle, id);
-  //   await updateSpaceTitleInFirestore(id, newTitle, currentUserId);
-  // }
-
-  // async function updateSpaceTitleInFirestore(
-  //   spaceId: string,
-  //   newSpaceTitle: string | undefined,
-  //   userId: string,
-  // ) {
-  //   try {
-  //     const response = await chrome.runtime.sendMessage({
-  //       action: "updateSpaceTitle",
-  //       spaceId,
-  //       newSpaceTitle,
-  //       userId,
-  //     });
-  //     if (!response.success) {
-  //       throw new Error("Failed to update space title in Firestore");
-  //     }
-  //   } catch (err) {
-  //     if (err instanceof Error) {
-  //       console.error(err.message);
-  //     }
-  //   }
-  // }
-
   const isWebTime = location.pathname.includes("/webtime");
   const isRoot = location.pathname === "/";
   const tabsHeaderClasses = cn("flex relative z-10 flex-col", {

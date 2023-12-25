@@ -10,19 +10,15 @@ import Tabs from "../../components/Tabs";
 import MainContainer from "../../components/MainContainer";
 import CopyToClipboard from "./CopyToClipboard";
 import {
-  collection,
-  doc,
-  query,
-  where,
-  onSnapshot,
-  orderBy,
-} from "firebase/firestore";
-import { db } from "../../../firebase-config";
-import { cn, validateSpaceTitle, getToastVariant } from "../../utils";
+  cn,
+  validateSpaceTitle,
+  getToastVariant,
+  firebaseService,
+} from "../../utils";
 import ToggleViewBtn from "./ToggleViewBtn";
 import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";
-import { Tab, Space, SpaceDoc, Direction } from "../../types";
+import { Tab, TabOrder, Space, Direction } from "../../types";
 import { Loader } from "../../components/UI";
 
 interface Response {
@@ -77,50 +73,48 @@ const Home = () => {
     const currentPath = location.pathname.split("/")[1];
     if (currentPath.includes("webtime")) return setIsLoading(false);
     if (!currentUserId || !currentWindowId) return setIsLoading(false);
-    const tabsCollectionRef = collection(db, "users", currentUserId, "tabs");
-    const spacesCollectionRef = collection(
-      db,
+    const tabsCollectionRef = firebaseService.getCollectionRef([
+      "users",
+      currentUserId,
+      "tabs",
+    ]);
+    const spacesCollectionRef = firebaseService.getCollectionRef([
       "users",
       currentUserId,
       "spaces",
+    ]);
+    const tabQ = firebaseService.createTabsQuery(
+      tabsCollectionRef,
+      currentWindowId,
+      sharedWindowId,
+      currentPath,
     );
-    const tabQ =
-      currentPath !== ""
-        ? query(
-            tabsCollectionRef,
-            where("windowId", "in", [
-              currentWindowId,
-              sharedWindowId ? parseInt(sharedWindowId) : "",
-            ]),
-            where("spaceId", "==", currentPath),
-          )
-        : query(
-            tabsCollectionRef,
-            where("windowId", "in", [
-              currentWindowId,
-              sharedWindowId ? parseInt(sharedWindowId) : "",
-            ]),
-          );
-    const unsubscribeTab = onSnapshot(tabQ, (querySnapshot) => {
-      const currentTabs: Tab[] = [];
-      querySnapshot.forEach((doc) => {
-        const tab = doc.data() as Tab;
-        currentTabs.push(tab);
-      });
-      sortTabsByTabOrder(currentTabs);
-      setIsLoading(false);
-      return;
-    });
-    const spaceQ = query(spacesCollectionRef, orderBy("createdAt", "asc"));
-    const unsubscribeSpace = onSnapshot(spaceQ, (querySnapshot) => {
-      const currentSpaces: Space[] = [];
-      querySnapshot.forEach((doc) => {
-        const space = doc.data() as SpaceDoc;
-        currentSpaces.push({ id: doc.id, isEditing: false, ...space });
-      });
-      setSpaces(currentSpaces);
-      setIsLoading(false);
-    });
+    const unsubscribeTab = firebaseService.subscribeToQuery<Tab>(
+      tabQ,
+      (currentTabs) => {
+        sortTabsByTabOrder(currentTabs);
+        setIsLoading(false);
+        return;
+      },
+    );
+    const spaceQ = firebaseService.createSpacesQuery(
+      spacesCollectionRef,
+      "createdAt",
+      "asc",
+    );
+
+    const unsubscribeSpace = firebaseService.subscribeToQuery<Space>(
+      spaceQ,
+      (currentSpaces) => {
+        const spacesWithEditingState = currentSpaces.map((space) => ({
+          ...space,
+          isEditing: false,
+        }));
+        setSpaces(spacesWithEditingState);
+        setIsLoading(false);
+      },
+    );
+
     return () => {
       unsubscribeTab();
       unsubscribeSpace();
@@ -140,24 +134,24 @@ const Home = () => {
     const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
     if (location.pathname.includes("webtime")) return setIsLoading(false);
     if (!currentUserId || !currentWindowId) return setIsLoading(false);
-    const tabOrderDocRef = doc(
-      db,
+    const tabOrderDocRef = firebaseService.getDocRef([
       "users",
       currentUserId,
       "tabOrders",
       spaceId,
+    ]);
+    const unsubscribeTabOrder = firebaseService.subscribeToDoc<TabOrder>(
+      tabOrderDocRef,
+      (tabOrderData) => {
+        if (
+          tabOrderData.windowId !== currentWindowId &&
+          tabOrderData.windowId !== parsedSharedWindowId
+        ) {
+          return;
+        }
+        setTabOrder(tabOrderData.tabOrder);
+      },
     );
-    const unsubscribeTabOrder = onSnapshot(tabOrderDocRef, (docSnapshot) => {
-      if (!docSnapshot.exists()) return;
-      const tabOrderData = docSnapshot.data();
-      if (
-        tabOrderData.windowId !== currentWindowId &&
-        tabOrderData.windowId !== parsedSharedWindowId
-      ) {
-        return;
-      }
-      setTabOrder(tabOrderData.tabOrder);
-    });
     return () => {
       unsubscribeTabOrder();
     };

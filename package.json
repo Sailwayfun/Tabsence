@@ -10,20 +10,32 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "clsx": "^2.0.0",
+    "date-fns": "^3.0.1",
+    "firebase": "^10.6.0",
+    "highcharts": "^11.2.0",
+    "highcharts-react-official": "^3.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.18.0"
+    "react-hot-toast": "^2.4.1",
+    "react-router-dom": "^6.19.0",
+    "tailwind-merge": "^2.1.0",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@types/chrome": "^0.0.251",
+    "@types/lodash.debounce": "^4.0.9",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.3",
     "autoprefixer": "^10.4.16",
+    "daisyui": "^4.4.17",
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "lodash.debounce": "^4.0.8",
     "postcss": "^8.4.31",
     "prettier": "^3.1.0",
     "prettier-plugin-tailwindcss": "^0.5.7",

@@ -2,10 +2,14 @@
 export default {
   content: [
     "./index.html",
+    "./newTab.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require("daisyui")],
+  daisyui: {
+    themes: ["cupcake"],
+  },
 };

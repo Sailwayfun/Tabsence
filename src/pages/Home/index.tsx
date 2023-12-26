@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   useArchivedSpaceStore,
   useSpacesStore,
@@ -11,12 +11,7 @@ import Header from "../../components/Header";
 import Tabs from "../../components/Tabs";
 import MainContainer from "../../components/MainContainer";
 import CopyToClipboard from "./CopyToClipboard";
-import {
-  cn,
-  validateSpaceTitle,
-  getToastVariant,
-  firebaseService,
-} from "../../utils";
+import { cn, getToastVariant, firebaseService } from "../../utils";
 import ToggleViewBtn from "./ToggleViewBtn";
 import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";
@@ -31,7 +26,6 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isTabsGrid, setIsTabsGrid] = useState<boolean>(false);
   const location = useLocation();
-  const newSpaceInputRef = useRef<HTMLInputElement>(null);
   const currentWindowId = useWindowId();
   const { windowId: sharedWindowId, spaceId: currentSpaceId } = useParams<{
     windowId: string;
@@ -209,28 +203,6 @@ const Home = () => {
     return;
   }
 
-  async function addNewSpace() {
-    const newSpaceTitle: string | undefined =
-      newSpaceInputRef.current?.value.trim();
-    const errorToastId: string | null = validateSpaceTitle(
-      spaces,
-      undefined,
-      newSpaceTitle,
-    );
-    if (errorToastId && newSpaceInputRef.current) {
-      newSpaceInputRef.current.value = "";
-      return;
-    }
-    const response = await chrome.runtime.sendMessage({
-      action: "addSpace",
-      newSpaceTitle,
-      userId: currentUserId,
-    });
-    if (!response.id || !newSpaceTitle) return;
-    toast.success("Space added", getToastVariant("small"));
-    if (newSpaceInputRef.current) newSpaceInputRef.current.value = "";
-  }
-
   async function removeSpaceFromFirestore(spaceId: string, userId: string) {
     try {
       const response = await chrome.runtime.sendMessage({
@@ -341,8 +313,7 @@ const Home = () => {
       <MainContainer isWebTime={isWebTime}>
         {isLoggedin && (
           <Spaces
-            ref={newSpaceInputRef}
-            onAddNewSpace={addNewSpace}
+            // onAddNewSpace={addNewSpace}
             currentSpaceId={currentSpaceId}
             onRemoveSpace={handleRemoveSpace}
             isWebtimePage={isWebTime}

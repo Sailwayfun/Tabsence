@@ -1,7 +1,6 @@
-interface RestoreProps {
-  className: string;
-}
-const Restore = ({ className }: RestoreProps) => {
+import { IconProps } from "../../types";
+
+const Restore = ({ className }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -1,6 +1,4 @@
-interface IconProps {
-  className: string;
-}
+import { IconProps } from "../../types";
 
 const Kebab = ({ className }: IconProps) => {
   return (

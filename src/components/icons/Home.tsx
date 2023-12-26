@@ -1,6 +1,4 @@
-interface IconProps {
-  className: string;
-}
+import { IconProps } from "../../types";
 
 const Home = ({ className }: IconProps) => {
   return (

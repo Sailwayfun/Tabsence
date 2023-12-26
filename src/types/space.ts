@@ -1,9 +1,6 @@
-export interface SpaceDoc {
+export interface Space {
+  id: string;
+  isEditing?: boolean;
   title: string;
   isArchived?: boolean;
-}
-
-export interface Space extends SpaceDoc {
-  id: string;
-  isEditing: boolean;
 }

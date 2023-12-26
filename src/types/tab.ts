@@ -5,3 +5,7 @@ export interface Tab extends chrome.tabs.Tab {
   tabId: number | undefined;
   isPinned: boolean;
 }
+export interface TabOrder {
+  tabOrder: number[];
+  windowId: number;
+}

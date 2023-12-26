@@ -1,6 +1,5 @@
-interface IconProps {
-  className: string;
-}
+import { IconProps } from "../../types";
+
 const ArrowRight = ({ className }: IconProps) => {
   return (
     <svg
@@ -8,7 +7,6 @@ const ArrowRight = ({ className }: IconProps) => {
       fill="none"
       viewBox="0 0 24 24"
       strokeWidth={1.5}
-      stroke="currentColor"
       className={className}
     >
       <path

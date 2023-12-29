@@ -131,6 +131,7 @@ const TabCard = ({
     setSelectedSpaceId(e.target.value);
     const updatedTab = tabs.find((tab) => tab.tabId === selectedTabId);
     if (!updatedTab) return;
+    moveTabToSpace(updatedTab);
     const message = {
       action: "moveTabToSpace",
       updatedTab,
@@ -143,7 +144,6 @@ const TabCard = ({
       toast.error("Failed to move tab to space", getToastVariant("normal"));
       return;
     }
-    moveTabToSpace(updatedTab);
     toast.success("Tab moved to space", getToastVariant("normal"));
     return;
   }

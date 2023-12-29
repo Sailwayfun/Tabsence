@@ -63,9 +63,11 @@ const useTabsStore = create<TabStoreState>((set) => ({
       tabs: state.tabs.map((t) => (t.tabId === tab.tabId ? tab : t)),
     })),
   moveTabToSpace: (tab) =>
-    set((state) => ({
-      tabs: state.tabs.filter((t) => t.tabId !== tab.tabId),
-    })),
+    set((state) => {
+      return {
+        tabs: state.tabs.filter((t) => t.tabId !== tab.tabId),
+      };
+    }),
   removeTabsFromSpace: (spaceId) =>
     set((state) => ({
       tabs: state.tabs.filter((tab) => tab.spaceId !== spaceId),

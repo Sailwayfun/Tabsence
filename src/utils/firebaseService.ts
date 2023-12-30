@@ -37,20 +37,17 @@ export const firebaseService = {
     tabsCollectionRef: CollectionReference,
     currentWindowId: number,
     sharedWindowId?: string,
-    currentPath: string = "",
+    currentPath?: string,
   ): Query => {
     const windowIds = [
       currentWindowId,
       sharedWindowId ? parseInt(sharedWindowId) : 0,
     ];
-    if (currentPath) {
-      return query(
-        tabsCollectionRef,
-        where("windowId", "in", windowIds),
-        where("spaceId", "==", currentPath),
-      );
-    }
-    return query(tabsCollectionRef, where("windowId", "in", windowIds));
+    return query(
+      tabsCollectionRef,
+      where("windowId", "in", windowIds),
+      where("spaceId", "==", currentPath ? currentPath : "global"),
+    );
   },
   subscribeToQuery: <T>(query: Query, onData: (data: T[]) => void) => {
     return onSnapshot(query, (snapshot) => {

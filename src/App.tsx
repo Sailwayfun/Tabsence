@@ -21,7 +21,7 @@ const App = () => {
     <div className="flex h-60 w-80 flex-col gap-10 p-4">
       <div className="flex items-center">
         <h1 className="text-3xl font-bold">Tabsence</h1>
-        <img src="/icons/tabs.png" alt="Tabsence" className="ml-4 h-12 w-12" />
+        <img src="/assets/icons/tabs.png" alt="Tabsence" className="ml-4 h-12 w-12" />
       </div>
       <p className="text-2xl leading-8">Organize your tabs, and your life!</p>
       <div className="py-3">

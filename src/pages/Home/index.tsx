@@ -38,20 +38,19 @@ const Home = () => {
 
   const tabs: Tab[] = useTabsStore((state) => state.tabs);
   const tabOrder: number[] = useTabsStore((state) => state.tabOrder);
-  const hideArchivedTabs = useTabsStore((state) => state.hideArchivedTabs);
-  const sortTabsByTabOrder = useTabsStore((state) => state.sortTabsByTabOrder);
-  const removeTab = useTabsStore((state) => state.closeTab);
-  const updateTabInTabs = useTabsStore((state) => state.updateTab);
-  const removeTabsFromSpace = useTabsStore(
-    (state) => state.removeTabsFromSpace,
-  );
-  const moveTabOrder = useTabsStore((state) => state.moveTabOrder);
-  const sortTabsByPin = useTabsStore((state) => state.sortTabsByPin);
-  const setTabOrder = useTabsStore((state) => state.setTabOrder);
 
-  const spaces: Space[] = useSpacesStore((state) => state.spaces);
-  const setSpaces = useSpacesStore((state) => state.setSpaces);
-  const removeSpace = useSpacesStore((state) => state.removeSpace);
+  const {
+    hideArchivedTabs,
+    sortTabsByTabOrder,
+    closeTab: removeTab,
+    updateTab: updateTabInTabs,
+    removeTabsFromSpace,
+    moveTabOrder,
+    sortTabsByPin,
+    setTabOrder,
+  } = useTabsStore();
+
+  const { spaces, setSpaces, removeSpace } = useSpacesStore();
 
   useEffect(() => {
     hideArchivedTabs(archivedSpaces);
@@ -313,7 +312,6 @@ const Home = () => {
       <MainContainer isWebTime={isWebTime}>
         {isLoggedin && (
           <Spaces
-            // onAddNewSpace={addNewSpace}
             currentSpaceId={currentSpaceId}
             onRemoveSpace={handleRemoveSpace}
             isWebtimePage={isWebTime}
@@ -342,7 +340,6 @@ const Home = () => {
           )}
           {!isLoading && (
             <Tabs
-              tabs={tabs}
               isLoggedin={isLoggedin}
               closeTab={closeTab}
               handleTabOrderChange={handleTabOrderChange}

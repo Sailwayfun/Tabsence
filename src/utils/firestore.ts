@@ -21,6 +21,7 @@ async function saveTabInfo(tab: chrome.tabs.Tab, userId?: string) {
     favIconUrl: getFaviconUrl(tab.url) || tab.favIconUrl || "",
     lastAccessed: serverTimestamp(),
     isPinned: false,
+    spaceId: "global",
   };
   const newTabId = tab.id;
   const tabDocRef = doc(db, "users", userId, "tabs", tab.id.toString());

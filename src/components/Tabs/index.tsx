@@ -1,10 +1,10 @@
 import Card from "./Card";
-import { Tab, Direction } from "../../types";
+import { Direction } from "../../types";
 import { useLocation } from "react-router-dom";
 import { cn } from "../../utils";
+import { useTabsStore } from "../../store";
 
 interface TabsProps {
-  tabs: Tab[];
   selectedTabId?: number;
   isLoggedin: boolean;
   isGrid: boolean;
@@ -15,7 +15,6 @@ interface TabsProps {
 }
 
 const Tabs = ({
-  tabs,
   isLoggedin,
   closeTab,
   handleTabOrderChange,
@@ -23,6 +22,7 @@ const Tabs = ({
   isGrid,
   currentUserId,
 }: TabsProps) => {
+  const { tabs } = useTabsStore();
   const location = useLocation();
   const listStyles = "flex flex-col gap-5 w-full";
   const gridStyles = "grid grid-cols-3 gap-8 max-h-full w-full";
@@ -43,7 +43,7 @@ const Tabs = ({
               onToggleTabPin={toggleTabPin}
               isGrid={isGrid}
               currentUserId={currentUserId}
-            ></Card>
+            />
           );
         })}
     </ul>

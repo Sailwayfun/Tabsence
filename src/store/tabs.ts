@@ -8,7 +8,6 @@ interface TabStoreState {
   sortTabsByTabOrder: (tabsFromFirestore: Tab[]) => void;
   closeTab: (tabId: number) => void;
   updateTab: (tab: Tab) => void;
-  moveTabToSpace: (tab: Tab) => void;
   removeTabsFromSpace: (spaceId: string) => void;
   moveTabOrder: (tabId: number, direction: Direction) => void;
   sortTabsByPin: (tabId: number) => void;
@@ -61,10 +60,6 @@ const useTabsStore = create<TabStoreState>((set) => ({
   updateTab: (tab) =>
     set((state) => ({
       tabs: state.tabs.map((t) => (t.tabId === tab.tabId ? tab : t)),
-    })),
-  moveTabToSpace: (tab) =>
-    set((state) => ({
-      tabs: state.tabs.filter((t) => t.tabId !== tab.tabId),
     })),
   removeTabsFromSpace: (spaceId) =>
     set((state) => ({

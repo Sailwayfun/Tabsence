@@ -33,7 +33,7 @@
 
 ## Built with
 
-<div align="center" style="display:flex; justify-content: center; margin-bottom: 16px; gap: 8px;">
+<div style="display:flex; justify-content: center; margin-bottom: 16px; gap: 8px;">
    <img src="https://img.shields.io/badge/React-61DAFB.svg?style=for-the-badge&logo=React&logoColor=black" alt="React"/> 
    <img src="https://img.shields.io/badge/Firebase-FFCA28.svg?style=for-the-badge&logo=Firebase&logoColor=black" alt="Firebase"/>
    <img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style=for-the-badge&logo=TypeScript&logoColor=white" alt="TypeScript"/>
@@ -112,7 +112,7 @@ Libraries
 
 ## Contact
 
-<div style="display:flex; gap: 12px" align="center">
+<div style="display:flex; gap: 12px">
    <a href="https://www.linkedin.com/in/sailliaodev/">
       <img src="https://img.shields.io/badge/LinkedIn-0A66C2.svg?style=for-the-badge&logo=LinkedIn&logoColor=white" alt="LinkedIn"/>
    </a>

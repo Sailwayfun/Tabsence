@@ -92,15 +92,23 @@ Libraries
    </li>
 </ol>
 
-- Unused spaces can be archived and can be restored later.
-<div style="padding: 12px 43px;">
-   <img src="public/assets/archive-and-restore.gif" width="500" alt="sort tabs" />
-</div>
+<ul>
+   <li>
+      <p>Unused spaces can be archived and can be restored later.</p>
+      <div style="padding: 12px 0px;">
+         <img src="public/assets/archive-and-restore.gif" width="500" alt="sort tabs" />
+      </div>
+   </li>
+</ul>
 
-- The time spent on websites is visualized by a table and a chart on the webtime page. Data is displayed per day, and switching dates can be done by clicking the arrows on the top-right corner.
-<div style="padding: 12px 43px;">
-   <img src="public/assets/webtime-chart.gif" width="500" alt="sort tabs" />
-</div>
+<ul>
+   <li>
+   <p>The time spent on websites is visualized by a table and a chart on the webtime page. Data is displayed per day, and switching dates can be done by clicking the arrows on the top-right corner.</p>
+   </li>
+   <div style="padding: 12px 0px;">
+      <img src="public/assets/webtime-chart.gif" width="500" alt="sort tabs" />
+   </div>
+</ul>
 
 ## Contact
 

@@ -92,6 +92,7 @@ Libraries
    </li>
 </ol>
 
+
 <ul>
    <li>
       <p>Unused spaces can be archived and can be restored later.</p>
@@ -109,6 +110,7 @@ Libraries
       <img src="public/assets/webtime-chart.gif" width="500" alt="sort tabs" />
    </div>
 </ul>
+
 
 ## Contact
 

@@ -65,25 +65,32 @@ Libraries
 
 - Sorting and categorization of tabs can be done on the homepage:
 
-1. Opened Tabs in the browser will be rendered on the extension page at the same time.
-<div style="padding: 12px 43px;">
-   <img src="public/assets/sync-tabs.gif" width="500" alt="sync tabs" />
-</div>
-
-2. Tabs can be viewed in list or grid views.
-<div style="padding: 12px 43px;">
-   <img src="public/assets/list-grid-views.gif" width="500" alt="sync tabs" />
-</div>
-
-3. Tabs can be sorted on the extension page by clicking arrows on the tab card.
-<div style="padding: 12px 43px;">
-   <img src="public/assets/sort-tabs.gif" width="500" alt="sort tabs" />
-</div>
-
-4. Tabs can be categorized into customized spaces users create.
-<div style="padding: 12px 43px;">
-   <img src="public/assets/move-tab-to-space.gif" width="500" alt="sort tabs" />
-</div>
+<ol>
+   <li>
+      <p>Opened Tabs in the browser will be rendered on the extension page at the same time.</p>
+      <div style="padding: 12px 0px;">
+         <img src="public/assets/sync-tabs.gif" width="500" alt="sync tabs" />
+      </div>
+   </li>
+   <li>
+      <p>Tabs can be viewed in list or grid views.</p>
+       <div style="padding: 12px 0px;">
+         <img src="public/assets/list-grid-views.gif" width="500" alt="sync tabs" />
+      </div>
+   </li>
+   <li>
+      <p>Tabs can be sorted on the extension page by clicking arrows on the tab card.</p>
+       <div style="padding: 12px 0px;">
+         <img src="public/assets/sort-tabs.gif" width="500" alt="sort tabs" />
+      </div>
+   </li>
+   <li>
+      <p>Tabs can be categorized into customized spaces users create.</p>
+      <div style="padding: 12px 0px;">
+         <img src="public/assets/move-tab-to-space.gif" width="500" alt="sort tabs" />
+      </div>
+   </li>
+</ol>
 
 - Unused spaces can be archived and can be restored later.
 <div style="padding: 12px 43px;">

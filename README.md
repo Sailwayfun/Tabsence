@@ -27,10 +27,6 @@
 - Tracked users' time spent on different websites, and visualized the data on the webpage using `Highcharts`.
 - Implemented global state management with `Zustand`.
 
-<div style="display:flex; width: 100%; justify-content: flex-end">
-   <a href="#">Back to top</a>
-</div>
-
 ## Built with
 
 <div style="display:flex; justify-content: center; margin-bottom: 16px; gap: 8px;">
@@ -59,17 +55,10 @@ Libraries
 - daisyui
 - date-fns
 
-<div style="display:flex; width: 100%; justify-content: flex-end">
-   <a href="#">Back to top</a>
-</div>
-
 ## Flow chart
 
 <div align="center">
    <img src="public/assets/flowchart.png" width="500" />
-   <div style="display:flex; width: 100%; justify-content: flex-end">
-      <a href="#">Back to top</a>
-   </div>
 </div>
 
 ## Demo
@@ -106,10 +95,6 @@ Libraries
    <img src="public/assets/webtime-chart.gif" width="500" alt="sort tabs" />
 </div>
 
-<div style="display:flex; width: 100%; justify-content: flex-end">
-   <a href="#">Back to top</a>
-</div>
-
 ## Contact
 
 <div style="display:flex; gap: 12px">
@@ -119,8 +104,4 @@ Libraries
    <a href="mailto:liaoleon000513@gmail.com">
       <img src="https://img.shields.io/badge/Gmail-EA4335.svg?style=for-the-badge&logo=Gmail&logoColor=white" alt="Gmail"/>
    </a>
-</div>
-
-<div style="display:flex; width: 100%; justify-content: flex-end">
-   <a href="#">Back to top</a>
 </div>

@@ -19,7 +19,12 @@ interface SpacesProps {
   isWebtimePage: boolean;
 }
 const Spaces = (props: SpacesProps) => {
-  const { onRemoveSpace, isWebtimePage, currentUserId }: SpacesProps = props;
+  const {
+    onRemoveSpace,
+    isWebtimePage,
+    currentUserId,
+    currentSpaceId,
+  }: SpacesProps = props;
   const archivedSpaces = useArchivedSpaceStore((state) => state.archivedSpaces);
   const addArchived = useArchivedSpaceStore((state) => state.addArchived);
   const restoreArchived = useArchivedSpaceStore(
@@ -170,10 +175,14 @@ const Spaces = (props: SpacesProps) => {
     const space = spaces.find((space) => space.id === id);
     if (!space) return null;
     const { title, isEditing } = space;
+    const isSpaceActive = id === currentSpaceId;
     return (
       <SpaceTab
         key={id}
-        linkClasses="bg-orange-700 opacity-80 text-white"
+        linkClasses={cn(
+          "bg-orange-700 opacity-80 text-white",
+          isSpaceActive && "text-yellow-300",
+        )}
         id={id}
         title={title}
         onToggleArchive={isArchived ? restoreSpace : archiveSpace}

@@ -62,8 +62,9 @@ const TabCard = ({
   const [selectedSpaceId, setSelectedSpaceId] = useState<string>("");
   const [selectedTabId, setSelectedTabId] = useState<number>(0);
   const spaces = useSpacesStore((state) => state.spaces);
-  const tabs = useTabsStore((state) => state.tabs);
-  const moveTabToSpace = useTabsStore((state) => state.moveTabToSpace);
+  const { tabs } = useTabsStore();
+
+  console.log("tabs in tab card", tabs);
 
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
@@ -143,7 +144,6 @@ const TabCard = ({
       toast.error("Failed to move tab to space", getToastVariant("normal"));
       return;
     }
-    moveTabToSpace(updatedTab);
     toast.success("Tab moved to space", getToastVariant("normal"));
     return;
   }

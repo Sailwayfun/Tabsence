@@ -12,6 +12,7 @@ import {
   OrderByDirection,
   DocumentReference,
   WhereFilterOp,
+  getDocs,
   setDoc,
   arrayUnion,
   arrayRemove,
@@ -89,6 +90,7 @@ export const firebaseService = {
   },
   saveNewTabToFirestore,
   moveTabToSpace,
+  removeSpace,
 };
 
 async function saveNewTabToFirestore(tab: chrome.tabs.Tab, userId?: string) {
@@ -146,10 +148,52 @@ async function moveTabToSpace(
   const batch = writeBatch(db);
   batch.update(tabDocRef, { spaceId: newSpaceId });
   batch.update(oldTabOrderDocRef, { tabOrder: arrayRemove(tabId) });
-  batch.set(newTabOrderDocRef, { tabOrder: arrayUnion(tabId), windowId });
+  batch.set(
+    newTabOrderDocRef,
+    { tabOrder: arrayUnion(tabId), windowId },
+    { merge: true },
+  );
 
   try {
     await batch.commit();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function removeSpace(spaceId: string, userId: string) {
+  const spaceDocRef = firebaseService.getDocRef([
+    "users",
+    userId,
+    "spaces",
+    spaceId,
+  ]);
+  const tabOrderDocRef = firebaseService.getDocRef([
+    "users",
+    userId,
+    "tabOrders",
+    spaceId,
+  ]);
+
+  const deletedTabIds: number[] = [];
+  const batch = writeBatch(db);
+  const tabCollectionRef = collection(db, "users", userId, "tabs");
+  const tabQuery = query(tabCollectionRef, where("spaceId", "==", spaceId));
+  const tabsSnapshot = await getDocs(tabQuery);
+  if (tabsSnapshot.empty) {
+    return;
+  }
+  batch.delete(spaceDocRef);
+  batch.delete(tabOrderDocRef);
+  tabsSnapshot.forEach((doc) => {
+    batch.delete(doc.ref);
+  });
+  tabsSnapshot.forEach((doc) => {
+    deletedTabIds.push(doc.data().tabId);
+  });
+  try {
+    await batch.commit();
+    return deletedTabIds;
   } catch (error) {
     console.error(error);
   }

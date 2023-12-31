@@ -1,5 +1,4 @@
 export {
-  saveTabInfo,
   updateOldTabOrderDoc,
   updateNewTabOrderDoc,
   updateSpaceOfTab,

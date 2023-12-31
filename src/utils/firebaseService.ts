@@ -12,7 +12,10 @@ import {
   OrderByDirection,
   DocumentReference,
   WhereFilterOp,
+  setDoc,
+  arrayUnion,
 } from "firebase/firestore";
+import { getFaviconUrl } from "./tabs";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD6FBXo1fXHD25XpBM6notUM7v6U7mt6mU",
@@ -82,4 +85,29 @@ export const firebaseService = {
   ) => {
     return query(urlDurationCollectionRef, where(field, operator, value));
   },
+  saveNewTabToFirestore,
 };
+
+async function saveNewTabToFirestore(tab: chrome.tabs.Tab, userId?: string) {
+  if (!userId || !tab.url || !tab.title || !tab.id) return;
+
+  const tabData = {
+    windowId: tab.windowId,
+    tabId: tab.id,
+    title: tab.title,
+    url: tab.url,
+    favIconUrl: getFaviconUrl(tab.url) || tab.favIconUrl || "",
+    isPinned: false,
+    spaceId: "global",
+  };
+  const newTabId = tab.id;
+  const tabDocRef = doc(db, "users", userId, "tabs", tab.id.toString());
+  const tabOrderDocRef = doc(db, "users", userId, "tabOrders", "global");
+  await setDoc(
+    tabOrderDocRef,
+    { tabOrder: arrayUnion(newTabId), windowId: tab.windowId },
+    { merge: true },
+  );
+  await setDoc(tabDocRef, tabData, { merge: true });
+  return tabData;
+}

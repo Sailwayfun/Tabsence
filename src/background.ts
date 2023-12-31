@@ -17,7 +17,7 @@ import {
 import { urlsStore } from "./store/tabUrlMap";
 
 import {
-  saveTabInfo,
+  firebaseService,
   trackTabTime,
   updateTabDuration,
   updateOldTabOrderDoc,
@@ -51,7 +51,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     const userId = await chrome.storage.local
       .get("userId")
       .then((res) => res.userId);
-    const tabData = await saveTabInfo(tab, userId);
+    const tabData = await firebaseService.saveNewTabToFirestore(tab, userId);
     try {
       const response = await chrome.runtime.sendMessage({
         action: "tabUpdated",

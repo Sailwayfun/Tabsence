@@ -1,5 +1,4 @@
 import {
-  serverTimestamp,
   setDoc,
   collection,
   doc,
@@ -19,7 +18,6 @@ async function saveTabInfo(tab: chrome.tabs.Tab, userId?: string) {
     title: tab.title,
     url: tab.url,
     favIconUrl: getFaviconUrl(tab.url) || tab.favIconUrl || "",
-    lastAccessed: serverTimestamp(),
     isPinned: false,
     spaceId: "global",
   };

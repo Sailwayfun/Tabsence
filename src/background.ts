@@ -66,21 +66,6 @@ chrome.runtime.onMessage.addListener(
     if (message.action === "moveTabToSpace") {
       const { tabId, windowId } = message.updatedTab;
       if (!tabId) return sendResponse({ success: false });
-
-      // await updateOldTabOrderDoc(
-      //   message.userId,
-      //   message.originalSpaceId,
-      //   tabId,
-      // );
-
-      // await updateNewTabOrderDoc(
-      //   message.userId,
-      //   message.spaceId,
-      //   tabId,
-      //   message.updatedTab.windowId,
-      // );
-
-      // await updateSpaceOfTab(tabId, message.spaceId, message.userId);
       const { userId, originalSpaceId, spaceId } = message;
       await firebaseService.moveTabToSpace(
         userId,

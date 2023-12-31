@@ -3,14 +3,9 @@ import { Tab } from "./types/tab";
 import {
   collection,
   doc,
-  // getDocs,
   deleteDoc,
   updateDoc,
-  // query,
-  // where,
   setDoc,
-  // QuerySnapshot,
-  // DocumentData,
   serverTimestamp,
 } from "firebase/firestore";
 
@@ -300,45 +295,7 @@ chrome.runtime.onMessage.addListener(
   },
 );
 
-// async function deleteSpaceDoc(spaceId: string, userId: string) {
-//   try {
-//     const spaceDocRef = doc(db, "users", userId, "spaces", spaceId);
-//     await deleteDoc(spaceDocRef);
-//   } catch (err) {
-//     return { success: false };
-//   }
-// }
-
-// async function deleteTabOrderDoc(spaceId: string, userId: string) {
-//   try {
-//     const tabOrderDocRef = doc(db, "users", userId, "tabOrders", spaceId);
-//     await deleteDoc(tabOrderDocRef);
-//   } catch (err) {
-//     return { success: false };
-//   }
-// }
-
-// async function deleteTabDocsOfSpace(spaceId: string, userId: string) {
-//   try {
-//     const tabCollectionRef = collection(db, "users", userId, "tabs");
-//     const tabQuery = query(tabCollectionRef, where("spaceId", "==", spaceId));
-//     const deletedTabsSnapshot = await getDocs(tabQuery);
-//     if (deletedTabsSnapshot.empty) {
-//       return;
-//     }
-//     await closeDeletedTabs(deletedTabsSnapshot);
-//     await Promise.all(
-//       deletedTabsSnapshot.docs.map((doc) => deleteDoc(doc.ref)),
-//     );
-//   } catch (err) {
-//     return { success: false };
-//   }
-// }
-
-async function closeDeletedTabs(
-  // deletedTabsSnapshot: QuerySnapshot<DocumentData, DocumentData>,
-  deletedSpaceIds?: number[],
-) {
+async function closeDeletedTabs(deletedSpaceIds?: number[]) {
   try {
     if (!deletedSpaceIds) return;
     await Promise.all(deletedSpaceIds.map((id) => chrome.tabs.remove(id)));
@@ -351,13 +308,10 @@ async function handleRemoveSpace(message: RuntimeMessage) {
   if (!message.userId || !message.spaceId) {
     return { success: false };
   }
-  // await deleteSpaceDoc(message.spaceId, message.userId);
-  // await deleteTabOrderDoc(message.spaceId, message.userId);
   const deletedTabIds = await firebaseService.removeSpace(
     message.spaceId,
     message.userId,
   );
-  // await deleteTabDocsOfSpace(message.spaceId, message.userId);
   await closeDeletedTabs(deletedTabIds);
   return { success: true };
 }

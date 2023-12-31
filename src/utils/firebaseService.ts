@@ -14,6 +14,8 @@ import {
   WhereFilterOp,
   setDoc,
   arrayUnion,
+  arrayRemove,
+  writeBatch,
 } from "firebase/firestore";
 import { getFaviconUrl } from "./tabs";
 
@@ -86,6 +88,7 @@ export const firebaseService = {
     return query(urlDurationCollectionRef, where(field, operator, value));
   },
   saveNewTabToFirestore,
+  moveTabToSpace,
 };
 
 async function saveNewTabToFirestore(tab: chrome.tabs.Tab, userId?: string) {
@@ -110,4 +113,44 @@ async function saveNewTabToFirestore(tab: chrome.tabs.Tab, userId?: string) {
   );
   await setDoc(tabDocRef, tabData, { merge: true });
   return tabData;
+}
+
+async function moveTabToSpace(
+  userId: string,
+  originalSpaceId: string,
+  newSpaceId: string,
+  tabId: number,
+  windowId: number,
+) {
+  const oldSpaceId = originalSpaceId || "global";
+  const oldTabOrderDocRef = firebaseService.getDocRef([
+    "users",
+    userId,
+    "tabOrders",
+    oldSpaceId,
+  ]);
+  const newTabOrderDocRef = firebaseService.getDocRef([
+    "users",
+    userId,
+    "tabOrders",
+    newSpaceId,
+  ]);
+
+  const tabDocRef = firebaseService.getDocRef([
+    "users",
+    userId,
+    "tabs",
+    tabId.toString(),
+  ]);
+
+  const batch = writeBatch(db);
+  batch.update(tabDocRef, { spaceId: newSpaceId });
+  batch.update(oldTabOrderDocRef, { tabOrder: arrayRemove(tabId) });
+  batch.set(newTabOrderDocRef, { tabOrder: arrayUnion(tabId), windowId });
+
+  try {
+    await batch.commit();
+  } catch (error) {
+    console.error(error);
+  }
 }

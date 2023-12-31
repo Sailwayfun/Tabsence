@@ -16,14 +16,7 @@ import {
 
 import { urlsStore } from "./store/tabUrlMap";
 
-import {
-  firebaseService,
-  trackTabTime,
-  updateTabDuration,
-  updateOldTabOrderDoc,
-  updateNewTabOrderDoc,
-  updateSpaceOfTab,
-} from "./utils";
+import { firebaseService, trackTabTime, updateTabDuration } from "./utils";
 
 interface RuntimeMessage {
   action: string;
@@ -71,23 +64,31 @@ chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
     if (message.action === "signIn" || !message.userId) return;
     if (message.action === "moveTabToSpace") {
-      const tabId = message.updatedTab.tabId;
+      const { tabId, windowId } = message.updatedTab;
       if (!tabId) return sendResponse({ success: false });
 
-      await updateOldTabOrderDoc(
-        message.userId,
-        message.originalSpaceId,
-        tabId,
-      );
+      // await updateOldTabOrderDoc(
+      //   message.userId,
+      //   message.originalSpaceId,
+      //   tabId,
+      // );
 
-      await updateNewTabOrderDoc(
-        message.userId,
-        message.spaceId,
-        tabId,
-        message.updatedTab.windowId,
-      );
+      // await updateNewTabOrderDoc(
+      //   message.userId,
+      //   message.spaceId,
+      //   tabId,
+      //   message.updatedTab.windowId,
+      // );
 
-      await updateSpaceOfTab(tabId, message.spaceId, message.userId);
+      // await updateSpaceOfTab(tabId, message.spaceId, message.userId);
+      const { userId, originalSpaceId, spaceId } = message;
+      await firebaseService.moveTabToSpace(
+        userId,
+        originalSpaceId,
+        spaceId,
+        tabId,
+        windowId,
+      );
 
       sendResponse({ success: true });
     }

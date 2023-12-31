@@ -1,9 +1,4 @@
 export {
-  updateOldTabOrderDoc,
-  updateNewTabOrderDoc,
-  updateSpaceOfTab,
-} from "./firestore";
-export {
   tabTimes,
   getCurrentDate,
   trackTabTime,

@@ -1,9 +1,5 @@
-import { db } from "../firebase-config";
 import { Tab } from "./types/tab";
-import { collection, doc, setDoc } from "firebase/firestore";
-
 import { urlsStore } from "./store/tabUrlMap";
-
 import { firebaseService, trackTabTime, updateTabDuration } from "./utils";
 
 interface RuntimeMessage {
@@ -273,7 +269,7 @@ chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
     if (message.action === "updateSpaceTitle") {
       if (!message.userId || !message.spaceId || !message.newSpaceTitle) return;
-    
+
       const { userId, spaceId, newSpaceTitle } = message;
       await firebaseService.updateSpaceTitle(userId, spaceId, newSpaceTitle);
       sendResponse({ success: true });
@@ -283,19 +279,14 @@ chrome.runtime.onMessage.addListener(
 );
 
 chrome.windows.onCreated.addListener(async (window) => {
-  const userId = await chrome.storage.local
-    .get("userId")
-    .then((res) => res.userId);
-  if (!userId) return;
-  const tabOrdersCollectionRef = collection(db, "users", userId, "tabOrders");
-  const tabOrderDocRef = doc(tabOrdersCollectionRef, "global");
-  await setDoc(
-    tabOrderDocRef,
-    {
-      tabOrder: [],
-      windowId: window.id,
-    },
-    { merge: true },
-  );
+  const userId = await getUserId();
+  if (!window.id) return;
+  try {
+    await firebaseService.initializeTabOrder(window.id, userId);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
   return true;
 });

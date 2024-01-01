@@ -108,6 +108,7 @@ export const firebaseService = {
   archiveSpace,
   restoreSpace,
   updateSpaceTitle,
+  initializeTabOrder,
 };
 
 async function saveNewTabToFirestore(tab: chrome.tabs.Tab, userId?: string) {
@@ -311,4 +312,18 @@ async function updateSpaceTitle(
     spaceId,
   ]);
   await updateDoc(spaceDocRef, { title });
+}
+
+async function initializeTabOrder(windowId: number, userId: string) {
+  const tabOrderDocRef = firebaseService.getDocRef([
+    "users",
+    userId,
+    "tabOrders",
+    "global",
+  ]);
+  try {
+    await setDoc(tabOrderDocRef, { tabOrder: [], windowId }, { merge: true });
+  } catch (err) {
+    throw new Error("Error initializing tab order");
+  }
 }

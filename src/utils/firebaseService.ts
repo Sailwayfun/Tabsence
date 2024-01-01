@@ -197,9 +197,6 @@ async function removeSpace(spaceId: string, userId: string) {
   const tabCollectionRef = collection(db, "users", userId, "tabs");
   const tabQuery = query(tabCollectionRef, where("spaceId", "==", spaceId));
   const tabsSnapshot = await getDocs(tabQuery);
-  if (tabsSnapshot.empty) {
-    return;
-  }
   batch.delete(spaceDocRef);
   batch.delete(tabOrderDocRef);
   tabsSnapshot.forEach((doc) => {

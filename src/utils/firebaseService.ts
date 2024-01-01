@@ -107,6 +107,7 @@ export const firebaseService = {
   pinTab,
   archiveSpace,
   restoreSpace,
+  updateSpaceTitle,
 };
 
 async function saveNewTabToFirestore(tab: chrome.tabs.Tab, userId?: string) {
@@ -299,4 +300,18 @@ async function restoreSpace(userId: string, spaceId: string) {
     spaceId,
   ]);
   await updateDoc(spaceDocRef, { isArchived: false });
+}
+
+async function updateSpaceTitle(
+  userId: string,
+  spaceId: string,
+  title: string,
+) {
+  const spaceDocRef = firebaseService.getDocRef([
+    "users",
+    userId,
+    "spaces",
+    spaceId,
+  ]);
+  await updateDoc(spaceDocRef, { title });
 }

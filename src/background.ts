@@ -1,6 +1,6 @@
 import { db } from "../firebase-config";
 import { Tab } from "./types/tab";
-import { collection, doc, updateDoc, setDoc } from "firebase/firestore";
+import { collection, doc, setDoc } from "firebase/firestore";
 
 import { urlsStore } from "./store/tabUrlMap";
 
@@ -273,14 +273,16 @@ chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
     if (message.action === "updateSpaceTitle") {
       if (!message.userId || !message.spaceId || !message.newSpaceTitle) return;
-      const spaceDocRef = doc(
-        db,
-        "users",
-        message.userId,
-        "spaces",
-        message.spaceId,
-      );
-      await updateDoc(spaceDocRef, { title: message.newSpaceTitle });
+      // const spaceDocRef = doc(
+      //   db,
+      //   "users",
+      //   message.userId,
+      //   "spaces",
+      //   message.spaceId,
+      // );
+      // await updateDoc(spaceDocRef, { title: message.newSpaceTitle });
+      const { userId, spaceId, newSpaceTitle } = message;
+      await firebaseService.updateSpaceTitle(userId, spaceId, newSpaceTitle);
       sendResponse({ success: true });
     }
     return true;

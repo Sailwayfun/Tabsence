@@ -6,7 +6,7 @@ import {
   deleteDoc,
   updateDoc,
   setDoc,
-  serverTimestamp,
+  // serverTimestamp,
 } from "firebase/firestore";
 
 import { urlsStore } from "./store/tabUrlMap";
@@ -73,26 +73,14 @@ chrome.runtime.onMessage.addListener(
       sendResponse({ success: true });
     }
     if (message.action === "addSpace") {
-      const spaceCollectionRef = collection(
-        db,
-        "users",
-        message.userId,
-        "spaces",
-      );
-      const spaceId: string = doc(spaceCollectionRef).id;
-      const spaceData = {
-        title: message.newSpaceTitle,
-        spaceId: spaceId,
-        createdAt: serverTimestamp(),
-        isArchived: false,
-      };
+      const { userId, newSpaceTitle } = message;
       try {
-        await setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
-          merge: true,
-        });
+        await firebaseService.addSpace(userId, newSpaceTitle);
         sendResponse({ success: true });
       } catch (error) {
-        console.error("Error adding space: ", error);
+        if (error instanceof Error) {
+          console.error(error.message);
+        }
         sendResponse({ success: false });
       }
       return true;

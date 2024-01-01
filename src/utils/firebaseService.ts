@@ -17,6 +17,7 @@ import {
   arrayUnion,
   arrayRemove,
   writeBatch,
+  serverTimestamp,
 } from "firebase/firestore";
 import { getFaviconUrl } from "./tabs";
 
@@ -92,6 +93,7 @@ export const firebaseService = {
   moveTabToSpace,
   removeSpace,
   updateTabOrder,
+  addSpace,
 };
 
 async function saveNewTabToFirestore(tab: chrome.tabs.Tab, userId?: string) {
@@ -213,4 +215,26 @@ async function updateTabOrder(
     spaceId,
   ]);
   await setDoc(tabOrderDocRef, { tabOrder, windowId }, { merge: true });
+}
+
+async function addSpace(userId: string, newSpaceTitle: string) {
+  const spaceCollectionRef = firebaseService.getCollectionRef([
+    "users",
+    userId,
+    "spaces",
+  ]);
+  const spaceId: string = doc(spaceCollectionRef).id;
+  const spaceData = {
+    title: newSpaceTitle,
+    spaceId: spaceId,
+    createdAt: serverTimestamp(),
+    isArchived: false,
+  };
+  try {
+    await setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
+      merge: true,
+    });
+  } catch (error) {
+    throw new Error("Error adding space");
+  }
 }

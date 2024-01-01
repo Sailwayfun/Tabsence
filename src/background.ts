@@ -1,29 +1,6 @@
-import { db } from "../firebase-config";
 import { Tab } from "./types/tab";
-import {
-  collection,
-  doc,
-  getDocs,
-  deleteDoc,
-  updateDoc,
-  query,
-  where,
-  setDoc,
-  QuerySnapshot,
-  DocumentData,
-  serverTimestamp,
-} from "firebase/firestore";
-
 import { urlsStore } from "./store/tabUrlMap";
-
-import {
-  saveTabInfo,
-  trackTabTime,
-  updateTabDuration,
-  updateOldTabOrderDoc,
-  updateNewTabOrderDoc,
-  updateSpaceOfTab,
-} from "./utils";
+import { firebaseService, trackTabTime, updateUrlDuration } from "./utils";
 
 interface RuntimeMessage {
   action: string;
@@ -51,7 +28,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     const userId = await chrome.storage.local
       .get("userId")
       .then((res) => res.userId);
-    const tabData = await saveTabInfo(tab, userId);
+    const tabData = await firebaseService.saveNewTabToFirestore(tab, userId);
     try {
       const response = await chrome.runtime.sendMessage({
         action: "tabUpdated",
@@ -71,47 +48,28 @@ chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
     if (message.action === "signIn" || !message.userId) return;
     if (message.action === "moveTabToSpace") {
-      const tabId = message.updatedTab.tabId;
+      const { tabId, windowId } = message.updatedTab;
       if (!tabId) return sendResponse({ success: false });
-
-      await updateOldTabOrderDoc(
-        message.userId,
-        message.originalSpaceId,
+      const { userId, originalSpaceId, spaceId } = message;
+      await firebaseService.moveTabToSpace(
+        userId,
+        originalSpaceId,
+        spaceId,
         tabId,
+        windowId,
       );
-
-      await updateNewTabOrderDoc(
-        message.userId,
-        message.spaceId,
-        tabId,
-        message.updatedTab.windowId,
-      );
-
-      await updateSpaceOfTab(tabId, message.spaceId, message.userId);
 
       sendResponse({ success: true });
     }
     if (message.action === "addSpace") {
-      const spaceCollectionRef = collection(
-        db,
-        "users",
-        message.userId,
-        "spaces",
-      );
-      const spaceId: string = doc(spaceCollectionRef).id;
-      const spaceData = {
-        title: message.newSpaceTitle,
-        spaceId: spaceId,
-        createdAt: serverTimestamp(),
-        isArchived: false,
-      };
+      const { userId, newSpaceTitle } = message;
       try {
-        await setDoc(doc(spaceCollectionRef, spaceId), spaceData, {
-          merge: true,
-        });
+        await firebaseService.addSpace(userId, newSpaceTitle);
         sendResponse({ success: true });
       } catch (error) {
-        console.error("Error adding space: ", error);
+        if (error instanceof Error) {
+          console.error(error.message);
+        }
         sendResponse({ success: false });
       }
       return true;
@@ -134,6 +92,15 @@ chrome.runtime.onMessage.addListener(
   },
 );
 
+function getTabOrderIds(newTabs: Tab[]) {
+  return newTabs.reduce((acc: number[], tab: Tab) => {
+    if (tab.tabId) {
+      acc.push(tab.tabId);
+    }
+    return acc;
+  }, [] as number[]);
+}
+
 chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
     if (!message.userId || !message.windowId) return;
@@ -141,24 +108,15 @@ chrome.runtime.onMessage.addListener(
       case "updateTabOrder":
         {
           try {
-            const tabOrdersCollectionRef = collection(
-              db,
-              "users",
-              message.userId,
-              "tabOrders",
-            );
+            const { userId, newTabs } = message;
             const spaceId = message.spaceId || "global";
-            const tabOrderDocRef = doc(tabOrdersCollectionRef, spaceId);
-            const newTabOrderData = message.newTabs
-              .map((tab) => tab.tabId)
-              .filter(Boolean);
-            await setDoc(
-              tabOrderDocRef,
-              {
-                tabOrder: newTabOrderData,
-                windowId: message.newTabs[0].windowId,
-              },
-              { merge: true },
+            const windowId = message.newTabs[0].windowId;
+            const newTabOrderData = getTabOrderIds(newTabs);
+            await firebaseService.updateTabOrder(
+              userId,
+              spaceId,
+              newTabOrderData,
+              windowId,
             );
             sendResponse({ success: true });
           } catch (error) {
@@ -194,29 +152,25 @@ async function closeTab(tabId: number) {
 }
 
 async function removeTabFromFirestore(tabId: number, userId: string) {
-  const tabDocRef = doc(db, "users", userId, "tabs", tabId.toString());
-  await deleteDoc(tabDocRef);
+  await firebaseService.deleteDoc(["users", userId, "tabs", tabId.toString()]);
 }
 
 chrome.tabs.onRemoved.addListener(async (tabId: number) => {
+  // console.log("tab onRemoved handler triggered");
   const closedTabUrl: string = urlsStore.getState().getTabUrl(tabId);
-  const userId: string | undefined = await chrome.storage.local
-    .get("userId")
-    .then((res) => res.userId);
-  if (!userId) return;
+  const userId = await getUserId();
   await removeTabFromFirestore(tabId, userId);
-  await updateTabDuration(closedTabUrl);
-  chrome.runtime.sendMessage({ action: "tabClosed", tabId });
+  await updateUrlDuration(closedTabUrl);
+  await chrome.runtime.sendMessage({ action: "tabClosed", tabId });
   return true;
 });
 
-async function getUserId() {
+export async function getUserId() {
   const result: { [key: string]: string | undefined } =
     await chrome.storage.local.get("userId");
   const userId = result.userId;
   if (!userId) {
-    const userCollectionRef = collection(db, "users");
-    const docId: string = doc(userCollectionRef).id;
+    const docId = firebaseService.getDocId(["users"]);
     return docId;
   }
   return userId;
@@ -235,43 +189,22 @@ chrome.runtime.onMessage.addListener(
 
 chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
-    const result = await chrome.storage.local.get("userId");
-    if (!result.userId) return sendResponse({ success: false });
     if (message.action === "toggleTabPin" && message.tabId) {
       try {
+        const userId = await getUserId();
         const tab = await chrome.tabs.update(message.tabId, {
           pinned: !message.isPinned,
         });
         if (!tab) throw new Error("tab not found");
-
-        const tabDocRef = doc(
-          db,
-          "users",
-          result.userId,
-          "tabs",
-          message.tabId.toString(),
+        const { spaceId, tabId, isPinned, newTabs } = message;
+        const newTabOrder = getTabOrderIds(newTabs);
+        await firebaseService.pinTab(
+          userId,
+          spaceId,
+          tabId,
+          newTabOrder,
+          isPinned,
         );
-
-        const tabOrderDocRef = doc(
-          db,
-          "users",
-          result.userId,
-          "tabOrders",
-          message.spaceId,
-        );
-
-        const newTabOrder = message.newTabs
-          .map((tab) => tab.tabId)
-          .filter(Boolean);
-
-        await setDoc(
-          tabOrderDocRef,
-          { tabOrder: newTabOrder },
-          { merge: true },
-        );
-
-        await updateDoc(tabDocRef, { isPinned: !message.isPinned });
-
         sendResponse({ success: true });
       } catch (err) {
         if (err instanceof Error) {
@@ -286,78 +219,23 @@ chrome.runtime.onMessage.addListener(
 
 chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
-    const result = await chrome.storage.local.get("userId");
-    if (!result.userId) return sendResponse({ success: false });
+    const userId = await getUserId();
     if (message.action === "archiveSpace" && message.spaceId) {
-      const spaceDocRef = doc(
-        db,
-        "users",
-        result.userId,
-        "spaces",
-        message.spaceId,
-      );
-      await updateDoc(spaceDocRef, { isArchived: true });
+      await firebaseService.archiveSpace(userId, message.spaceId);
       sendResponse({ success: true });
     }
     if (message.action === "restoreSpace" && message.spaceId) {
-      const spaceDocRef = doc(
-        db,
-        "users",
-        result.userId,
-        "spaces",
-        message.spaceId,
-      );
-      await updateDoc(spaceDocRef, { isArchived: false });
+      await firebaseService.restoreSpace(userId, message.spaceId);
       sendResponse({ success: true });
     }
     return true;
   },
 );
 
-async function deleteSpaceDoc(spaceId: string, userId: string) {
+async function closeDeletedTabs(deletedSpaceIds?: number[]) {
   try {
-    const spaceDocRef = doc(db, "users", userId, "spaces", spaceId);
-    await deleteDoc(spaceDocRef);
-  } catch (err) {
-    return { success: false };
-  }
-}
-
-async function deleteTabOrderDoc(spaceId: string, userId: string) {
-  try {
-    const tabOrderDocRef = doc(db, "users", userId, "tabOrders", spaceId);
-    await deleteDoc(tabOrderDocRef);
-  } catch (err) {
-    return { success: false };
-  }
-}
-
-async function deleteTabDocsOfSpace(spaceId: string, userId: string) {
-  try {
-    const tabCollectionRef = collection(db, "users", userId, "tabs");
-    const tabQuery = query(tabCollectionRef, where("spaceId", "==", spaceId));
-    const deletedTabsSnapshot = await getDocs(tabQuery);
-    if (deletedTabsSnapshot.empty) {
-      return;
-    }
-    await closeDeletedTabs(deletedTabsSnapshot);
-    await Promise.all(
-      deletedTabsSnapshot.docs.map((doc) => deleteDoc(doc.ref)),
-    );
-  } catch (err) {
-    return { success: false };
-  }
-}
-
-async function closeDeletedTabs(
-  deletedTabsSnapshot: QuerySnapshot<DocumentData, DocumentData>,
-) {
-  try {
-    await Promise.all(
-      deletedTabsSnapshot.docs.map((doc) =>
-        chrome.tabs.remove(doc.data().tabId),
-      ),
-    );
+    if (!deletedSpaceIds) return;
+    await Promise.all(deletedSpaceIds.map((id) => chrome.tabs.remove(id)));
   } catch (err) {
     return { success: false };
   }
@@ -367,9 +245,11 @@ async function handleRemoveSpace(message: RuntimeMessage) {
   if (!message.userId || !message.spaceId) {
     return { success: false };
   }
-  await deleteSpaceDoc(message.spaceId, message.userId);
-  await deleteTabOrderDoc(message.spaceId, message.userId);
-  await deleteTabDocsOfSpace(message.spaceId, message.userId);
+  const deletedTabIds = await firebaseService.removeSpace(
+    message.spaceId,
+    message.userId,
+  );
+  await closeDeletedTabs(deletedTabIds);
   return { success: true };
 }
 
@@ -387,14 +267,9 @@ chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
     if (message.action === "updateSpaceTitle") {
       if (!message.userId || !message.spaceId || !message.newSpaceTitle) return;
-      const spaceDocRef = doc(
-        db,
-        "users",
-        message.userId,
-        "spaces",
-        message.spaceId,
-      );
-      await updateDoc(spaceDocRef, { title: message.newSpaceTitle });
+
+      const { userId, spaceId, newSpaceTitle } = message;
+      await firebaseService.updateSpaceTitle(userId, spaceId, newSpaceTitle);
       sendResponse({ success: true });
     }
     return true;
@@ -402,19 +277,14 @@ chrome.runtime.onMessage.addListener(
 );
 
 chrome.windows.onCreated.addListener(async (window) => {
-  const userId = await chrome.storage.local
-    .get("userId")
-    .then((res) => res.userId);
-  if (!userId) return;
-  const tabOrdersCollectionRef = collection(db, "users", userId, "tabOrders");
-  const tabOrderDocRef = doc(tabOrdersCollectionRef, "global");
-  await setDoc(
-    tabOrderDocRef,
-    {
-      tabOrder: [],
-      windowId: window.id,
-    },
-    { merge: true },
-  );
+  const userId = await getUserId();
+  if (!window.id) return;
+  try {
+    await firebaseService.initializeTabOrder(window.id, userId);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
   return true;
 });

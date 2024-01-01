@@ -225,28 +225,13 @@ chrome.runtime.onMessage.addListener(
 
 chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
-    const result = await chrome.storage.local.get("userId");
-    if (!result.userId) return sendResponse({ success: false });
+    const userId = await getUserId();
     if (message.action === "archiveSpace" && message.spaceId) {
-      const spaceDocRef = doc(
-        db,
-        "users",
-        result.userId,
-        "spaces",
-        message.spaceId,
-      );
-      await updateDoc(spaceDocRef, { isArchived: true });
+      await firebaseService.archiveSpace(userId, message.spaceId);
       sendResponse({ success: true });
     }
     if (message.action === "restoreSpace" && message.spaceId) {
-      const spaceDocRef = doc(
-        db,
-        "users",
-        result.userId,
-        "spaces",
-        message.spaceId,
-      );
-      await updateDoc(spaceDocRef, { isArchived: false });
+      await firebaseService.restoreSpace(userId, message.spaceId);
       sendResponse({ success: true });
     }
     return true;

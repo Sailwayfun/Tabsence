@@ -15,6 +15,7 @@ import {
   getDocs,
   setDoc,
   deleteDoc,
+  updateDoc,
   arrayUnion,
   arrayRemove,
   writeBatch,
@@ -104,6 +105,8 @@ export const firebaseService = {
   updateTabOrder,
   addSpace,
   pinTab,
+  archiveSpace,
+  restoreSpace,
 };
 
 async function saveNewTabToFirestore(tab: chrome.tabs.Tab, userId?: string) {
@@ -276,4 +279,24 @@ async function pinTab(
   } catch (error) {
     throw new Error("Error pinning tab");
   }
+}
+
+async function archiveSpace(userId: string, spaceId: string) {
+  const spaceDocRef = firebaseService.getDocRef([
+    "users",
+    userId,
+    "spaces",
+    spaceId,
+  ]);
+  await updateDoc(spaceDocRef, { isArchived: true });
+}
+
+async function restoreSpace(userId: string, spaceId: string) {
+  const spaceDocRef = firebaseService.getDocRef([
+    "users",
+    userId,
+    "spaces",
+    spaceId,
+  ]);
+  await updateDoc(spaceDocRef, { isArchived: false });
 }

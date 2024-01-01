@@ -1,11 +1,6 @@
 import { db } from "../firebase-config";
 import { Tab } from "./types/tab";
-import {
-  collection,
-  doc,
-  updateDoc,
-  setDoc,
-} from "firebase/firestore";
+import { collection, doc, updateDoc, setDoc } from "firebase/firestore";
 
 import { urlsStore } from "./store/tabUrlMap";
 
@@ -181,8 +176,7 @@ async function getUserId() {
     await chrome.storage.local.get("userId");
   const userId = result.userId;
   if (!userId) {
-    const userCollectionRef = collection(db, "users");
-    const docId: string = doc(userCollectionRef).id;
+    const docId = firebaseService.getDocId(["users"]);
     return docId;
   }
   return userId;

@@ -94,6 +94,10 @@ export const firebaseService = {
     const docRef = this.getDocRef(paths);
     await deleteDoc(docRef);
   },
+  getDocId: function (paths: string[]) {
+    const collectionRef = this.getCollectionRef(paths);
+    return doc(collectionRef).id;
+  },
   saveNewTabToFirestore,
   moveTabToSpace,
   removeSpace,

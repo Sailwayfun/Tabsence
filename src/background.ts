@@ -1,6 +1,6 @@
 import { Tab } from "./types/tab";
 import { urlsStore } from "./store/tabUrlMap";
-import { firebaseService, trackTabTime, updateTabDuration } from "./utils";
+import { firebaseService, trackTabTime, updateUrlDuration } from "./utils";
 
 interface RuntimeMessage {
   action: string;
@@ -156,14 +156,12 @@ async function removeTabFromFirestore(tabId: number, userId: string) {
 }
 
 chrome.tabs.onRemoved.addListener(async (tabId: number) => {
+  // console.log("tab onRemoved handler triggered");
   const closedTabUrl: string = urlsStore.getState().getTabUrl(tabId);
-  const userId: string | undefined = await chrome.storage.local
-    .get("userId")
-    .then((res) => res.userId);
-  if (!userId) return;
+  const userId = await getUserId();
   await removeTabFromFirestore(tabId, userId);
-  await updateTabDuration(closedTabUrl);
-  chrome.runtime.sendMessage({ action: "tabClosed", tabId });
+  await updateUrlDuration(closedTabUrl);
+  await chrome.runtime.sendMessage({ action: "tabClosed", tabId });
   return true;
 });
 

@@ -96,7 +96,7 @@ const Spaces = (props: SpacesProps) => {
       newSpaceTitle,
       userId: currentUserId,
     });
-    console.log("response from add space", response);
+    // console.log("response from add space", response);
     if (!response.success) return;
     toast.success("Space added", getToastVariant("small"));
     if (inputRef.current) inputRef.current.value = "";

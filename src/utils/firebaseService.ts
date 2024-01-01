@@ -13,6 +13,7 @@ import {
   DocumentReference,
   WhereFilterOp,
   getDocs,
+  getDoc,
   setDoc,
   deleteDoc,
   updateDoc,
@@ -20,7 +21,9 @@ import {
   arrayRemove,
   writeBatch,
   serverTimestamp,
+  increment,
 } from "firebase/firestore";
+import debounce from "lodash.debounce";
 import { getFaviconUrl } from "./tabs";
 
 const firebaseConfig = {
@@ -109,6 +112,7 @@ export const firebaseService = {
   restoreSpace,
   updateSpaceTitle,
   initializeTabOrder,
+  saveUrlDuration,
 };
 
 async function saveNewTabToFirestore(tab: chrome.tabs.Tab, userId?: string) {
@@ -326,4 +330,62 @@ async function initializeTabOrder(windowId: number, userId: string) {
   } catch (err) {
     throw new Error("Error initializing tab order");
   }
+}
+
+type DebouncedFunction = (
+  durationBySecond: number,
+  url: string,
+  date: string,
+) => void;
+
+const debouncedWrites: Record<string, DebouncedFunction> = {};
+
+function saveUrlDuration(
+  userId: string,
+  newUrl: string,
+  date: string,
+  durationBySecond: number,
+) {
+  const domain = new URL(newUrl).hostname;
+  const myDomain: string = "icdbgchingbnboklhnagfckgjpdfjfeg";
+  if (domain === myDomain || domain === "newtab") return;
+  const debouncedWriteToFirestore = getDebouncedWrite(userId, domain);
+  // console.log("getDebouncedWrite called in fiebaseService");
+  debouncedWriteToFirestore(durationBySecond, newUrl, date);
+}
+
+function getDebouncedWrite(userId: string, domain: string) {
+  if (!debouncedWrites[domain]) {
+    debouncedWrites[domain] = debounce(async (durationBySecond, url, date) => {
+      const urlRef = firebaseService.getDocRef([
+        "users",
+        userId,
+        "urlDurations",
+        date,
+        "domains",
+        domain,
+      ]);
+      const urlSnapShot = await getDoc(urlRef);
+      if (urlSnapShot.exists()) {
+        await updateDoc(urlRef, {
+          durationBySecond: increment(durationBySecond),
+          visitCounts: increment(1),
+          lastVisit: serverTimestamp(),
+        });
+      } else {
+        await setDoc(
+          urlRef,
+          {
+            faviconUrl: getFaviconUrl(url),
+            url,
+            durationBySecond,
+            visitCounts: 1,
+            lastVisit: serverTimestamp(),
+          },
+          { merge: true },
+        );
+      }
+    }, 1000);
+  }
+  return debouncedWrites[domain];
 }

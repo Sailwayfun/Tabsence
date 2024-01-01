@@ -2,7 +2,7 @@ export {
   tabTimes,
   getCurrentDate,
   trackTabTime,
-  updateTabDuration,
+  updateUrlDuration,
   getPrevDate,
   getNextDate,
 } from "./trackTime";

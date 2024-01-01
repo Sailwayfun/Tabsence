@@ -91,6 +91,7 @@ export const firebaseService = {
   saveNewTabToFirestore,
   moveTabToSpace,
   removeSpace,
+  updateTabOrder,
 };
 
 async function saveNewTabToFirestore(tab: chrome.tabs.Tab, userId?: string) {
@@ -197,4 +198,19 @@ async function removeSpace(spaceId: string, userId: string) {
   } catch (error) {
     console.error(error);
   }
+}
+
+async function updateTabOrder(
+  userId: string,
+  spaceId: string,
+  tabOrder: number[],
+  windowId: number,
+) {
+  const tabOrderDocRef = firebaseService.getDocRef([
+    "users",
+    userId,
+    "tabOrders",
+    spaceId,
+  ]);
+  await setDoc(tabOrderDocRef, { tabOrder, windowId }, { merge: true });
 }

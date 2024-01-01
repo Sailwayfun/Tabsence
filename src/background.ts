@@ -115,6 +115,15 @@ chrome.runtime.onMessage.addListener(
   },
 );
 
+function getTabOrderIds(newTabs: Tab[]) {
+  return newTabs.reduce((acc: number[], tab: Tab) => {
+    if (tab.tabId) {
+      acc.push(tab.tabId);
+    }
+    return acc;
+  }, [] as number[]);
+}
+
 chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
     if (!message.userId || !message.windowId) return;
@@ -122,24 +131,15 @@ chrome.runtime.onMessage.addListener(
       case "updateTabOrder":
         {
           try {
-            const tabOrdersCollectionRef = collection(
-              db,
-              "users",
-              message.userId,
-              "tabOrders",
-            );
+            const { userId, newTabs } = message;
             const spaceId = message.spaceId || "global";
-            const tabOrderDocRef = doc(tabOrdersCollectionRef, spaceId);
-            const newTabOrderData = message.newTabs
-              .map((tab) => tab.tabId)
-              .filter(Boolean);
-            await setDoc(
-              tabOrderDocRef,
-              {
-                tabOrder: newTabOrderData,
-                windowId: message.newTabs[0].windowId,
-              },
-              { merge: true },
+            const windowId = message.newTabs[0].windowId;
+            const newTabOrderData = getTabOrderIds(newTabs);
+            await firebaseService.updateTabOrder(
+              userId,
+              spaceId,
+              newTabOrderData,
+              windowId,
             );
             sendResponse({ success: true });
           } catch (error) {

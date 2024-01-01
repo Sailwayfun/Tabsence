@@ -195,43 +195,22 @@ chrome.runtime.onMessage.addListener(
 
 chrome.runtime.onMessage.addListener(
   async (message: RuntimeMessage, _, sendResponse) => {
-    const result = await chrome.storage.local.get("userId");
-    if (!result.userId) return sendResponse({ success: false });
     if (message.action === "toggleTabPin" && message.tabId) {
       try {
+        const userId = await getUserId();
         const tab = await chrome.tabs.update(message.tabId, {
           pinned: !message.isPinned,
         });
         if (!tab) throw new Error("tab not found");
-
-        const tabDocRef = doc(
-          db,
-          "users",
-          result.userId,
-          "tabs",
-          message.tabId.toString(),
+        const { spaceId, tabId, isPinned, newTabs } = message;
+        const newTabOrder = getTabOrderIds(newTabs);
+        await firebaseService.pinTab(
+          userId,
+          spaceId,
+          tabId,
+          newTabOrder,
+          isPinned,
         );
-
-        const tabOrderDocRef = doc(
-          db,
-          "users",
-          result.userId,
-          "tabOrders",
-          message.spaceId,
-        );
-
-        const newTabOrder = message.newTabs
-          .map((tab) => tab.tabId)
-          .filter(Boolean);
-
-        await setDoc(
-          tabOrderDocRef,
-          { tabOrder: newTabOrder },
-          { merge: true },
-        );
-
-        await updateDoc(tabDocRef, { isPinned: !message.isPinned });
-
         sendResponse({ success: true });
       } catch (err) {
         if (err instanceof Error) {

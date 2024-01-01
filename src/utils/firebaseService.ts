@@ -103,6 +103,7 @@ export const firebaseService = {
   removeSpace,
   updateTabOrder,
   addSpace,
+  pinTab,
 };
 
 async function saveNewTabToFirestore(tab: chrome.tabs.Tab, userId?: string) {
@@ -245,5 +246,34 @@ async function addSpace(userId: string, newSpaceTitle: string) {
     });
   } catch (error) {
     throw new Error("Error adding space");
+  }
+}
+
+async function pinTab(
+  userId: string,
+  spaceId: string,
+  tabId: number,
+  newTabOrder: number[],
+  isPinned: boolean,
+) {
+  const tabDocRef = firebaseService.getDocRef([
+    "users",
+    userId,
+    "tabs",
+    tabId.toString(),
+  ]);
+  const tabOrderDocRef = firebaseService.getDocRef([
+    "users",
+    userId,
+    "tabOrders",
+    spaceId,
+  ]);
+  const batch = writeBatch(db);
+  batch.update(tabDocRef, { isPinned: !isPinned });
+  batch.set(tabOrderDocRef, { tabOrder: newTabOrder }, { merge: true });
+  try {
+    await batch.commit();
+  } catch (error) {
+    throw new Error("Error pinning tab");
   }
 }

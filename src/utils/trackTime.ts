@@ -14,9 +14,7 @@ import { subDays, addDays, format } from "date-fns";
 
 import { db } from "../../firebase-config";
 
-async function getUserId(): Promise<string | undefined> {
-  return await chrome.storage.local.get("userId").then((res) => res.userId);
-}
+import { getUserId } from "../background";
 
 export function getCurrentDate(): string {
   const today = new Date();

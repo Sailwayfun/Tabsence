@@ -14,6 +14,7 @@ import {
   WhereFilterOp,
   getDocs,
   setDoc,
+  deleteDoc,
   arrayUnion,
   arrayRemove,
   writeBatch,
@@ -88,6 +89,10 @@ export const firebaseService = {
     value: number,
   ) => {
     return query(urlDurationCollectionRef, where(field, operator, value));
+  },
+  deleteDoc: async function (paths: string[]) {
+    const docRef = this.getDocRef(paths);
+    await deleteDoc(docRef);
   },
   saveNewTabToFirestore,
   moveTabToSpace,

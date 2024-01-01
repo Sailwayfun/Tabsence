@@ -3,10 +3,8 @@ import { Tab } from "./types/tab";
 import {
   collection,
   doc,
-  deleteDoc,
   updateDoc,
   setDoc,
-  // serverTimestamp,
 } from "firebase/firestore";
 
 import { urlsStore } from "./store/tabUrlMap";
@@ -163,8 +161,7 @@ async function closeTab(tabId: number) {
 }
 
 async function removeTabFromFirestore(tabId: number, userId: string) {
-  const tabDocRef = doc(db, "users", userId, "tabs", tabId.toString());
-  await deleteDoc(tabDocRef);
+  await firebaseService.deleteDoc(["users", userId, "tabs", tabId.toString()]);
 }
 
 chrome.tabs.onRemoved.addListener(async (tabId: number) => {

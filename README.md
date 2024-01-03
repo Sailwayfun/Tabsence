@@ -65,35 +65,52 @@ Libraries
 
 - Sorting and categorization of tabs can be done on the homepage:
 
-1. Opened Tabs in the browser will be rendered on the extension page at the same time.
-<div style="padding: 12px 43px;">
-   <img src="public/assets/sync-tabs.gif" width="500" alt="sync tabs" />
-</div>
+<ol>
+   <li>
+      <p>Opened Tabs in the browser will be rendered on the extension page at the same time.</p>
+      <div style="padding: 12px 0px;">
+         <img src="public/assets/sync-tabs.gif" width="500" alt="sync tabs" />
+      </div>
+   </li>
+   <li>
+      <p>Tabs can be viewed in list or grid views.</p>
+       <div style="padding: 12px 0px;">
+         <img src="public/assets/list-grid-views.gif" width="500" alt="sync tabs" />
+      </div>
+   </li>
+   <li>
+      <p>Tabs can be sorted on the extension page by clicking arrows on the tab card.</p>
+       <div style="padding: 12px 0px;">
+         <img src="public/assets/sort-tabs.gif" width="500" alt="sort tabs" />
+      </div>
+   </li>
+   <li>
+      <p>Tabs can be categorized into customized spaces users create.</p>
+      <div style="padding: 12px 0px;">
+         <img src="public/assets/move-tab-to-space.gif" width="500" alt="sort tabs" />
+      </div>
+   </li>
+</ol>
 
-2. Tabs can be viewed in list or grid views.
-<div style="padding: 12px 43px;">
-   <img src="public/assets/list-grid-views.gif" width="500" alt="sync tabs" />
-</div>
 
-3. Tabs can be sorted on the extension page by clicking arrows on the tab card.
-<div style="padding: 12px 43px;">
-   <img src="public/assets/sort-tabs.gif" width="500" alt="sort tabs" />
-</div>
+<ul>
+   <li>
+      <p>Unused spaces can be archived and can be restored later.</p>
+      <div style="padding: 12px 0px;">
+         <img src="public/assets/archive-and-restore.gif" width="500" alt="sort tabs" />
+      </div>
+   </li>
+</ul>
 
-4. Tabs can be categorized into customized spaces users create.
-<div style="padding: 12px 43px;">
-   <img src="public/assets/move-tab-to-space.gif" width="500" alt="sort tabs" />
-</div>
+<ul>
+   <li>
+   <p>The time spent on websites is visualized by a table and a chart on the webtime page. Data is displayed per day, and switching dates can be done by clicking the arrows on the top-right corner.</p>
+   </li>
+   <div style="padding: 12px 0px;">
+      <img src="public/assets/webtime-chart.gif" width="500" alt="sort tabs" />
+   </div>
+</ul>
 
-- Unused spaces can be archived and can be restored later.
-<div style="padding: 12px 43px;">
-   <img src="public/assets/archive-and-restore.gif" width="500" alt="sort tabs" />
-</div>
-
-- The time spent on websites is visualized by a table and a chart on the webtime page. Data is displayed per day, and switching dates can be done by clicking the arrows on the top-right corner.
-<div style="padding: 12px 43px;">
-   <img src="public/assets/webtime-chart.gif" width="500" alt="sort tabs" />
-</div>
 
 ## Contact
 

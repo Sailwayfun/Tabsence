@@ -64,8 +64,6 @@ const TabCard = ({
   const spaces = useSpacesStore((state) => state.spaces);
   const { tabs } = useTabsStore();
 
-  console.log("tabs in tab card", tabs);
-
   function openLink(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
     tab: Tab,

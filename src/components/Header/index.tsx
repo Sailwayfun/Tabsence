@@ -2,7 +2,8 @@ import Clock from "../Icons/Clock";
 import Home from "../Icons/Home";
 import Logo from "./Logo";
 import HeaderLink from "./HeaderLink";
-import { getCurrentDate, cn } from "../../utils";
+import { cn } from "../../utils";
+import { getCurrentDate } from "../../utils/trackTime";
 
 interface HeaderProps {
   isWebtimePage: boolean;

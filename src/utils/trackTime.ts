@@ -1,18 +1,4 @@
-// import {
-//   doc,
-//   updateDoc,
-//   getDoc,
-//   setDoc,
-//   increment,
-//   serverTimestamp,
-// } from "firebase/firestore";
-// import { getFaviconUrl } from "./tabs";
-
-// import debounce from "lodash.debounce";
-
 import { subDays, addDays, format } from "date-fns";
-
-// import { db } from "../../firebase-config";
 
 import { firebaseService } from "./firebaseService";
 
@@ -61,59 +47,8 @@ export async function updateUrlDuration(newUrl?: string): Promise<void> {
   const seconds = Math.floor(duration / 1000);
   if (seconds < 1) return;
   const newDuration = durationBySecond + seconds;
-
-  // const domain = new URL(newUrl).hostname;
-  // const myDomain: string = "icdbgchingbnboklhnagfckgjpdfjfeg";
-  // if (domain === myDomain || domain === "newtab") return;
-  // const debouncedWriteToFirestore = getDebouncedWrite(userId, domain);
-  // debouncedWriteToFirestore(tabInfo.durationBySecond, newUrl, date);
   return firebaseService.saveUrlDuration(userId, newUrl, date, newDuration);
 }
-
-// type DebouncedFunction = (
-//   durationBySecond: number,
-//   url: string,
-//   date: string,
-// ) => void;
-
-// const debouncedWrites: Record<string, DebouncedFunction> = {};
-
-// function getDebouncedWrite(userId: string, domain: string): DebouncedFunction {
-//   if (!debouncedWrites[domain]) {
-//     debouncedWrites[domain] = debounce(async (durationBySecond, url, date) => {
-//       const urlRef = doc(
-//         db,
-//         "users",
-//         userId,
-//         "urlDurations",
-//         date,
-//         "domains",
-//         domain,
-//       );
-//       const urlSnapShot = await getDoc(urlRef);
-//       if (urlSnapShot.exists()) {
-//         await updateDoc(urlRef, {
-//           durationBySecond: increment(durationBySecond),
-//           visitCounts: increment(1),
-//           lastVisit: serverTimestamp(),
-//         });
-//       } else {
-//         await setDoc(
-//           urlRef,
-//           {
-//             faviconUrl: getFaviconUrl(url),
-//             url,
-//             durationBySecond,
-//             visitCounts: 1,
-//             lastVisit: serverTimestamp(),
-//           },
-//           { merge: true },
-//         );
-//       }
-//     }, 1000);
-//   }
-//   return debouncedWrites[domain];
-// }
 
 export function getPrevDate(date: string): string {
   const today = new Date(date);

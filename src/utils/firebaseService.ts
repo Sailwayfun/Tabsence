@@ -27,7 +27,7 @@ import debounce from "lodash.debounce";
 import { getFaviconUrl } from "./tabs";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD6FBXo1fXHD25XpBM6notUM7v6U7mt6mU",
+  apiKey: import.meta.env.VITE_FIRESTORE_API_KEY,
   authDomain: "wordle-sail.firebaseapp.com",
   projectId: "wordle-sail",
   messagingSenderId: "194079596933",

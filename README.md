@@ -12,6 +12,8 @@
    <a href="#demo">Demo</a>
    <span>| </span>
    <a href="#contact">Contact</a>
+   <span>| </span>
+   <a href="https://chromewebstore.google.com/detail/tabsence/icdbgchingbnboklhnagfckgjpdfjfeg?hl=zh-TW">Chrome Web Store</a>
   </div>
 </div>
 

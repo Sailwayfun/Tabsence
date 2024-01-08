@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import Clock from "../Icons/Clock";
 import Home from "../Icons/Home";
 import Logo from "./Logo";
@@ -9,9 +10,9 @@ interface HeaderProps {
   isWebtimePage: boolean;
 }
 const Header = ({ isWebtimePage }: HeaderProps) => {
-  function getHeaderLinkConfig(isPathIncludesWebtime: boolean) {
+  const { link, icon, text } = useMemo(() => {
     const iconClasses = "mr-3 h-6 w-6 stroke-current";
-    if (isPathIncludesWebtime) {
+    if (isWebtimePage) {
       return {
         link: "/",
         icon: <Home className={iconClasses} />,
@@ -23,15 +24,7 @@ const Header = ({ isWebtimePage }: HeaderProps) => {
       icon: <Clock className={iconClasses} />,
       text: "Website Time Tracker",
     };
-  }
-
-  const { link, icon, text } = getHeaderLinkConfig(isWebtimePage);
-
-  const generateHeaderLink = () => {
-    return (
-      <HeaderLink className="flex gap-4" to={link} icon={icon} content={text} />
-    );
-  };
+  }, [isWebtimePage]);
 
   return (
     <div
@@ -40,7 +33,14 @@ const Header = ({ isWebtimePage }: HeaderProps) => {
       })}
     >
       {isWebtimePage && <Logo isWebtimePage={isWebtimePage} />}
-      <div className="pr-4">{generateHeaderLink()}</div>
+      <div className="pr-4">
+        <HeaderLink
+          className="flex gap-4"
+          to={link}
+          icon={icon}
+          content={text}
+        />
+      </div>
     </div>
   );
 };

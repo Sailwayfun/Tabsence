@@ -24,6 +24,7 @@ const AddSpace = forwardRef(
             placeholder="Enter a space name with 10 or fewer characters."
           />
           <button
+            type="button"
             onClick={(e) => {
               onAddNewSpace(e, modalRef);
             }}

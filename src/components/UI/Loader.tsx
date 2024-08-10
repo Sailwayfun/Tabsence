@@ -13,6 +13,7 @@ const Loader = ({ text, animateClass }: LoaderProps) => {
         stroke="currentColor"
         className={`h-8 w-8 ${animateClass}`}
       >
+        <title>{text}</title>
         <path
           strokeLinecap="round"
           strokeLinejoin="round"

@@ -15,6 +15,7 @@ const ToggleArchiveBtn = ({
   return (
     <div className="tooltip" data-tip={`${isArchived ? "Restore" : "Archive"}`}>
       <button
+        type="button"
         className="hidden group-hover/space-tab:block"
         onClick={() => onOpenModal(id, action)}
       >

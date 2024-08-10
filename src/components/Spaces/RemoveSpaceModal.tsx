@@ -20,6 +20,7 @@ const RemoveSpaceModal = ({ id, onRemoveSpace }: RemoveSpaceModalProps) => {
       <p className="py-4">Press ESC key or click on ✕ button to close</p>
       <div className="flex gap-3">
         <button
+          type="button"
           onClick={(e) => {
             e.preventDefault();
             onRemoveSpace(id);
@@ -30,6 +31,7 @@ const RemoveSpaceModal = ({ id, onRemoveSpace }: RemoveSpaceModalProps) => {
           Remove Space
         </button>
         <button
+          type="button"
           className="rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900"
           onClick={() => {
             closeDialog(modalRef.current);

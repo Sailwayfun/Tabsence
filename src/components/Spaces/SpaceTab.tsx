@@ -63,7 +63,6 @@ const SpaceTab = ({
           onChange={(e) => onSpaceTitleChange(e, id)}
           onBlur={(e) => onSpaceTitleBlur(e, id)}
           onKeyUp={handleKeyup}
-          autoFocus
         />
       )}
 

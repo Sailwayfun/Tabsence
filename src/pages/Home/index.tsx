@@ -15,7 +15,7 @@ import { cn, getToastVariant, firebaseService } from "../../utils";
 import ToggleViewBtn from "./ToggleViewBtn";
 import useWindowId from "../../hooks/useWindowId";
 import useLogin from "../../hooks/useLogin";
-import { Tab, TabOrder, Space, Direction } from "../../types";
+import type { Tab, TabOrder, Space, Direction } from "../../types";
 import { Loader } from "../../components/UI";
 
 interface Response {
@@ -119,7 +119,7 @@ const Home = () => {
 
   useEffect(() => {
     const spaceId = currentSpaceId || "global";
-    const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
+    const parsedSharedWindowId = sharedWindowId ? Number.parseInt(sharedWindowId) : "";
     if (location.pathname.includes("webtime")) return setIsLoading(false);
     if (!currentUserId || !currentWindowId) return setIsLoading(false);
     const tabOrderDocRef = firebaseService.getDocRef([
@@ -153,7 +153,7 @@ const Home = () => {
   ]);
 
   useEffect(() => {
-    const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
+    const parsedSharedWindowId = sharedWindowId ? Number.parseInt(sharedWindowId) : "";
     const handleMessagePassing = (
       message: {
         action: string;
@@ -244,7 +244,7 @@ const Home = () => {
     newTabs: Tab[],
     spaceId: string | undefined,
   ): Promise<void> {
-    const parsedSharedWindowId = sharedWindowId ? parseInt(sharedWindowId) : "";
+    const parsedSharedWindowId = sharedWindowId ? Number.parseInt(sharedWindowId) : "";
     try {
       const response = await chrome.runtime.sendMessage({
         action: "updateTabOrder",

@@ -8,6 +8,7 @@ const RemoveSpaceBtn = ({ id, onOpenModal, action }: RemoveSpaceBtnProps) => {
   return (
     <div className="tooltip" data-tip="Remove">
       <button
+        type="button"
         id={id}
         className="hidden group-hover/space-tab:block"
         onClick={() => onOpenModal(id, action)}
@@ -20,6 +21,7 @@ const RemoveSpaceBtn = ({ id, onOpenModal, action }: RemoveSpaceBtnProps) => {
           stroke="currentColor"
           className="h-6 w-6 stroke-white"
         >
+          <title>Remove Space</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"

@@ -5,7 +5,7 @@ interface ToggleViewBtnProps {
 
 const ToggleViewBtn = ({ onToggleView, className }: ToggleViewBtnProps) => {
   return (
-    <button onClick={onToggleView} className={className}>
+    <button type="button" onClick={onToggleView} className={className}>
       List / Grid View
     </button>
   );

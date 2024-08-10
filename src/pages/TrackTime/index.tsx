@@ -9,7 +9,7 @@ import Card from "./Card";
 import NoData from "./Nodata";
 import ToggleOrderBtn from "./ToggleOrderBtn";
 import { cn, firebaseService } from "../../utils";
-import { UrlDuration } from "../../types";
+import type { UrlDuration } from "../../types";
 
 const TrackTime = () => {
   const [urlDurations, setUrlDurations] = useState<UrlDuration[]>([]);

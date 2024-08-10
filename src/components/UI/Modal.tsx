@@ -11,7 +11,8 @@ type ModalRef = HTMLDialogElement;
 
 const Modal = forwardRef<ModalRef, ModalProps>(
   ({ id, children, onClose }, ref) => {
-    function handleClose() {
+    function handleClose(e: React.KeyboardEvent<HTMLFormElement> | React.MouseEvent) {
+      if ("key" in e && e.key !== "Escape") return;
       if (onClose) {
         onClose();
       }
@@ -21,6 +22,7 @@ const Modal = forwardRef<ModalRef, ModalProps>(
         <div className="modal-box relative rounded-md">
           <form method="dialog" className="modal-backdrop">
             <button
+              type="submit"
               onClick={handleClose}
               className="btn btn-ghost btn-sm absolute right-0 top-0 rounded-none bg-red-500 text-white"
             >
@@ -29,8 +31,13 @@ const Modal = forwardRef<ModalRef, ModalProps>(
           </form>
           {children}
         </div>
-        <form method="dialog" className="modal-backdrop" onClick={handleClose}>
-          <button></button>
+        <form
+          method="dialog"
+          className="modal-backdrop"
+          onClick={handleClose}
+          onKeyDown={handleClose}
+        >
+          <button type="submit" />
         </form>
       </dialog>,
       document.body,

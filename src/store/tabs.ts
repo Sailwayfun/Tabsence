@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Tab, Direction } from "../types";
+import type { Tab, Direction } from "../types";
 
 interface TabStoreState {
   tabs: Tab[];

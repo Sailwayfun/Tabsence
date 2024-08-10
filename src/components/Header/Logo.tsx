@@ -19,7 +19,11 @@ const Logo = ({ isWebtimePage }: LogoProps) => {
           "max-w-[200px] invert filter": isWebtimePage,
         })}
       />
-      <img src="/assets/icons/tabs.png" className="block h-12 w-12" />
+      <img
+        src="/assets/icons/tabs.png"
+        className="block h-12 w-12"
+        alt="tabsence logo"
+      />
     </Link>
   );
 };

@@ -1,5 +1,5 @@
 import { getToastVariant } from "./toastConfig";
-import { Space } from "../types/space";
+import type { Space } from "../types/space";
 import { toast } from "react-hot-toast";
 
 type ErrorToastId = string;

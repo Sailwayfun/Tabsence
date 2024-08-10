@@ -1,4 +1,4 @@
-import { Tab } from "./types/tab";
+import type { Tab } from "./types/tab";
 import { urlsStore } from "./store/tabUrlMap";
 import { firebaseService, trackTabTime, updateUrlDuration } from "./utils";
 

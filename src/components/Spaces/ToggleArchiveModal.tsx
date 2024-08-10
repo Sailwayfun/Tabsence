@@ -26,6 +26,7 @@ const ToggleArchiveModal = ({
       <p className="py-4">Press ESC key or click on ✕ button to close</p>
       <div className="flex w-full gap-3">
         <button
+          type="button"
           onClick={(e) => {
             e.preventDefault();
             onAction(id);
@@ -36,6 +37,7 @@ const ToggleArchiveModal = ({
           {`${btnText} Space`}
         </button>
         <button
+          type="button"
           onClick={() => closeDialog(modalRef.current)}
           className="grow rounded-md border bg-orange-700 px-4 py-2 text-white shadow-md hover:bg-orange-900"
         >

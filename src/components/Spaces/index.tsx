@@ -196,7 +196,7 @@ const Spaces = (props: SpacesProps) => {
         onSpaceTitleBlur={handleSpaceEditBlur}
         onSpaceTitleChange={handleSpaceTitleChange}
         onEditSpace={handleEditSpace}
-      ></SpaceTab>
+      />
     );
   }
 

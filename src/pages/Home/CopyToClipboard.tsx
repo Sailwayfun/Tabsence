@@ -8,7 +8,7 @@ const CopyToClipboard = ({ onCopySpaceLink }: CopyToClipboardProps) => {
       className="tooltip flex items-center text-sm"
       data-tip="Copy Space Link"
     >
-      <button onClick={onCopySpaceLink}>
+      <button type="button" onClick={onCopySpaceLink}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -17,6 +17,7 @@ const CopyToClipboard = ({ onCopySpaceLink }: CopyToClipboardProps) => {
           stroke="currentColor"
           className="h-6 w-6"
         >
+          <title>Copy Space Link</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"

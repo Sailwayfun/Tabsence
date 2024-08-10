@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Space } from "../types";
+import type { Space } from "../types";
 import { toast } from "react-hot-toast";
 import { validateSpaceTitle, getToastVariant } from "../utils";
 

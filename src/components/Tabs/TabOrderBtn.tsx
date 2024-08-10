@@ -1,7 +1,7 @@
 import { cn } from "../../utils";
 import TabOrderIcon from "../Icons/TabOrderIcon";
 import { IconButton } from "../UI";
-import { Direction } from "../../types";
+import type { Direction } from "../../types";
 
 interface TabOrderBtnProps {
   onMoveUp: (tabId: number, direction: "up" | "left") => Promise<void>;

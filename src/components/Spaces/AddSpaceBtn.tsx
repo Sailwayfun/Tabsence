@@ -4,6 +4,7 @@ interface AddSpaceBtnProps {
 const AddSpaceBtn = ({ onAddSpace }: AddSpaceBtnProps) => {
   return (
     <button
+      type="button"
       className="flex cursor-pointer items-center gap-3 py-4 pl-3"
       onClick={onAddSpace}
     >
@@ -14,6 +15,7 @@ const AddSpaceBtn = ({ onAddSpace }: AddSpaceBtnProps) => {
         strokeWidth={1.5}
         className="h-6 w-6 fill-slate-300 stroke-slate-300"
       >
+        <title>New Space</title>
         <path
           strokeLinecap="round"
           strokeLinejoin="round"

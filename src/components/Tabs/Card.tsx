@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { Tab, Direction, Space } from "../../types";
+import type { Tab, Direction, Space } from "../../types";
 import MoveToSpaceBtn from "./MoveToSpaceBtn";
 import CloseBtn from "./CloseBtn";
 import { Tooltip, Dropdown } from "../UI";
@@ -65,7 +65,7 @@ const TabCard = ({
   const { tabs } = useTabsStore();
 
   function openLink(
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     tab: Tab,
   ) {
     e.preventDefault();
@@ -174,13 +174,15 @@ const TabCard = ({
         />
       )}
       <img
+        alt="favicon"
         src={tab.favIconUrl}
         className={cn("border bg-white shadow", {
           "h-8 w-8": isGrid,
           "xl:h-4 xl:w-4": !isGrid,
         })}
       />
-      <a
+      <button
+        type="button"
         onClick={(e) => openLink(e, tab)}
         className={cn(
           "mt-4 line-clamp-1 max-w-full cursor-pointer flex-wrap hover:text-gray-500 hover:underline xl:mb-0 xl:mt-0",
@@ -188,7 +190,7 @@ const TabCard = ({
         )}
       >
         {tab.title}
-      </a>
+      </button>
       {((showIcons && isGrid) || !isGrid) && (
         <div
           className={cn("mr-3 flex gap-4", !isGrid && "xl:ml-auto", {

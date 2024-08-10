@@ -5,13 +5,13 @@ import {
   doc,
   where,
   query,
-  CollectionReference,
-  Query,
+  type CollectionReference,
+  type Query,
   onSnapshot,
   orderBy,
-  OrderByDirection,
-  DocumentReference,
-  WhereFilterOp,
+  type OrderByDirection,
+  type DocumentReference,
+  type WhereFilterOp,
   getDocs,
   getDoc,
   setDoc,
@@ -53,7 +53,7 @@ export const firebaseService = {
   ): Query => {
     const windowIds = [
       currentWindowId,
-      sharedWindowId ? parseInt(sharedWindowId) : 0,
+      sharedWindowId ? Number.parseInt(sharedWindowId) : 0,
     ];
     return query(
       tabsCollectionRef,
@@ -64,10 +64,10 @@ export const firebaseService = {
   subscribeToQuery: <T>(query: Query, onData: (data: T[]) => void) => {
     return onSnapshot(query, (snapshot) => {
       const data: T[] = [];
-      snapshot.forEach((doc) => {
+      for (const doc of snapshot.docs) {
         const id = doc.id;
         data.push({ id, ...doc.data() } as T);
-      });
+      }
       onData(data);
     });
   },

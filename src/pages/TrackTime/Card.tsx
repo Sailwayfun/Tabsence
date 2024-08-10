@@ -16,7 +16,7 @@ const Card = ({
   function generateWebtimeFigures(figures: number[]) {
     return figures.map((figure, index) => {
       return (
-        <div className="mx-auto my-0 text-xl" key={index}>
+        <div className="mx-auto my-0 text-xl" key={index + figure}>
           {figure}
         </div>
       );

@@ -1,5 +1,5 @@
 import Card from "./Card";
-import { Direction } from "../../types";
+import type { Direction } from "../../types";
 import { useLocation } from "react-router-dom";
 import { cn } from "../../utils";
 import { useTabsStore } from "../../store";

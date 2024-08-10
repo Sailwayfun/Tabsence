@@ -1,4 +1,4 @@
-import { Direction } from "../types";
+import type { Direction } from "../types";
 
 type DirectionStrategy = {
   [K in "isFirst" | "isLast" | "isMiddle"]: Direction[];

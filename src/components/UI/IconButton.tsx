@@ -1,4 +1,4 @@
-import { Direction } from "../../types";
+import type { Direction } from "../../types";
 import { cn } from "../../utils";
 import { forwardRef } from "react";
 

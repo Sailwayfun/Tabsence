@@ -1,4 +1,4 @@
-import { cn } from "../../utils";
+import { cn } from "@/utils/cn";
 import TabOrderIcon from "../Icons/TabOrderIcon";
 import { IconButton } from "../UI";
 import type { Direction } from "../../types";

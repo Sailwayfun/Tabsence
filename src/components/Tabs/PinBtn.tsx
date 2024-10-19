@@ -1,4 +1,4 @@
-import { cn } from "../../utils";
+import { cn } from "@/utils/cn";
 import Pin from "../Icons/Pin";
 import { Tooltip, IconButton } from "../UI";
 interface PinBtnProps {

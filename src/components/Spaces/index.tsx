@@ -9,8 +9,10 @@ import Folder from "../Icons/Folder";
 import AddSpace from "./AddSpace";
 import { Heading } from "../UI";
 import Box from "../Icons/Box";
-import { cn, getToastVariant, validateSpaceTitle } from "../../utils";
-import { useSpacesStore } from "../../store";
+import { cn } from "@/utils/cn";
+import { getToastVariant } from "@/utils/toastConfig";
+import { validateSpaceTitle } from "@/utils/validate";
+import { useSpacesStore } from "@/store";
 interface SpacesProps {
   // onAddNewSpace: () => Promise<void>;
   onRemoveSpace: (id: string) => void;

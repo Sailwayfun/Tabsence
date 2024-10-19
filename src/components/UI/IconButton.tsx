@@ -1,5 +1,5 @@
 import type { Direction } from "../../types";
-import { cn } from "../../utils";
+import { cn } from "@/utils/cn";
 import { forwardRef } from "react";
 
 interface IconButtonOptions {

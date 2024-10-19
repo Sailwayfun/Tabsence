@@ -1,7 +1,7 @@
 import Card from "./Card";
 import type { Direction } from "../../types";
 import { useLocation } from "react-router-dom";
-import { cn } from "../../utils";
+import { cn } from "@/utils/cn";
 import { useTabsStore } from "../../store";
 
 interface TabsProps {

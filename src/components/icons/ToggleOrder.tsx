@@ -1,5 +1,5 @@
 import { IconProps } from "../../types";
-import { cn } from "../../utils";
+import { cn } from "@/utils/cn";
 
 interface ToggleOrderIconProps extends IconProps {
   className: string;

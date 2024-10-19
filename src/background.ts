@@ -1,6 +1,8 @@
 import type { Tab } from "./types/tab";
 import { urlsStore } from "./store/tabUrlMap";
-import { firebaseService, trackTabTime, updateUrlDuration } from "./utils";
+import { firebaseService } from "./utils/firebaseService";
+import { trackTabTime } from "./utils/trackTime";
+import { updateUrlDuration } from "./utils/trackTime";
 
 interface RuntimeMessage {
   action: string;

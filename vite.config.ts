@@ -24,6 +24,16 @@ export default defineConfig({
           if (chunkInfo.name === "background") return "background.js";
           return "[name]-[hash].js";
         },
+        manualChunks: {
+          highcharts: ["highcharts"],
+          "highchart-react": ["highcharts-react-official"],
+          daisy: ["daisyui"],
+          "react-hot-toast": ["react-hot-toast"],
+          "tailwind-merge": ["tailwind-merge"],
+          zustand: ["zustand"],
+          react: ["react", "react-router-dom"],
+          clsx: ["clsx"],
+        },
       },
     },
     sourcemap: true,

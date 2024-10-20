@@ -10,8 +10,8 @@ import { cn } from "@/utils/cn";
 import { getToastVariant } from "@/utils/toastConfig";
 import TabOrderBtn from "./TabOrderBtn";
 import { directionStrategies } from "../../strategies";
-import { useSpacesStore } from "../../store/spaces";
-import { useTabsStore } from "../../store/tabs";
+import { useSpacesStore } from "@/store/spaces";
+import { useTabsStore } from "@/store/tabs";
 import { toast } from "react-hot-toast";
 interface TabProps {
   tab: Tab;

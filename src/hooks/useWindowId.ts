@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { getToastVariant } from "../utils";
+import { getToastVariant } from "@/utils/toastConfig";
 
 export default function useWindowId(): number {
   const [windowId, setWindowId] = useState<number>(0);

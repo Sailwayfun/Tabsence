@@ -1,8 +1,8 @@
 import Card from "./Card";
 import type { Direction } from "../../types";
 import { useLocation } from "react-router-dom";
-import { cn } from "../../utils";
-import { useTabsStore } from "../../store";
+import { cn } from "@/utils/cn";
+import { useTabsStore } from "@/store/tabs";
 
 interface TabsProps {
   selectedTabId?: number;

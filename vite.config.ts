@@ -1,10 +1,15 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { resolve } from "path";
+import { resolve } from "node:path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      "@": resolve(__dirname, "src"),
+    },
+  },
   build: {
     rollupOptions: {
       input: {
@@ -19,8 +24,18 @@ export default defineConfig({
           if (chunkInfo.name === "background") return "background.js";
           return "[name]-[hash].js";
         },
+        manualChunks: {
+          highcharts: ["highcharts"],
+          "highchart-react": ["highcharts-react-official"],
+          daisy: ["daisyui"],
+          "react-hot-toast": ["react-hot-toast"],
+          "tailwind-merge": ["tailwind-merge"],
+          zustand: ["zustand"],
+          react: ["react", "react-router-dom"],
+          clsx: ["clsx"],
+        },
       },
     },
-    sourcemap: true,
+    sourcemap: process.env.NODE_ENV === "development",
   },
 });

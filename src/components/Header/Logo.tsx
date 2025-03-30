@@ -1,6 +1,6 @@
 import logo from "./logo.png";
 import { Link } from "react-router-dom";
-import { cn } from "../../utils";
+import { cn } from "@/utils/cn";
 
 interface LogoProps {
   isWebtimePage: boolean;

@@ -1,22 +1,22 @@
 import { useState, useEffect } from "react";
-import {
-  useArchivedSpaceStore,
-  useSpacesStore,
-  useTabsStore,
-} from "../../store";
+import { useTabsStore } from "@/store/tabs";
+import { useArchivedSpaceStore } from "@/store/archiveSpace";
+import { useSpacesStore } from "@/store/spaces";
 import { useLocation, Outlet, useParams } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
-import Spaces from "../../components/Spaces";
-import Header from "../../components/Header";
-import Tabs from "../../components/Tabs";
-import MainContainer from "../../components/MainContainer";
+import Spaces from "@/components/Spaces";
+import Header from "@/components/Header";
+import Tabs from "@/components/Tabs";
+import MainContainer from "@/components/MainContainer";
 import CopyToClipboard from "./CopyToClipboard";
-import { cn, getToastVariant, firebaseService } from "../../utils";
+import { firebaseService } from "@/utils/firebaseService";
+import { cn } from "@/utils/cn";
+import { getToastVariant } from "@/utils/toastConfig";
 import ToggleViewBtn from "./ToggleViewBtn";
-import useWindowId from "../../hooks/useWindowId";
-import useLogin from "../../hooks/useLogin";
-import type { Tab, TabOrder, Space, Direction } from "../../types";
-import { Loader } from "../../components/UI";
+import useWindowId from "@/hooks/useWindowId";
+import useLogin from "@/hooks/useLogin";
+import type { Tab, TabOrder, Space, Direction } from "@/types";
+import { Loader } from "@/components/UI";
 
 interface Response {
   success: boolean;
@@ -119,7 +119,9 @@ const Home = () => {
 
   useEffect(() => {
     const spaceId = currentSpaceId || "global";
-    const parsedSharedWindowId = sharedWindowId ? Number.parseInt(sharedWindowId) : "";
+    const parsedSharedWindowId = sharedWindowId
+      ? Number.parseInt(sharedWindowId)
+      : "";
     if (location.pathname.includes("webtime")) return setIsLoading(false);
     if (!currentUserId || !currentWindowId) return setIsLoading(false);
     const tabOrderDocRef = firebaseService.getDocRef([
@@ -153,7 +155,9 @@ const Home = () => {
   ]);
 
   useEffect(() => {
-    const parsedSharedWindowId = sharedWindowId ? Number.parseInt(sharedWindowId) : "";
+    const parsedSharedWindowId = sharedWindowId
+      ? Number.parseInt(sharedWindowId)
+      : "";
     const handleMessagePassing = (
       message: {
         action: string;
@@ -244,7 +248,9 @@ const Home = () => {
     newTabs: Tab[],
     spaceId: string | undefined,
   ): Promise<void> {
-    const parsedSharedWindowId = sharedWindowId ? Number.parseInt(sharedWindowId) : "";
+    const parsedSharedWindowId = sharedWindowId
+      ? Number.parseInt(sharedWindowId)
+      : "";
     try {
       const response = await chrome.runtime.sendMessage({
         action: "updateTabOrder",

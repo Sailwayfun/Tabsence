@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import Chart from "./Chart";
 import { useParams } from "react-router-dom";
 import Header from "./Header";
-import { Loader } from "../../components/UI";
-import useLogin from "../../hooks/useLogin";
+import { Loader } from "@/components/UI";
+import useLogin from "@/hooks/useLogin";
 import Card from "./Card";
 import NoData from "./Nodata";
 import ToggleOrderBtn from "./ToggleOrderBtn";
-import { cn, firebaseService } from "../../utils";
-import type { UrlDuration } from "../../types";
+import { cn } from "@/utils/cn";
+import { firebaseService } from "@/utils/firebaseService";
+import type { UrlDuration } from "@/types";
 
 const TrackTime = () => {
   const [urlDurations, setUrlDurations] = useState<UrlDuration[]>([]);

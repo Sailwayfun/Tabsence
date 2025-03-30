@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import type { Space } from "../types";
 import { toast } from "react-hot-toast";
-import { validateSpaceTitle, getToastVariant } from "../utils";
+import { validateSpaceTitle } from "@/utils/validate";
+import { getToastVariant } from "@/utils/toastConfig";
 
 interface SpacesState {
   spaces: Space[];

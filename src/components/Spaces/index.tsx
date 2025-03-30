@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { useArchivedSpaceStore } from "../../store/archiveSpace";
+import { useArchivedSpaceStore } from "@/store/archiveSpace";
 import AddSpaceBtn from "./AddSpaceBtn";
 import SpaceTab from "./SpaceTab";
 import Logo from "../Header/Logo";
@@ -9,8 +9,10 @@ import Folder from "../Icons/Folder";
 import AddSpace from "./AddSpace";
 import { Heading } from "../UI";
 import Box from "../Icons/Box";
-import { cn, getToastVariant, validateSpaceTitle } from "../../utils";
-import { useSpacesStore } from "../../store";
+import { cn } from "@/utils/cn";
+import { getToastVariant } from "@/utils/toastConfig";
+import { validateSpaceTitle } from "@/utils/validate";
+import { useSpacesStore } from "@/store/spaces";
 interface SpacesProps {
   // onAddNewSpace: () => Promise<void>;
   onRemoveSpace: (id: string) => void;

@@ -2,7 +2,7 @@ import { subDays, addDays, format } from "date-fns";
 
 import { firebaseService } from "./firebaseService";
 
-import { getUserId } from "../background";
+import getUserId from "../shared/userUtils";
 
 export function getCurrentDate(): string {
   const today = new Date();

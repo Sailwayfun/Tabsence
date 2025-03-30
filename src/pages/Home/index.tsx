@@ -1,22 +1,22 @@
 import { useState, useEffect } from "react";
-import { useTabsStore } from "@/store/tabs";
-import { useArchivedSpaceStore } from "@/store/archiveSpace";
-import { useSpacesStore } from "@/store/spaces";
+import { useTabsStore } from "../../../src/store/tabs";
+import { useArchivedSpaceStore } from "../../../src/store/archiveSpace";
+import { useSpacesStore } from "../../../src/store/spaces";
 import { useLocation, Outlet, useParams } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
-import Spaces from "@/components/Spaces";
-import Header from "@/components/Header";
-import Tabs from "@/components/Tabs";
-import MainContainer from "@/components/MainContainer";
+import Spaces from "../../../src/components/Spaces";
+import Header from "../../../src/components/Header";
+import Tabs from "../../../src/components/Tabs";
+import MainContainer from "../../../src/components/MainContainer";
 import CopyToClipboard from "./CopyToClipboard";
-import { firebaseService } from "@/utils/firebaseService";
-import { cn } from "@/utils/cn";
-import { getToastVariant } from "@/utils/toastConfig";
+import { firebaseService } from "../../../src/utils/firebaseService";
+import { cn } from "../../../src/utils/cn";
+import { getToastVariant } from "../../../src/utils/toastConfig";
 import ToggleViewBtn from "./ToggleViewBtn";
-import useWindowId from "@/hooks/useWindowId";
-import useLogin from "@/hooks/useLogin";
-import type { Tab, TabOrder, Space, Direction } from "@/types";
-import { Loader } from "@/components/UI";
+import useWindowId from "../../../src/hooks/useWindowId";
+import useLogin from "../../../src/hooks/useLogin";
+import type { Tab, TabOrder, Space, Direction } from "../../../src/types";
+import { Loader } from "../../../src/components/UI";
 
 interface Response {
   success: boolean;
